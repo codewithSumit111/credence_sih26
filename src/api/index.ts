@@ -261,3 +261,31 @@ export const executionApi = {
     console.log(`Issue reported: ${issueType}`);
   },
 };
+
+// ============================================================
+// OVERVIEW API — Aggregated dashboard KPIs
+// ============================================================
+export const overviewApi = {
+  async getDashboardData() {
+    await delay(350);
+    const jobs = [...mockJobs];
+    const blocks = [...mockBlocks];
+    const trains = [...mockTrains];
+    const criticalJobs = jobs.filter(j => j.priorityScore >= 80);
+    const totalDelay = trains.reduce((sum, t) => sum + t.delay, 0);
+    const integratedBlocks = blocks.filter(b => b.bundled);
+    return {
+      assetAvailability: 96.8,
+      criticalJobCount: criticalJobs.length,
+      pendingMaintenance: 42,
+      blocksOptimized: 18,
+      expectedTrainDelay: totalDelay || 37,
+      integratedBlockCount: integratedBlocks.length,
+      priorityQueue: jobs.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 7),
+      recommendedBlock: blocks.find(b => b.id === 'BR-00231')!,
+      allBlocks: blocks,
+      allTrains: trains,
+    };
+  },
+};
+

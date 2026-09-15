@@ -18,6 +18,39 @@
 
 @layer utilities {
   .text-xxs { font-size: 10px; line-height: 14px; }
+  
+  /* Standard 4-Tier Typography Hierarchy */
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: #0f172a;
+  }
+  
+  .section-header {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1e293b;
+  }
+  
+  .data-value {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: #0f172a;
+  }
+  
+  .data-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+  }
+
   .gantt-block {
     position: absolute;
     top: 6px;

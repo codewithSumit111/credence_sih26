@@ -7,7 +7,7 @@ import {
 import { clsx } from 'clsx';
 
 const mainNav = [
-  { path: '/overview', label: 'Overview', icon: LayoutDashboard },
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/blocks', label: 'Block Plans', icon: CalendarClock },
   { path: '/priority', label: 'Priority', icon: ListOrdered },
   { path: '/trains', label: 'Trains', icon: Train },
@@ -27,7 +27,9 @@ export default function Sidebar() {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === '/overview') return location.pathname === '/' || location.pathname === '/overview';
+    if (path === '/dashboard') {
+      return location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/overview';
+    }
     return location.pathname.startsWith(path);
   };
 

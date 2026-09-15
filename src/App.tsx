@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
+import LandingPage from './pages/landing/LandingPage';
 import Overview from './pages/Overview';
 import BlockPlans from './pages/BlockPlans';
 import BlockDetail from './pages/BlockDetail';
@@ -20,9 +21,16 @@ import FieldExecution from './pages/FieldExecution';
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<AppShell />}>
-        <Route index element={<Navigate to="/overview" replace />} />
-        <Route path="overview" element={<Overview />} />
+      {/* Landing page — standalone, no app shell */}
+      <Route path="/" element={<LandingPage />} />
+
+      {/* Main app shell with sidebar nav */}
+      <Route path="/app" element={<AppShell />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+      </Route>
+      <Route element={<AppShell />}>
+        <Route path="dashboard" element={<Overview />} />
+        <Route path="overview" element={<Navigate to="/dashboard" replace />} />
         <Route path="blocks" element={<BlockPlans />} />
         <Route path="blocks/:id" element={<BlockDetail />} />
         <Route path="requests/new" element={<NewBlockRequest />} />
@@ -42,8 +50,9 @@ export default function App() {
       {/* Mobile-first field execution view */}
       <Route path="field" element={<FieldExecution />} />
       <Route path="field/blocks/:id" element={<FieldExecution />} />
-      <Route path="*" element={<Navigate to="/overview" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
+
 
