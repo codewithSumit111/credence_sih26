@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
-import { openPrototype } from '../lib/landingConfig';
+import { openPrototype } from '@/lib/config';
 
 interface CardItem {
   id: string;
