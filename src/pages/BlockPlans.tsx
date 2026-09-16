@@ -110,40 +110,6 @@ const BLOCKS_DATA: BlockItem[] = [
     timeWindow: '10:30 – 11:45',
     startTime: '10:30',
     endTime: '11:45',
-    duration: '75 min',
-    departments: ['ENG'],
-    jobs: '1',
-    jobCount: 1,
-    priority: 'MEDIUM',
-    status: 'AI-OPTIMIZED',
-    affectedTrains: 1,
-  },
-];
-
-// 20 Trains on Corridor
-const ALL_CORRIDOR_TRAINS = [
-  { id: '12123', name: 'Deccan Queen', start: '08:00', end: '12:30', occStart: '', occEnd: '' },
-  { id: '11008', name: 'Sinhagad Exp', start: '10:30', end: '15:00', occStart: '13:40', occEnd: '14:30' },
-  { id: '22145', name: 'Kalyan SF', start: '12:30', end: '17:00', occStart: '16:00', occEnd: '16:50' },
-  { id: '12127', name: 'Intercity Exp', start: '06:15', end: '09:45', occStart: '07:30', occEnd: '08:15' },
-  { id: '12128', name: 'Pune CSMT', start: '17:30', end: '21:00', occStart: '18:15', occEnd: '19:00' },
-  { id: '12111', name: 'Vidarbha Exp', start: '19:00', end: '23:30', occStart: '20:10', occEnd: '21:00' },
-  { id: '12112', name: 'Sewagram Exp', start: '01:00', end: '05:30', occStart: '03:15', occEnd: '04:00' },
-  { id: '12859', name: 'Gitanjali Exp', start: '05:45', end: '10:00', occStart: '06:30', occEnd: '07:15' },
-  { id: '12860', name: 'Howrah Mail', start: '21:30', end: '02:00', occStart: '22:15', occEnd: '23:00' },
-  { id: '11041', name: 'CSMT-PUNE', start: '14:15', end: '18:45', occStart: '15:30', occEnd: '16:15' },
-  { id: '11042', name: 'PUNE-CSMT', start: '11:00', end: '15:15', occStart: '12:00', occEnd: '12:45' },
-  { id: '22223', name: 'Vande Bharat', start: '06:00', end: '09:15', occStart: '07:00', occEnd: '07:45' },
-  { id: '22224', name: 'Vande Bharat Return', start: '18:30', end: '21:45', occStart: '19:15', occEnd: '20:00' },
-  { id: '12051', name: 'Jan Shatabdi', start: '05:00', end: '09:30', occStart: '06:00', occEnd: '06:45' },
-  { id: '12052', name: 'Madgaon Return', start: '15:00', end: '19:30', occStart: '16:15', occEnd: '17:00' },
-  { id: '17411', name: 'Mahalaxmi Exp', start: '20:30', end: '01:00', occStart: '21:15', occEnd: '22:00' },
-  { id: '17412', name: 'Kolhapur Exp', start: '07:15', end: '11:45', occStart: '08:00', occEnd: '08:45' },
-  { id: '12125', name: 'Pragati Exp', start: '16:30', end: '20:45', occStart: '17:15', occEnd: '18:00' },
-  { id: '12126', name: 'Pragati Return', start: '07:45', end: '12:00', occStart: '08:30', occEnd: '09:15' },
-  { id: '11007', name: 'Deccan Exp', start: '07:00', end: '11:30', occStart: '08:15', occEnd: '09:00' },
-];
-
 const OPTIMIZER_STEPS = [
   'Computing Weighted Priority Scores...',
   'Checking job compatibility & bundling...',
@@ -168,7 +134,8 @@ function durationPct(startStr: string, endStr: string): number {
 
 export default function BlockPlans() {
   const navigate = useNavigate();
-  const [blocksData, setBlocksData] = useState<BlockItem[]>(BLOCKS_DATA as any); // Fallback initially
+  const [blocksData, setBlocksData] = useState<BlockItem[]>([]);
+  const [trainsData, setTrainsData] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<string>('BR-00231');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -207,6 +174,8 @@ export default function BlockPlans() {
         setBlocksData(mapped as any);
         if (mapped.length > 0) setSelectedId(mapped[0].id);
       }
+      const trains = await trainsApi.getTrains();
+      setTrainsData(trains);
     } catch (e) {
       console.error(e);
     }
@@ -216,7 +185,7 @@ export default function BlockPlans() {
     loadBlocks();
   }, []);
 
-  const selectedBlock = blocksData.find((b) => b.id === selectedId) || blocksData[0] || BLOCKS_DATA[0];
+  const selectedBlock = blocksData.find((b) => b.id === selectedId) || blocksData[0];
 
   const handleRunOptimizer = async () => {
     setOptimizing(true);
@@ -277,7 +246,7 @@ export default function BlockPlans() {
     return true;
   });
 
-  const displayedTrains = showAllTrains ? ALL_CORRIDOR_TRAINS : ALL_CORRIDOR_TRAINS.slice(0, 3);
+  const displayedTrains = showAllTrains ? trainsData : trainsData.slice(0, 3);
 
   return (
     <div className="p-4 sm:p-5 max-w-[1760px] mx-auto space-y-4 bg-[#F8FAFC] min-h-screen">

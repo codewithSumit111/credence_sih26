@@ -1,4 +1,10 @@
-import { mockJobs, mockBlocks, mockTrains, mockEvents, mockApprovals, mockAnalytics, mockReoptimization, mockFieldBlock, mockBlockRequests } from '../data/mockData';
+const mockEvents = [{ id: 'EV-1', type: 'DELAY', trainId: 'T-101', description: 'Signal failure', status: 'ACTIVE', time: '10:00' }];
+const mockApprovals = [{ id: 'AP-1', blockId: 'BR-00231', status: 'PENDING', requestor: 'System', department: 'TRD', priority: 'HIGH', auditTrail: [] }];
+const mockBlockRequests: any[] = [];
+const mockFieldBlock = { id: 'BR-1', status: 'NOT_STARTED', progress: 0 };
+const mockAnalytics = { uptime: 99.9 };
+const mockReoptimization = { status: 'PENDING', proposedPlan: [] };
+
 import type { MaintenanceJob, OptimizedBlock, Train, LiveEvent, ApprovalItem, AnalyticsData, ReoptimizationPlan, FieldBlock, BlockRequest, BlockStatus, ApprovalStatus } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -17,7 +23,7 @@ export const jobsApi = {
       return await res.json();
     } catch(e) {
       console.warn("Using mock fallback for jobs:", e);
-      return [...mockJobs];
+      return [];
     }
   },
   async getJob(id: string): Promise<MaintenanceJob | undefined> {
@@ -27,13 +33,13 @@ export const jobsApi = {
       return await res.json();
     } catch(e) {
       console.warn("Using mock fallback for job details:", e);
-      return mockJobs.find(j => j.id === id);
+      return [].find(j => j.id === id);
     }
   },
   async createJob(job: Partial<MaintenanceJob>): Promise<MaintenanceJob> {
     await delay(600);
     const newJob = { ...job, id: `JOB-${Math.floor(Math.random() * 9000) + 1000}` } as MaintenanceJob;
-    mockJobs.push(newJob);
+    [].push(newJob);
     return newJob;
   },
 };
@@ -47,7 +53,7 @@ export const priorityApi = {
       const jobs = await jobsApi.getJobs();
       return jobs.sort((a, b) => b.priorityScore - a.priorityScore);
     } catch (e) {
-      return [...mockJobs].sort((a, b) => b.priorityScore - a.priorityScore);
+      return [].sort((a, b) => b.priorityScore - a.priorityScore);
     }
   },
 };
@@ -61,10 +67,10 @@ export const blocksApi = {
       const res = await fetch(`${API_URL}/api/blocks`);
       if (!res.ok) throw new Error('API failed');
       const blocks = await res.json();
-      return blocks.length ? blocks : [...mockBlocks]; // Fallback to mock if empty
+      return blocks.length ? blocks : []; // Fallback to mock if empty
     } catch (e) {
       console.warn("Using mock fallback for blocks:", e);
-      return [...mockBlocks];
+      return [];
     }
   },
   async getBlock(id: string): Promise<OptimizedBlock | undefined> {
@@ -98,13 +104,13 @@ export const blocksApi = {
     } catch (e) {
       console.warn("Using mock fallback for planning:", e);
       await delay(1500);
-      return mockBlocks.filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED');
+      return [].filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED');
     }
   },
   // POST /api/v1/optimize/whatif
   async optimizeWhatIf(_params: Record<string, unknown>): Promise<{ originalPlan: OptimizedBlock[]; simulatedPlan: OptimizedBlock[] }> {
     await delay(1200);
-    return { originalPlan: mockBlocks, simulatedPlan: mockBlocks };
+    return { originalPlan: [], simulatedPlan: [] };
   },
   // POST /api/v1/compatibility/check — Rule/constraint-based compatibility detection
   async checkCompatibility(_jobIds: string[]): Promise<{ compatible: boolean; reason: string[] }> {
@@ -113,7 +119,7 @@ export const blocksApi = {
   },
   async updateStatus(id: string, status: BlockStatus): Promise<OptimizedBlock> {
     await delay(500);
-    const block = mockBlocks.find(b => b.id === id);
+    const block = [].find(b => b.id === id);
     if (!block) throw new Error(`Block ${id} not found`);
     block.status = status;
     return block;
@@ -134,9 +140,9 @@ export const trainsApi = {
       const res = await fetch(`${API_URL}/api/trains`);
       if (!res.ok) throw new Error('API failed');
       const trains = await res.json();
-      return trains.length ? trains : [...mockTrains];
+      return trains.length ? trains : [];
     } catch (e) {
-      return [...mockTrains];
+      return [];
     }
   },
   async getTrain(number: string): Promise<Train | undefined> {
@@ -146,13 +152,13 @@ export const trainsApi = {
   // POST /api/v1/routes/compute — Time-Dependent A* routing
   async computeRoute(_trainNumber: string, _blockId: string): Promise<Train['proposedRoute']> {
     await delay(800);
-    const train = mockTrains.find(t => t.number === _trainNumber);
+    const train = [].find(t => t.number === _trainNumber);
     return train?.proposedRoute;
   },
   // POST /api/v1/routes/reroute
   async acceptReroute(trainNumber: string): Promise<Train> {
     await delay(600);
-    const train = mockTrains.find(t => t.number === trainNumber);
+    const train = [].find(t => t.number === trainNumber);
     if (!train) throw new Error(`Train ${trainNumber} not found`);
     train.reroutingStatus = 'ACCEPTED';
     train.currentStatus = 'REROUTED';
@@ -204,7 +210,7 @@ export const approvalsApi = {
       type: 'USER',
     });
     // Also update the corresponding block
-    const block = mockBlocks.find(b => b.id === apv.blockId);
+    const block = [].find(b => b.id === apv.blockId);
     if (block) block.status = 'APPROVED';
     return apv;
   },
@@ -219,7 +225,7 @@ export const approvalsApi = {
       actor: 'Ctrl. R. Sharma',
       type: 'USER',
     });
-    const block = mockBlocks.find(b => b.id === apv.blockId);
+    const block = [].find(b => b.id === apv.blockId);
     if (block) block.status = 'REJECTED';
     return apv;
   },
@@ -331,15 +337,15 @@ export const overviewApi = {
         expectedTrainDelay: dashboard.totalTrainDelay || 0,
         integratedBlockCount: integratedBlocks.length,
         priorityQueue: jobs.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 7),
-        recommendedBlock: blocks.length ? blocks[0] : mockBlocks[0],
+        recommendedBlock: blocks.length ? blocks[0] : [][0],
         allBlocks: blocks,
         allTrains: trains,
       };
     } catch (e) {
       console.warn("Using mock fallback for dashboard data:", e);
-      const jobs = [...mockJobs];
-      const blocks = [...mockBlocks];
-      const trains = [...mockTrains];
+      const jobs = [];
+      const blocks = [];
+      const trains = [];
       const criticalJobs = jobs.filter(j => j.priorityScore >= 80);
       const totalDelay = trains.reduce((sum, t) => sum + t.delay, 0);
       const integratedBlocks = blocks.filter(b => b.bundled);

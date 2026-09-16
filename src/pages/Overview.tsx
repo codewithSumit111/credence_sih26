@@ -33,15 +33,7 @@ interface DashboardData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 const HORIZONS = ['Today', 'This Week', 'This Month', '52-Week Plan'] as const;
 
-const PRIORITY_JOBS = [
-  { rank: 1, id: 'TRD-3094', asset: 'OHE-142-05', dept: 'TRD', risk: '0.90', overdue: '5 d', action: 'Block Today', actionStyle: 'bg-red-500 hover:bg-red-600 text-white', riskColor: 'text-red-600', overdueColor: 'text-red-600' },
-  { rank: 2, id: 'ENG-1042', asset: 'Rail-142-03', dept: 'ENG', risk: '0.84', overdue: '7 d', action: 'Bundle', actionStyle: 'bg-orange-100 hover:bg-orange-200 text-orange-700', riskColor: 'text-red-600', overdueColor: 'text-red-600' },
-  { rank: 3, id: 'SNT-2081', asset: 'SIG-142-06', dept: 'S&T', risk: '0.78', overdue: '3 d', action: 'Bundle', actionStyle: 'bg-orange-100 hover:bg-orange-200 text-orange-700', riskColor: 'text-red-600', overdueColor: 'text-red-600' },
-  { rank: 4, id: 'TRD-3110', asset: 'OHE-143-01', dept: 'TRD', risk: '0.72', overdue: '2 d', action: 'Schedule', actionStyle: 'bg-amber-100 hover:bg-amber-200 text-amber-800', riskColor: 'text-amber-600', overdueColor: 'text-amber-600' },
-  { rank: 5, id: 'ENG-1187', asset: 'Track-145-02', dept: 'ENG', risk: '0.68', overdue: '1 d', action: 'Schedule', actionStyle: 'bg-amber-100 hover:bg-amber-200 text-amber-800', riskColor: 'text-amber-600', overdueColor: 'text-amber-600' },
-  { rank: 6, id: 'SNT-2201', asset: 'LC-143-04', dept: 'S&T', risk: '0.66', overdue: '4 d', action: 'Review', actionStyle: 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200', riskColor: 'text-slate-600', overdueColor: 'text-red-600' },
-  { rank: 7, id: 'TRD-2991', asset: 'SSP-141-03', dept: 'TRD', risk: '0.61', overdue: '2 d', action: 'Review', actionStyle: 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200', riskColor: 'text-slate-600', overdueColor: 'text-amber-600' },
-];
+
 
 const DATA_SOURCES = [
   { name: 'TMS', status: 'Connected', lastSync: '2 min ago', records: '428', isLive: false },
@@ -412,29 +404,34 @@ export default function Overview() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-[11px]">
-                {PRIORITY_JOBS.map((j) => (
+                {data?.priorityQueue?.map((j, idx) => {
+                  const riskColor = j.priorityScore > 0.8 ? 'text-red-600' : (j.priorityScore > 0.6 ? 'text-amber-600' : 'text-slate-600');
+                  const overdueColor = (j.overdueDays && j.overdueDays > 3) ? 'text-red-600' : 'text-amber-600';
+                  const actionStyle = j.priorityScore > 0.8 ? 'bg-red-500 text-white' : 'bg-orange-100 text-orange-700';
+                  const actionText = j.priorityScore > 0.8 ? 'Block Today' : 'Bundle';
+                  return (
                   <tr 
                     key={j.id} 
                     onClick={() => navigate('/priority')}
                     className="hover:bg-slate-50/80 cursor-pointer transition-colors"
                   >
-                    <td className="py-2 px-3 font-semibold text-slate-500">{j.rank}</td>
+                    <td className="py-2 px-3 font-semibold text-slate-500">{idx + 1}</td>
                     <td className="py-2 px-2 font-bold font-mono text-[#0F2240]">{j.id}</td>
                     <td className="py-2 px-2 text-slate-600 font-medium">{j.asset}</td>
-                    <td className="py-2 px-2 font-semibold text-slate-700">{j.dept}</td>
-                    <td className={clsx('py-2 px-2 font-mono font-bold', j.riskColor)}>
-                      {j.risk}
+                    <td className="py-2 px-2 font-semibold text-slate-700">{j.department}</td>
+                    <td className={clsx('py-2 px-2 font-mono font-bold', riskColor)}>
+                      {j.priorityScore.toFixed(2)}
                     </td>
-                    <td className={clsx('py-2 px-2 font-semibold', j.overdueColor)}>
-                      {j.overdue}
+                    <td className={clsx('py-2 px-2 font-semibold', overdueColor)}>
+                      {j.overdueDays || 0} d
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <span className={clsx('inline-block text-[10px] font-bold px-2.5 py-0.5 rounded shadow-xs', j.actionStyle)}>
-                        {j.action}
+                      <span className={clsx('inline-block text-[10px] font-bold px-2.5 py-0.5 rounded shadow-xs', actionStyle)}>
+                        {actionText}
                       </span>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>
