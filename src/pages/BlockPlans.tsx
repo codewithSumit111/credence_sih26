@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
@@ -168,6 +168,7 @@ function durationPct(startStr: string, endStr: string): number {
 
 export default function BlockPlans() {
   const navigate = useNavigate();
+  const [blocksData, setBlocksData] = useState<BlockItem[]>(BLOCKS_DATA as any); // Fallback initially
   const [selectedId, setSelectedId] = useState<string>('BR-00231');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -180,7 +181,42 @@ export default function BlockPlans() {
   const [actionLoading, setActionLoading] = useState(false);
   const [showAllTrains, setShowAllTrains] = useState(false);
 
-  const selectedBlock = BLOCKS_DATA.find((b) => b.id === selectedId) || BLOCKS_DATA[0];
+  // Fetch blocks from API
+  const loadBlocks = async () => {
+    try {
+      const blocks = await blocksApi.getBlocks();
+      if (blocks && blocks.length > 0) {
+        // Map backend block format to BlockItem expected by UI if needed, 
+        // or just use directly if the keys match closely enough.
+        // For prototype, we ensure it has id, track, section, timeWindow, etc.
+        const mapped = blocks.map(b => ({
+          id: b.id,
+          track: b.track || 'TR-01',
+          section: b.section || 'NGP-WR',
+          timeWindow: `${b.startTime} - ${b.endTime}`,
+          startTime: b.startTime,
+          endTime: b.endTime,
+          duration: `${b.duration} min`,
+          departments: b.departments || ['ENG'],
+          jobs: b.jobIds ? (b.jobIds.length > 1 ? `${b.jobIds.length} (Bundled)` : '1') : '1',
+          jobCount: b.jobIds ? b.jobIds.length : 1,
+          priority: b.priority > 0.5 ? 'HIGH' : (b.priority > 0.3 ? 'MEDIUM' : 'LOW'),
+          status: b.status || 'AI-OPTIMIZED',
+          affectedTrains: b.trainImpact > 0 ? 1 : 0
+        }));
+        setBlocksData(mapped as any);
+        if (mapped.length > 0) setSelectedId(mapped[0].id);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    loadBlocks();
+  }, []);
+
+  const selectedBlock = blocksData.find((b) => b.id === selectedId) || blocksData[0] || BLOCKS_DATA[0];
 
   const handleRunOptimizer = async () => {
     setOptimizing(true);
@@ -199,6 +235,8 @@ export default function BlockPlans() {
     } finally {
       setOptimizing(false);
       setOptimizerStep(-1);
+      // Refresh blocks after optimization
+      await loadBlocks();
     }
   };
 
@@ -224,7 +262,7 @@ export default function BlockPlans() {
     setSectionFilter('ALL');
   };
 
-  const filteredBlocks = BLOCKS_DATA.filter((b) => {
+  const filteredBlocks = blocksData.filter((b) => {
     if (statusFilter !== 'ALL' && b.status !== statusFilter) return false;
     if (deptFilter !== 'ALL' && !b.departments.includes(deptFilter)) return false;
     if (sectionFilter !== 'ALL' && !b.section.includes(sectionFilter)) return false;

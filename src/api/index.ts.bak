@@ -1,9 +1,7 @@
 import { mockJobs, mockBlocks, mockTrains, mockEvents, mockApprovals, mockAnalytics, mockReoptimization, mockFieldBlock, mockBlockRequests } from '../data/mockData';
 import type { MaintenanceJob, OptimizedBlock, Train, LiveEvent, ApprovalItem, AnalyticsData, ReoptimizationPlan, FieldBlock, BlockRequest, BlockStatus, ApprovalStatus } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-// Simulated async delay — fallback for unintegrated endpoints
+// Simulated async delay — replace with real fetch() when backend is ready
 const delay = (ms: number = 400) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ============================================================
@@ -11,24 +9,12 @@ const delay = (ms: number = 400) => new Promise(resolve => setTimeout(resolve, m
 // ============================================================
 export const jobsApi = {
   async getJobs(): Promise<MaintenanceJob[]> {
-    try {
-      const res = await fetch(`${API_URL}/api/jobs`);
-      if (!res.ok) throw new Error('API failed');
-      return await res.json();
-    } catch(e) {
-      console.warn("Using mock fallback for jobs:", e);
-      return [...mockJobs];
-    }
+    await delay();
+    return [...mockJobs];
   },
   async getJob(id: string): Promise<MaintenanceJob | undefined> {
-    try {
-      const res = await fetch(`${API_URL}/api/jobs/${id}`);
-      if (!res.ok) throw new Error('API failed');
-      return await res.json();
-    } catch(e) {
-      console.warn("Using mock fallback for job details:", e);
-      return mockJobs.find(j => j.id === id);
-    }
+    await delay(200);
+    return mockJobs.find(j => j.id === id);
   },
   async createJob(job: Partial<MaintenanceJob>): Promise<MaintenanceJob> {
     await delay(600);
@@ -43,12 +29,8 @@ export const jobsApi = {
 // ============================================================
 export const priorityApi = {
   async getScores(): Promise<MaintenanceJob[]> {
-    try {
-      const jobs = await jobsApi.getJobs();
-      return jobs.sort((a, b) => b.priorityScore - a.priorityScore);
-    } catch (e) {
-      return [...mockJobs].sort((a, b) => b.priorityScore - a.priorityScore);
-    }
+    await delay(300);
+    return [...mockJobs].sort((a, b) => b.priorityScore - a.priorityScore);
   },
 };
 
@@ -57,19 +39,12 @@ export const priorityApi = {
 // ============================================================
 export const blocksApi = {
   async getBlocks(): Promise<OptimizedBlock[]> {
-    try {
-      const res = await fetch(`${API_URL}/api/blocks`);
-      if (!res.ok) throw new Error('API failed');
-      const blocks = await res.json();
-      return blocks.length ? blocks : [...mockBlocks]; // Fallback to mock if empty
-    } catch (e) {
-      console.warn("Using mock fallback for blocks:", e);
-      return [...mockBlocks];
-    }
+    await delay();
+    return [...mockBlocks];
   },
   async getBlock(id: string): Promise<OptimizedBlock | undefined> {
-    const blocks = await this.getBlocks();
-    return blocks.find(b => b.id === id);
+    await delay(200);
+    return mockBlocks.find(b => b.id === id);
   },
   async getRequests(): Promise<BlockRequest[]> {
     await delay(300);
@@ -86,20 +61,10 @@ export const blocksApi = {
     mockBlockRequests.push(newReq);
     return newReq;
   },
-  // POST /api/planning/run — CP-SAT scheduling (Replaces optimizeWeekly)
+  // POST /api/v1/optimize/weekly — CP-SAT scheduling
   async optimizeWeekly(): Promise<OptimizedBlock[]> {
-    try {
-      const res = await fetch(`${API_URL}/api/planning/run`, {
-        method: 'POST',
-      });
-      if (!res.ok) throw new Error('Planning API failed');
-      const result = await res.json();
-      return result.schedule || [];
-    } catch (e) {
-      console.warn("Using mock fallback for planning:", e);
-      await delay(1500);
-      return mockBlocks.filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED');
-    }
+    await delay(1500);
+    return mockBlocks.filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED');
   },
   // POST /api/v1/optimize/whatif
   async optimizeWhatIf(_params: Record<string, unknown>): Promise<{ originalPlan: OptimizedBlock[]; simulatedPlan: OptimizedBlock[] }> {
@@ -130,18 +95,12 @@ export const blocksApi = {
 // ============================================================
 export const trainsApi = {
   async getTrains(): Promise<Train[]> {
-    try {
-      const res = await fetch(`${API_URL}/api/trains`);
-      if (!res.ok) throw new Error('API failed');
-      const trains = await res.json();
-      return trains.length ? trains : [...mockTrains];
-    } catch (e) {
-      return [...mockTrains];
-    }
+    await delay();
+    return [...mockTrains];
   },
   async getTrain(number: string): Promise<Train | undefined> {
-    const trains = await this.getTrains();
-    return trains.find(t => t.number === number);
+    await delay(200);
+    return mockTrains.find(t => t.number === number);
   },
   // POST /api/v1/routes/compute — Time-Dependent A* routing
   async computeRoute(_trainNumber: string, _blockId: string): Promise<Train['proposedRoute']> {
@@ -260,14 +219,8 @@ export const reoptimizationApi = {
 // ============================================================
 export const analyticsApi = {
   async getAnalytics(): Promise<AnalyticsData> {
-    try {
-      const res = await fetch(`${API_URL}/api/analytics`);
-      if (!res.ok) throw new Error('API failed');
-      const data = await res.json();
-      return { ...mockAnalytics, ...data };
-    } catch (e) {
-      return { ...mockAnalytics };
-    }
+    await delay(500);
+    return { ...mockAnalytics };
   },
 };
 
@@ -283,6 +236,7 @@ export const executionApi = {
     await delay(400);
     const block = { ...mockFieldBlock, progress };
     if (progress > 0 && block.status === 'NOT_STARTED') block.status = 'IN_PROGRESS';
+    console.log(`Block ${blockId} progress: ${progress}%`);
     return block;
   },
   async startBlock(_blockId: string): Promise<FieldBlock> {
@@ -304,6 +258,7 @@ export const executionApi = {
   },
   async reportIssue(_blockId: string, issueType: string): Promise<void> {
     await delay(400);
+    console.log(`Issue reported: ${issueType}`);
   },
 };
 
@@ -312,49 +267,25 @@ export const executionApi = {
 // ============================================================
 export const overviewApi = {
   async getDashboardData() {
-    try {
-      const res = await fetch(`${API_URL}/api/dashboard`);
-      if (!res.ok) throw new Error('API failed');
-      const dashboard = await res.json();
-      
-      const jobs = await jobsApi.getJobs();
-      const blocks = await blocksApi.getBlocks();
-      const trains = await trainsApi.getTrains();
-      
-      const integratedBlocks = blocks.filter(b => b.bundled || (b.jobIds && b.jobIds.length > 1));
-      
-      return {
-        assetAvailability: 96.8,
-        criticalJobCount: dashboard.highPriorityJobs || 0,
-        pendingMaintenance: dashboard.maintenanceJobs || 0,
-        blocksOptimized: dashboard.selectedBlocks || 0,
-        expectedTrainDelay: dashboard.totalTrainDelay || 0,
-        integratedBlockCount: integratedBlocks.length,
-        priorityQueue: jobs.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 7),
-        recommendedBlock: blocks.length ? blocks[0] : mockBlocks[0],
-        allBlocks: blocks,
-        allTrains: trains,
-      };
-    } catch (e) {
-      console.warn("Using mock fallback for dashboard data:", e);
-      const jobs = [...mockJobs];
-      const blocks = [...mockBlocks];
-      const trains = [...mockTrains];
-      const criticalJobs = jobs.filter(j => j.priorityScore >= 80);
-      const totalDelay = trains.reduce((sum, t) => sum + t.delay, 0);
-      const integratedBlocks = blocks.filter(b => b.bundled);
-      return {
-        assetAvailability: 96.8,
-        criticalJobCount: criticalJobs.length,
-        pendingMaintenance: 42,
-        blocksOptimized: 18,
-        expectedTrainDelay: totalDelay || 37,
-        integratedBlockCount: integratedBlocks.length,
-        priorityQueue: jobs.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 7),
-        recommendedBlock: blocks.find(b => b.id === 'BR-00231')!,
-        allBlocks: blocks,
-        allTrains: trains,
-      };
-    }
+    await delay(350);
+    const jobs = [...mockJobs];
+    const blocks = [...mockBlocks];
+    const trains = [...mockTrains];
+    const criticalJobs = jobs.filter(j => j.priorityScore >= 80);
+    const totalDelay = trains.reduce((sum, t) => sum + t.delay, 0);
+    const integratedBlocks = blocks.filter(b => b.bundled);
+    return {
+      assetAvailability: 96.8,
+      criticalJobCount: criticalJobs.length,
+      pendingMaintenance: 42,
+      blocksOptimized: 18,
+      expectedTrainDelay: totalDelay || 37,
+      integratedBlockCount: integratedBlocks.length,
+      priorityQueue: jobs.sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 7),
+      recommendedBlock: blocks.find(b => b.id === 'BR-00231')!,
+      allBlocks: blocks,
+      allTrains: trains,
+    };
   },
 };
+
