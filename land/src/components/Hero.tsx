@@ -53,11 +53,11 @@ export default function Hero() {
           >
             <span className="badge badge-blue" style={{ gap: '0.5rem' }}>
               <span className="glow-dot-blue" />
-              SIH26027
+              CENTRAL RAILWAY
             </span>
             <span style={{ color: '#D9E2EC' }}>|</span>
             <span style={{ fontSize: '0.7rem', color: '#64748B', letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace' }}>
-              SMART INDIA HACKATHON 2025
+              NAGPUR DIVISION
             </span>
           </motion.div>
 

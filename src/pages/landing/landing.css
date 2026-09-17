@@ -1,6 +1,6 @@
 /* ============================================================
    KAVACH Landing Page — Light Mode Design System
-   SIH26027 AI-Powered Block Planning
+   Central Railway Automatic Block Planning
    Scoped to .landing-page wrapper to avoid conflicts with main app
    ============================================================ */
 
@@ -12,31 +12,31 @@
   --lp-text-secondary: #344054;
   --lp-text-muted: #667085;
   --lp-text-faint: #98A2B3;
-  --lp-accent-blue: #1D4ED8;
-  --lp-accent-blue-mid: #2563EB;
-  --lp-accent-blue-light: #3B82F6;
-  --lp-accent-blue-pale: #EFF6FF;
-  --lp-accent-blue-dim: rgba(29, 78, 216, 0.08);
-  --lp-accent-blue-glow: rgba(29, 78, 216, 0.12);
-  --lp-accent-sky: #0EA5E9;
-  --lp-accent-sky-pale: #F0F9FF;
-  --lp-accent-sky-dim: rgba(14, 165, 233, 0.1);
+  --lp-accent-blue: #1B6B45;
+  --lp-accent-blue-mid: #145536;
+  --lp-accent-blue-light: #228B58;
+  --lp-accent-blue-pale: #ECFDF5;
+  --lp-accent-blue-dim: rgba(27, 107, 69, 0.08);
+  --lp-accent-blue-glow: rgba(27, 107, 69, 0.16);
+  --lp-accent-sky: #0D9488;
+  --lp-accent-sky-pale: #F0FDF4;
+  --lp-accent-sky-dim: rgba(13, 148, 136, 0.1);
   --lp-accent-amber: #D97706;
   --lp-accent-amber-pale: #FFFBEB;
   --lp-accent-amber-dim: rgba(217, 119, 6, 0.08);
-  --lp-accent-green: #059669;
+  --lp-accent-green: #1B6B45;
   --lp-accent-green-pale: #ECFDF5;
-  --lp-accent-green-dim: rgba(5, 150, 105, 0.08);
+  --lp-accent-green-dim: rgba(27, 107, 69, 0.08);
   --lp-border-light: #F2F4F7;
   --lp-border-base: #D9E2EC;
   --lp-border-medium: #B8C7D9;
-  --lp-border-accent: rgba(29, 78, 216, 0.2);
+  --lp-border-accent: rgba(27, 107, 69, 0.25);
   --lp-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
   --lp-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
   --lp-shadow-md: 0 4px 8px rgba(16, 24, 40, 0.06), 0 2px 4px rgba(16, 24, 40, 0.04);
   --lp-shadow-lg: 0 12px 24px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.04);
   --lp-shadow-xl: 0 24px 48px rgba(16, 24, 40, 0.1), 0 8px 16px rgba(16, 24, 40, 0.06);
-  --lp-shadow-blue: 0 4px 16px rgba(29, 78, 216, 0.18);
+  --lp-shadow-blue: 0 4px 16px rgba(27, 107, 69, 0.28);
   --lp-radius-sm: 6px;
   --lp-radius-md: 10px;
   --lp-radius-lg: 16px;
@@ -54,31 +54,31 @@
   --text-secondary: #344054;
   --text-muted: #667085;
   --text-faint: #98A2B3;
-  --accent-blue: #1D4ED8;
-  --accent-blue-mid: #2563EB;
-  --accent-blue-light: #3B82F6;
-  --accent-blue-pale: #EFF6FF;
-  --accent-blue-dim: rgba(29, 78, 216, 0.08);
-  --accent-blue-glow: rgba(29, 78, 216, 0.12);
-  --accent-sky: #0EA5E9;
-  --accent-sky-pale: #F0F9FF;
-  --accent-sky-dim: rgba(14, 165, 233, 0.1);
+  --accent-blue: #1B6B45;
+  --accent-blue-mid: #145536;
+  --accent-blue-light: #228B58;
+  --accent-blue-pale: #ECFDF5;
+  --accent-blue-dim: rgba(27, 107, 69, 0.08);
+  --accent-blue-glow: rgba(27, 107, 69, 0.16);
+  --accent-sky: #0D9488;
+  --accent-sky-pale: #F0FDF4;
+  --accent-sky-dim: rgba(13, 148, 136, 0.1);
   --accent-amber: #D97706;
   --accent-amber-pale: #FFFBEB;
   --accent-amber-dim: rgba(217, 119, 6, 0.08);
-  --accent-green: #059669;
+  --accent-green: #1B6B45;
   --accent-green-pale: #ECFDF5;
-  --accent-green-dim: rgba(5, 150, 105, 0.08);
+  --accent-green-dim: rgba(27, 107, 69, 0.08);
   --border-light: #F2F4F7;
   --border-base: #D9E2EC;
   --border-medium: #B8C7D9;
-  --border-accent: rgba(29, 78, 216, 0.2);
+  --border-accent: rgba(27, 107, 69, 0.25);
   --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
   --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 4px 8px rgba(16, 24, 40, 0.06), 0 2px 4px rgba(16, 24, 40, 0.04);
   --shadow-lg: 0 12px 24px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.04);
   --shadow-xl: 0 24px 48px rgba(16, 24, 40, 0.1), 0 8px 16px rgba(16, 24, 40, 0.06);
-  --shadow-blue: 0 4px 16px rgba(29, 78, 216, 0.18);
+  --shadow-blue: 0 4px 16px rgba(27, 107, 69, 0.28);
   --shadow-card: 0 2px 12px rgba(16, 24, 40, 0.08);
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -131,8 +131,9 @@
   font-family: 'JetBrains Mono', 'Courier New', monospace;
 }
 
-.text-gradient-blue {
-  background: linear-gradient(135deg, #1D4ED8 0%, #0EA5E9 100%);
+.text-gradient-blue,
+.text-gradient-green {
+  background: linear-gradient(135deg, #1B6B45 0%, #0D9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -168,23 +169,23 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
-  background: var(--accent-blue);
+  background: linear-gradient(135deg, #1B6B45 0%, #135F3A 100%);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.9375rem;
   border-radius: var(--radius-md);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   white-space: nowrap;
-  box-shadow: var(--shadow-blue);
+  box-shadow: 0 4px 16px rgba(27, 107, 69, 0.28);
 }
 
 .btn-primary:hover {
-  background: var(--accent-blue-mid);
+  background: linear-gradient(135deg, #145536 0%, #0E472A 100%);
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.28);
+  box-shadow: 0 8px 24px rgba(27, 107, 69, 0.38);
 }
 
 .btn-primary:active { transform: translateY(0); }
@@ -257,13 +258,13 @@
 .badge-blue {
   background: var(--accent-blue-dim);
   color: var(--accent-blue);
-  border: 1px solid rgba(29, 78, 216, 0.15);
+  border: 1px solid rgba(27, 107, 69, 0.2);
 }
 
 .badge-sky {
   background: var(--accent-sky-dim);
   color: var(--accent-sky);
-  border: 1px solid rgba(14, 165, 233, 0.2);
+  border: 1px solid rgba(13, 148, 136, 0.2);
 }
 
 .badge-amber {
@@ -275,7 +276,7 @@
 .badge-green {
   background: var(--accent-green-dim);
   color: var(--accent-green);
-  border: 1px solid rgba(5, 150, 105, 0.15);
+  border: 1px solid rgba(27, 107, 69, 0.2);
 }
 
 .label-illustrative {
@@ -300,35 +301,35 @@
 
 .bg-grid-light {
   background-image:
-    linear-gradient(rgba(29, 78, 216, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(29, 78, 216, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(27, 107, 69, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 107, 69, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(circle, rgba(29,78,216,0.1) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(27, 107, 69, 0.1) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .mesh-gradient-bg {
   background-color: #F7F9FC;
   background-image: 
-    radial-gradient(at 40% 20%, rgba(29, 78, 216, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(14, 165, 233, 0.08) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, rgba(217, 119, 6, 0.06) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, rgba(124, 58, 237, 0.06) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, rgba(29, 78, 216, 0.08) 0px, transparent 50%),
-    radial-gradient(at 0% 0%, rgba(5, 150, 105, 0.04) 0px, transparent 50%);
+    radial-gradient(at 40% 20%, rgba(27, 107, 69, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(13, 148, 136, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, rgba(217, 119, 6, 0.05) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, rgba(13, 148, 136, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(27, 107, 69, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, rgba(27, 107, 69, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(27, 107, 69, 0.05) 0px, transparent 50%);
 }
 
 .mesh-gradient-hero {
   background-color: #FFFFFF;
   background-image: 
-    radial-gradient(at 80% 15%, rgba(14, 165, 233, 0.2) 0px, transparent 50%),
-    radial-gradient(at 15% 80%, rgba(29, 78, 216, 0.15) 0px, transparent 50%),
-    radial-gradient(at 90% 85%, rgba(124, 58, 237, 0.12) 0px, transparent 50%),
-    radial-gradient(at 10% 15%, rgba(217, 119, 6, 0.08) 0px, transparent 50%);
+    radial-gradient(at 80% 15%, rgba(13, 148, 136, 0.15) 0px, transparent 50%),
+    radial-gradient(at 15% 80%, rgba(27, 107, 69, 0.15) 0px, transparent 50%),
+    radial-gradient(at 90% 85%, rgba(13, 148, 136, 0.1) 0px, transparent 50%),
+    radial-gradient(at 10% 15%, rgba(217, 119, 6, 0.06) 0px, transparent 50%);
 }
 
 /* ============================================================

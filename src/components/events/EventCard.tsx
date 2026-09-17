@@ -39,7 +39,7 @@ export default function EventCard({ event, onClick, onReoptimize }: Props) {
           {event.reoptimizationId && (
             <button
               onClick={(e) => { e.stopPropagation(); onReoptimize?.(); }}
-              className="text-blue-600 font-semibold hover:text-blue-700"
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
             >
               RE-OPTIMIZE →
             </button>

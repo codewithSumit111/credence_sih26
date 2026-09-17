@@ -15,7 +15,7 @@ export default function ImpactPanel({ block }: Props) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         <div className="p-2.5 bg-gray-50 rounded border border-gray-100">
           <div className="flex items-center gap-1.5 text-gray-500 text-xs mb-1">
-            <Clock className="w-3.5 h-3.5 text-blue-600" />
+            <Clock className="w-3.5 h-3.5 text-emerald-600" />
             <span>Expected Delay</span>
           </div>
           <p className="text-base font-bold text-gray-900">+{block.expectedDelay} min</p>

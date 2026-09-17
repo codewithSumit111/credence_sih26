@@ -43,7 +43,7 @@ export default function Footer() {
               </div>
               <div>
                 <div style={{ fontWeight: 800, fontSize: '0.875rem', color: '#101828' }}>KAVACH</div>
-                <div style={{ fontSize: '0.6rem', color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>SIH26027</div>
+                <div style={{ fontSize: '0.6rem', color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Central Railway</div>
               </div>
             </div>
             <p style={{ fontSize: '0.8rem', color: '#667085', lineHeight: 1.7, maxWidth: 220 }}>
@@ -108,8 +108,8 @@ export default function Footer() {
             This system is a research prototype developed for SIH 2025. All block recommendations require authorized railway authority validation and approval before execution.
           </p>
           <div style={{ fontSize: '0.75rem', color: '#94A3B8', textAlign: 'right', flexShrink: 0 }}>
-            <div>SIH26027 · Smart India Hackathon 2025</div>
-            <div style={{ marginTop: 2 }}>AI-Powered Automatic Block Planning</div>
+            <div>Central Railway · Nagpur Division</div>
+            <div style={{ marginTop: 2 }}>Integrated Railway Maintenance Intelligence</div>
           </div>
         </div>
       </div>

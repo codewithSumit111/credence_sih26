@@ -32,7 +32,7 @@ export default function RouteComparison({ train, options, onAcceptReroute, onKee
           <span className="text-sm text-gray-500 ml-2">{train.name}</span>
         </div>
         {recommended && (
-          <span className="text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-1 rounded font-semibold">
+          <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded font-semibold">
             Recommended: {recommended.label}
           </span>
         )}
@@ -44,15 +44,15 @@ export default function RouteComparison({ train, options, onAcceptReroute, onKee
             key={option.label}
             className={clsx(
               'border rounded p-3',
-              option.recommended ? 'border-blue-400 bg-blue-50' : 'border-gray-200'
+              option.recommended ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200'
             )}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className={clsx('text-xs font-bold uppercase', option.recommended ? 'text-blue-700' : 'text-gray-600')}>
+              <span className={clsx('text-xs font-bold uppercase', option.recommended ? 'text-emerald-700' : 'text-gray-600')}>
                 {option.label}
               </span>
               {option.recommended && (
-                <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">RECOMMENDED</span>
+                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">RECOMMENDED</span>
               )}
             </div>
             <div className="flex items-center gap-1 mb-1">
@@ -95,16 +95,16 @@ export default function RouteComparison({ train, options, onAcceptReroute, onKee
         </div>
         {train.proposedRoute && (
           <div>
-            <p className="text-[11px] text-blue-600 uppercase tracking-wide mb-1 font-semibold">PROPOSED ROUTE (A* Algorithm)</p>
+            <p className="text-[11px] text-emerald-600 uppercase tracking-wide mb-1 font-semibold">PROPOSED ROUTE (A* Algorithm)</p>
             <div className="flex items-center gap-1 flex-wrap">
               {train.proposedRoute.map((seg, i) => (
                 <span key={i} className="flex items-center gap-1">
-                  <span className="text-xs font-medium text-blue-800">{seg.from}</span>
-                  <ArrowRight className="w-3 h-3 text-blue-400" />
-                  <span className="text-[10px] text-blue-500 font-mono">[{seg.track}]</span>
-                  <ArrowRight className="w-3 h-3 text-blue-400" />
+                  <span className="text-xs font-medium text-emerald-800">{seg.from}</span>
+                  <ArrowRight className="w-3 h-3 text-emerald-400" />
+                  <span className="text-[10px] text-emerald-500 font-mono">[{seg.track}]</span>
+                  <ArrowRight className="w-3 h-3 text-emerald-400" />
                   {i === train.proposedRoute!.length - 1 && (
-                    <span className="text-xs font-medium text-blue-800">{seg.to}</span>
+                    <span className="text-xs font-medium text-emerald-800">{seg.to}</span>
                   )}
                 </span>
               ))}

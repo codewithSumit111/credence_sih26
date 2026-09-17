@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const papers = [
-  { title: 'Integrated Train Scheduling and Maintenance Optimization', year: '2022', method: 'Mixed-Integer Programming + Rolling Horizon', relevance: 'Multi-dept. block planning framework', color: '#1D4ED8' },
+  { title: 'Integrated Train Scheduling and Maintenance Optimization', year: '2022', method: 'Mixed-Integer Programming + Rolling Horizon', relevance: 'Multi-dept. block planning framework', color: '#1B6B45' },
   { title: 'Dynamic Maintenance Scheduling under Operational Uncertainty', year: '2021', method: 'Stochastic Programming, ALNS', relevance: 'Dynamic re-optimization approach', color: '#7C3AED' },
   { title: 'Predictive Maintenance in Railway Infrastructure', year: '2023', method: 'XGBoost, LSTM, Survival Models', relevance: 'Risk & priority scoring engine', color: '#059669' },
-  { title: 'GNN-Based Railway Network Maintenance Scheduling', year: '2023', method: 'Graph Neural Networks, RL', relevance: 'GNN-guided ALNS search', color: '#D97706' },
-  { title: 'ALNS for Railway Maintenance Window Optimization', year: '2020', method: 'Adaptive Large Neighbourhood Search', relevance: 'Core ALNS optimization layer', color: '#0EA5E9' },
-  { title: 'AI Applications in Indian Railways Maintenance', year: '2022', method: 'Predictive Analytics, Digital Twin', relevance: 'Indian Railways operational context', color: '#1D4ED8' },
+  { title: 'GNN-Based Railway Network Maintenance Scheduling', year: '2023', method: 'Graph Neural Networks, RL', relevance: 'GNN-guided ALNS search', color: '#D4A843' },
+  { title: 'ALNS for Railway Maintenance Window Optimization', year: '2020', method: 'Adaptive Large Neighbourhood Search', relevance: 'Core ALNS optimization layer', color: '#0D9488' },
+  { title: 'AI Applications in Indian Railways Maintenance', year: '2022', method: 'Predictive Analytics, Digital Twin', relevance: 'Indian Railways operational context', color: '#1B6B45' },
 ];
 
 export default function ResearchSection() {
@@ -18,7 +18,7 @@ export default function ResearchSection() {
       id="research"
       ref={ref as unknown as React.RefObject<HTMLElement>}
       className="section-padding"
-      style={{ background: '#F7F9FC' }}
+      style={{ background: '#F4F9F6' }}
       aria-labelledby="research-heading"
     >
       <div className="container-site">
@@ -31,7 +31,7 @@ export default function ResearchSection() {
           <span className="section-label" style={{ display: 'block', marginBottom: '0.875rem' }}>Research Foundation</span>
           <h2 id="research-heading" className="section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', maxWidth: 600, marginBottom: '1rem' }}>
             Architecture grounded in
-            <span className="text-gradient-blue"> published research.</span>
+            <span className="text-gradient-accent"> published research.</span>
           </h2>
           <p className="section-subheading" style={{ maxWidth: 560 }}>
             Every component of the optimization pipeline is informed by peer-reviewed academic work
@@ -48,7 +48,7 @@ export default function ResearchSection() {
               transition={{ duration: 0.5, delay: i * 0.07 }}
               style={{
                 padding: '1.5rem', borderRadius: 12,
-                background: '#FFFFFF', border: '1px solid #E4EDF6',
+                background: '#FFFFFF', border: '1px solid #E6F0EA',
                 boxShadow: '0 1px 4px rgba(16,24,40,0.04)',
                 transition: 'box-shadow 0.25s ease, border-color 0.25s ease',
                 cursor: 'default',

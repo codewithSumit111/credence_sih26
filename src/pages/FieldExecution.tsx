@@ -134,14 +134,14 @@ export default function FieldExecution() {
             <StatusBadge status={block.status === 'COMPLETED' ? 'COMPLETED' : 'ACTIVE'} />
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-600 pt-1 border-t border-gray-100">
-            <Clock className="w-3.5 h-3.5 text-blue-500" />
+            <Clock className="w-3.5 h-3.5 text-emerald-500" />
             <span>{block.startTime} – {block.endTime}</span>
-            <span className="ml-auto font-semibold text-blue-900">{block.progress}% complete</span>
+            <span className="ml-auto font-semibold text-emerald-900">{block.progress}% complete</span>
           </div>
           {/* Mini progress */}
           <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
             <div
-              className="bg-blue-900 h-full rounded-full transition-all duration-700 ease-out"
+              className="bg-emerald-900 h-full rounded-full transition-all duration-700 ease-out"
               style={{ width: `${block.progress}%` }}
             />
           </div>
@@ -153,7 +153,7 @@ export default function FieldExecution() {
         <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-gray-600 font-medium">Tasks Completed</span>
-            <span className="font-bold text-blue-900">{completedCount}/{totalCount}</span>
+            <span className="font-bold text-emerald-900">{completedCount}/{totalCount}</span>
           </div>
           <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
             <div
@@ -221,7 +221,7 @@ export default function FieldExecution() {
         {/* Time timeline */}
         <div className="flex items-center justify-between py-2 border-y border-gray-100 text-sm">
           <div className="flex items-center gap-1.5 font-bold text-gray-900">
-            <Clock className="w-4 h-4 text-blue-600" />
+            <Clock className="w-4 h-4 text-emerald-600" />
             <span>{block.startTime}</span>
           </div>
           <div className="flex-1 mx-3 border-t-2 border-dashed border-gray-300 relative">
@@ -279,12 +279,12 @@ export default function FieldExecution() {
       <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
         <div className="flex justify-between items-center text-xs font-bold">
           <span className="text-gray-500 uppercase tracking-wider">PROGRESS</span>
-          <span className="text-blue-900 font-mono text-sm">{block.progress}%</span>
+          <span className="text-emerald-900 font-mono text-sm">{block.progress}%</span>
         </div>
 
         <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
           <div
-            className="bg-blue-900 h-full rounded-full transition-all duration-700 ease-out"
+            className="bg-emerald-900 h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${block.progress}%` }}
           />
         </div>
@@ -297,7 +297,7 @@ export default function FieldExecution() {
               className={clsx(
                 'flex-1 py-1 rounded text-[11px] font-bold border transition-colors',
                 block.progress >= pct
-                  ? 'bg-blue-50 border-blue-300 text-blue-800'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
                   : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100',
               )}
             >
@@ -309,7 +309,7 @@ export default function FieldExecution() {
         {block.status !== 'COMPLETED' && (
           <button
             onClick={() => setShowCompleteModal(true)}
-            className="w-full mt-3 bg-blue-900 hover:bg-blue-950 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm"
+            className="w-full mt-3 bg-emerald-900 hover:bg-emerald-950 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm"
           >
             MARK WORK COMPLETE
           </button>
@@ -358,9 +358,9 @@ export default function FieldExecution() {
         </button>
       </div>
 
-      <div className="bg-blue-50 rounded-xl p-3 border border-blue-200 text-xs text-blue-800">
+      <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-200 text-xs text-emerald-800">
         <p className="font-bold mb-1">Emergency Escalation</p>
-        <p className="text-blue-700">Any reported issue is immediately transmitted to the Section Controller. ALNS re-optimization is triggered automatically for severe overruns.</p>
+        <p className="text-emerald-700">Any reported issue is immediately transmitted to the Section Controller. ALNS re-optimization is triggered automatically for severe overruns.</p>
       </div>
     </div>
   );
@@ -368,11 +368,11 @@ export default function FieldExecution() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-between max-w-md mx-auto shadow-2xl border-x border-gray-300">
       {/* Mobile Top Header */}
-      <div className="bg-[#0F2240] text-white p-4 sticky top-0 z-20 shadow">
+      <div className="bg-[#1B6B45] text-white p-4 sticky top-0 z-20 shadow">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-sm font-bold tracking-wider">RAILWAY FIELD OPS</h1>
-            <p className="text-[11px] text-blue-200">Engineering & S&T • {block.track}</p>
+            <p className="text-[11px] text-emerald-200">Engineering & S&T • {block.track}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] bg-green-600 text-white font-bold px-2 py-0.5 rounded-full">
@@ -398,14 +398,14 @@ export default function FieldExecution() {
       <div className="bg-white border-t border-gray-200 py-2.5 px-6 flex items-center justify-around text-xs sticky bottom-0 z-20">
         <button
           onClick={() => setActiveTab('home')}
-          className={clsx('flex flex-col items-center gap-1', activeTab === 'home' ? 'text-blue-900 font-bold' : 'text-gray-400')}
+          className={clsx('flex flex-col items-center gap-1', activeTab === 'home' ? 'text-emerald-900 font-bold' : 'text-gray-400')}
         >
           <Home className="w-4 h-4" />
           <span>Home</span>
         </button>
         <button
           onClick={() => setActiveTab('block')}
-          className={clsx('flex flex-col items-center gap-1', activeTab === 'block' ? 'text-blue-900 font-bold' : 'text-gray-400')}
+          className={clsx('flex flex-col items-center gap-1', activeTab === 'block' ? 'text-emerald-900 font-bold' : 'text-gray-400')}
         >
           <Calendar className="w-4 h-4" />
           <span>Block</span>
@@ -414,7 +414,7 @@ export default function FieldExecution() {
           onClick={() => setActiveTab('report')}
           className={clsx(
             'flex flex-col items-center gap-1 relative',
-            activeTab === 'report' ? 'text-blue-900 font-bold' : 'text-gray-400',
+            activeTab === 'report' ? 'text-emerald-900 font-bold' : 'text-gray-400',
           )}
         >
           <AlertOctagon className="w-4 h-4" />

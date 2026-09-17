@@ -72,9 +72,9 @@ export default function NewBlockRequest() {
         </div>
         <h2 className="text-lg font-bold text-gray-900">Block Request Submitted</h2>
         <p className="text-xs text-gray-600">
-          Request <strong className="font-mono text-blue-900">{submittedId}</strong> for <strong>{department}</strong> on <strong>{trackSection}</strong> has entered the optimization pipeline.
+          Request <strong className="font-mono text-emerald-900">{submittedId}</strong> for <strong>{department}</strong> on <strong>{trackSection}</strong> has entered the optimization pipeline.
         </p>
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded text-left text-xs space-y-1.5 text-blue-900">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded text-left text-xs space-y-1.5 text-emerald-900">
           <p className="font-bold">Next Pipeline Steps:</p>
           <p>1. Weighted Priority Scoring calculation</p>
           <p>2. Compatibility detection for bundling with S&T / Traction</p>
@@ -121,7 +121,7 @@ export default function NewBlockRequest() {
               <select
                 value={department}
                 onChange={e => setDepartment(e.target.value as Department)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
               >
                 <option value="Engineering">Engineering / Track</option>
                 <option value="S&T">Signal & Telecommunication (S&T)</option>
@@ -135,7 +135,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={maintenanceType}
                 onChange={e => setMaintenanceType(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. Track Renewal, Rail Grinding, Signal Test"
               />
             </FormField>
@@ -146,7 +146,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={trackSection}
                 onChange={e => setTrackSection(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. TR-02 (NGP-BSL)"
               />
             </FormField>
@@ -157,7 +157,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={asset}
                 onChange={e => setAsset(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. A-TR02-144"
               />
             </FormField>
@@ -168,7 +168,7 @@ export default function NewBlockRequest() {
                 type="date"
                 value={preferredDate}
                 onChange={e => setPreferredDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
               />
             </FormField>
 
@@ -178,7 +178,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={requestedDuration}
                 onChange={e => setRequestedDuration(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. 90 min"
               />
             </FormField>
@@ -189,7 +189,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={preferredWindow}
                 onChange={e => setPreferredWindow(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. 13:00 – 18:00"
               />
             </FormField>
@@ -200,7 +200,7 @@ export default function NewBlockRequest() {
                 type="number"
                 value={requiredManpower}
                 onChange={e => setRequiredManpower(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. 8"
               />
             </FormField>
@@ -213,7 +213,7 @@ export default function NewBlockRequest() {
                 type="text"
                 value={machinery}
                 onChange={e => setMachinery(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                 placeholder="e.g. Tamping Machine, Rail Grinder, OHE Tower Wagon"
               />
             </FormField>
@@ -260,7 +260,7 @@ export default function NewBlockRequest() {
                     type="checkbox"
                     checked={safetyBuffer}
                     onChange={e => setSafetyBuffer(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-0"
+                    className="rounded border-gray-300 text-emerald-600 focus:ring-0"
                   />
                   <span>Safety buffer required (+15 min minimum)</span>
                 </label>
@@ -269,7 +269,7 @@ export default function NewBlockRequest() {
                     type="checkbox"
                     checked={dependsOnJob}
                     onChange={e => setDependsOnJob(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-0"
+                    className="rounded border-gray-300 text-emerald-600 focus:ring-0"
                   />
                   <span>Depends on another maintenance job (Sequential)</span>
                 </label>
@@ -278,7 +278,7 @@ export default function NewBlockRequest() {
                     type="checkbox"
                     checked={requiresIsolation}
                     onChange={e => setRequiresIsolation(e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-0"
+                    className="rounded border-gray-300 text-emerald-600 focus:ring-0"
                   />
                   <span>Requires electrical/track isolation</span>
                 </label>
@@ -292,7 +292,7 @@ export default function NewBlockRequest() {
                   rows={4}
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-blue-500"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-xs font-medium focus:outline-none focus:border-emerald-500"
                   placeholder="Additional context for Section Controller and Optimization algorithm..."
                 />
               </FormField>

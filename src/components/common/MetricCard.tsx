@@ -26,7 +26,7 @@ export default function MetricCard({ label, value, sub, trend, trendValue, highl
           <p className="text-[11px] text-gray-500 font-semibold uppercase tracking-wide mb-1 leading-tight">{label}</p>
           <p className={clsx(
             'text-2xl font-bold leading-none',
-            highlight ? 'text-blue-700' : danger ? 'text-red-600' : 'text-gray-900'
+            highlight ? 'text-emerald-700' : danger ? 'text-red-600' : 'text-gray-900'
           )}>
             {value}
           </p>

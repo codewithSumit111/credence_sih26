@@ -95,7 +95,7 @@ export default function LiveEvents() {
                   <div className="flex flex-col items-center">
                     <div className={clsx(
                       'w-3 h-3 rounded-full mt-0.5 flex-shrink-0',
-                      entry.isAlert ? 'bg-red-600 ring-4 ring-red-100' : 'bg-blue-600'
+                      entry.isAlert ? 'bg-red-600 ring-4 ring-red-100' : 'bg-emerald-600'
                     )} />
                     {index < selectedEvent.timeline.length - 1 && (
                       <div className="w-px h-6 bg-gray-200 my-0.5" />
@@ -133,9 +133,9 @@ export default function LiveEvents() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 bg-blue-50/70 border border-blue-200 rounded">
-                <span className="font-semibold text-blue-900">Route Recalculation Required</span>
-                <span className="font-bold text-blue-700 text-sm">
+              <div className="flex items-center justify-between p-3 bg-emerald-50/70 border border-emerald-200 rounded">
+                <span className="font-semibold text-emerald-900">Route Recalculation Required</span>
+                <span className="font-bold text-emerald-700 text-sm">
                   • {selectedEvent?.systemImpact.routeRecalculations} Recalculation
                 </span>
               </div>
@@ -150,7 +150,7 @@ export default function LiveEvents() {
 
             {/* Direct Re-optimization Action */}
             <div className="mt-5 p-4 bg-gray-50 border border-gray-200 rounded text-xs space-y-2.5">
-              <div className="flex items-center gap-1.5 text-blue-900 font-bold">
+              <div className="flex items-center gap-1.5 text-emerald-900 font-bold">
                 <Zap className="w-4 h-4 text-amber-500" />
                 <span>Trigger Dynamic ALNS Schedule Repair</span>
               </div>
@@ -160,7 +160,7 @@ export default function LiveEvents() {
               <button
                 onClick={() => handleReoptimize(selectedEvent?.id || 'EVT-001')}
                 disabled={triggeringReopt}
-                className="w-full bg-blue-900 hover:bg-blue-950 text-white font-bold py-2 rounded text-xs transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-emerald-900 hover:bg-emerald-950 text-white font-bold py-2 rounded text-xs transition-colors flex items-center justify-center gap-2"
               >
                 {triggeringReopt ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />

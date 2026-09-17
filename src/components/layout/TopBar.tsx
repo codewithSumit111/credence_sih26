@@ -14,7 +14,7 @@ export default function TopBar() {
     <header className="h-[52px] bg-white border-b border-gray-200 flex items-center justify-between px-5 flex-shrink-0 z-10">
       {/* Left: date + corridor */}
       <div className="flex items-center gap-3">
-        <span className="text-xs font-bold text-[#0F2240] tracking-wider uppercase">
+        <span className="text-xs font-bold text-[#1B6B45] tracking-wider uppercase">
           TODAY • 27 AUG 2026
         </span>
         <span className="text-gray-300 hidden sm:block">|</span>
@@ -46,7 +46,7 @@ export default function TopBar() {
 
         {/* User */}
         <div className="flex items-center gap-2 border-l border-gray-200 pl-3">
-          <div className="w-7 h-7 rounded-full bg-[#0F2240] flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
+          <div className="w-7 h-7 rounded-full bg-[#1B6B45] flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
             RS
           </div>
           <div className="hidden sm:block leading-tight">
