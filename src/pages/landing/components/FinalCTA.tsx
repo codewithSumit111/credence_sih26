@@ -13,17 +13,17 @@ export default function FinalCTA() {
       aria-labelledby="cta-heading"
     >
       {/* Subtle top border */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, #D9E2EC, transparent)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, #C5D9CE, transparent)' }} />
 
       {/* Background dot pattern */}
       <div className="bg-dot-pattern" style={{ position: 'absolute', inset: 0, opacity: 0.4 }} />
 
-      {/* Subtle blue gradient center */}
+      {/* Subtle green gradient center */}
       <div style={{
         position: 'absolute', top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 600, height: 400, borderRadius: '50%',
-        background: 'radial-gradient(ellipse, rgba(29,78,216,0.04) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse, rgba(27,107,69,0.06) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
@@ -40,9 +40,9 @@ export default function FinalCTA() {
             className="font-display"
             style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', marginBottom: '1.5rem', maxWidth: 680, margin: '0 auto 1.5rem' }}
           >
-            <span style={{ color: '#101828' }}>From maintenance requests</span>
+            <span style={{ color: '#122A1F' }}>From maintenance requests</span>
             <br />
-            <span className="text-gradient-blue">to intelligent block decisions.</span>
+            <span className="text-gradient-accent">to intelligent block decisions.</span>
           </h2>
 
           <p className="section-subheading" style={{ maxWidth: 500, margin: '0 auto 3rem', fontSize: '1.0625rem' }}>

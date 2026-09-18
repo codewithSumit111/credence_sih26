@@ -177,7 +177,7 @@ export default function RailwayNetwork({
               cx={station.x}
               cy={station.y}
               r={11}
-              fill="#0F2240"
+              fill="#1B6B45"
               stroke="white"
               strokeWidth={2}
             />

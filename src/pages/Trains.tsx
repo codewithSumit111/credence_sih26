@@ -123,7 +123,7 @@ export default function Trains() {
                 e.stopPropagation();
                 navigate(`/rerouting?train=${row.number}`);
               }}
-              className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
+              className="text-xs font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-0.5"
             >
               <GitBranch className="w-3 h-3" /> Reroute
             </button>

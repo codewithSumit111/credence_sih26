@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const horizons = [
-  { label: '52-WEEK STRATEGIC', period: 'Annual', color: '#3B82F6', tag: 'Strategic', desc: 'Long-range maintenance strategy aligned with infrastructure overhaul plans.' },
-  { label: 'MONTHLY', period: '30-day rolling', color: '#7C3AED', tag: 'Tactical', desc: 'Monthly planning with demand forecasts and resource allocation optimization.' },
-  { label: 'WEEKLY', period: '7-day rolling', color: '#0EA5E9', tag: 'Operational', desc: 'Weekly block scheduling refined against current train movements and defect status.' },
+  { label: '52-WEEK STRATEGIC', period: 'Annual', color: '#1B6B45', tag: 'Strategic', desc: 'Long-range maintenance strategy aligned with infrastructure overhaul plans.' },
+  { label: 'MONTHLY', period: '30-day rolling', color: '#D4A843', tag: 'Tactical', desc: 'Monthly planning with demand forecasts and resource allocation optimization.' },
+  { label: 'WEEKLY', period: '7-day rolling', color: '#0D9488', tag: 'Operational', desc: 'Weekly block scheduling refined against current train movements and defect status.' },
   { label: 'EXECUTABLE BLOCK PLAN', period: 'Authorized output', color: '#059669', tag: 'Executable', desc: 'Final multi-department block plan ready for railway authority validation and approval.' },
 ];
 
@@ -15,7 +15,7 @@ export default function PlanningHorizons() {
     <section
       ref={ref as unknown as React.RefObject<HTMLElement>}
       className="section-padding"
-      style={{ background: '#F7F9FC' }}
+      style={{ background: '#F4F9F6' }}
       aria-labelledby="horizons-heading"
     >
       <div className="container-site">
@@ -28,7 +28,7 @@ export default function PlanningHorizons() {
             <span className="section-label" style={{ display: 'block', marginBottom: '1rem' }}>Planning Horizons</span>
             <h2 id="horizons-heading" className="section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', marginBottom: '1.25rem' }}>
               From strategic intent to
-              <span className="text-gradient-blue"> executable plan.</span>
+              <span className="text-gradient-accent"> executable plan.</span>
             </h2>
             <p className="section-subheading" style={{ marginBottom: '2rem' }}>
               The optimization engine operates across multiple time horizons — providing a decision
@@ -36,9 +36,9 @@ export default function PlanningHorizons() {
             </p>
             <div style={{
               padding: '1.25rem', borderRadius: 12,
-              background: '#EFF6FF', border: '1px solid rgba(29,78,216,0.12)',
+              background: '#EDF5F0', border: '1px solid rgba(27,107,69,0.18)',
             }}>
-              <p style={{ fontSize: '0.8125rem', color: '#344054', lineHeight: 1.7 }}>
+              <p style={{ fontSize: '0.8125rem', color: '#2D4A3E', lineHeight: 1.7 }}>
                 <strong>Positioned as:</strong> An optimization and decision intelligence layer
                 that complements existing railway planning systems — not a replacement.
               </p>

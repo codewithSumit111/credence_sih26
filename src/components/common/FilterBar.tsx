@@ -17,7 +17,7 @@ export default function FilterBar({ children, onSearch, searchPlaceholder }: Pro
             type="text"
             placeholder={searchPlaceholder ?? 'Search...'}
             onChange={e => onSearch(e.target.value)}
-            className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 w-48"
+            className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-400 w-48"
           />
         </div>
       )}

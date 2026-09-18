@@ -44,7 +44,7 @@ export default function ProblemSection() {
               title: 'ENGINEERING',
               desc: 'Track, bridges, civil assets and infrastructure defects',
               icon: <HardHat size={24} />,
-              color: '#1D4ED8'
+              color: '#1B6B45'
             },
             {
               title: 'S&T',

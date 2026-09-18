@@ -167,9 +167,9 @@ export default function BlockPlans() {
           departments: b.departments || ['ENG'],
           jobs: b.jobIds ? (b.jobIds.length > 1 ? `${b.jobIds.length} (Bundled)` : '1') : '1',
           jobCount: b.jobIds ? b.jobIds.length : 1,
-          priority: b.priority > 0.5 ? 'HIGH' : (b.priority > 0.3 ? 'MEDIUM' : 'LOW'),
+          priority: typeof b.priority === 'string' ? (b.priority as string).toUpperCase() : (Number(b.priority) > 0.5 ? 'HIGH' : 'MEDIUM'),
           status: b.status || 'AI-OPTIMIZED',
-          affectedTrains: b.trainImpact > 0 ? 1 : 0
+          affectedTrains: Array.isArray(b.affectedTrains) ? b.affectedTrains.length : (Number((b as any).trainImpact) || 0)
         }));
         setBlocksData(mapped as any);
         if (mapped.length > 0) setSelectedId(mapped[0].id);
@@ -265,10 +265,10 @@ export default function BlockPlans() {
           <button
             onClick={handleRunOptimizer}
             disabled={optimizing}
-            className="flex items-center gap-2 bg-white border border-slate-300 hover:border-blue-600 hover:bg-slate-50 text-slate-700 hover:text-blue-700 font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-xs"
+            className="flex items-center gap-2 bg-white border border-slate-300 hover:border-emerald-600 hover:bg-slate-50 text-slate-700 hover:text-emerald-700 font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-xs"
           >
             {optimizing ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
             ) : (
               <Settings className="w-3.5 h-3.5 text-slate-500" />
             )}
@@ -277,7 +277,7 @@ export default function BlockPlans() {
 
           <button
             onClick={() => navigate('/requests/new')}
-            className="flex items-center gap-1.5 bg-[#0F2240] hover:bg-slate-800 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-xs"
+            className="flex items-center gap-1.5 bg-[#1B6B45] hover:bg-slate-800 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Block Request</span>
@@ -289,7 +289,7 @@ export default function BlockPlans() {
       {optimizing && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-xs space-y-2">
           <div className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+            <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
             <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Google OR-Tools CP-SAT Solver Active
             </span>
@@ -303,7 +303,7 @@ export default function BlockPlans() {
                   idx < optimizerStep
                     ? 'bg-emerald-50/70 border-emerald-200 text-emerald-800 font-medium'
                     : idx === optimizerStep
-                    ? 'bg-blue-50 border-blue-200 text-blue-900 font-medium'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900 font-medium'
                     : 'bg-white border-slate-200 text-slate-400'
                 )}
               >
@@ -434,7 +434,7 @@ export default function BlockPlans() {
 
       {/* ── Filters Bar (Clean & Professional) ───────────────────────────────── */}
       <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-1 min-w-[240px] max-w-[380px] bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus-within:bg-white focus-within:border-blue-500 transition-colors">
+        <div className="flex items-center gap-2 flex-1 min-w-[240px] max-w-[380px] bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus-within:bg-white focus-within:border-emerald-500 transition-colors">
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <input
             type="text"
@@ -558,7 +558,7 @@ export default function BlockPlans() {
                         onClick={() => setSelectedId(block.id)}
                         className={clsx(
                           'cursor-pointer transition-colors',
-                          isSelected ? 'bg-blue-50/60 font-medium' : 'hover:bg-slate-50/60'
+                          isSelected ? 'bg-emerald-50/60 font-medium' : 'hover:bg-slate-50/60'
                         )}
                       >
                         {/* Checkbox / selection indicator */}
@@ -568,7 +568,7 @@ export default function BlockPlans() {
                             className={clsx(
                               'w-4 h-4 rounded flex items-center justify-center border transition-all',
                               isSelected
-                                ? 'bg-blue-600 border-blue-600 text-white'
+                                ? 'bg-emerald-600 border-emerald-600 text-white'
                                 : 'border-slate-300 bg-white hover:border-slate-400'
                             )}
                           >
@@ -638,7 +638,7 @@ export default function BlockPlans() {
                           <span
                             className={clsx(
                               'text-[10px] font-semibold px-2 py-0.5 rounded border',
-                              block.status === 'AI-OPTIMIZED' && 'bg-blue-50/70 border-blue-200 text-blue-700',
+                              block.status === 'AI-OPTIMIZED' && 'bg-emerald-50/70 border-emerald-200 text-emerald-700',
                               block.status === 'PROPOSED' && 'bg-slate-100 border-slate-200 text-slate-700',
                               block.status === 'APPROVED' && 'bg-emerald-50 border-emerald-200 text-emerald-700',
                               block.status === 'PROVISIONAL' && 'bg-amber-50 border-amber-200 text-amber-700',
@@ -661,7 +661,7 @@ export default function BlockPlans() {
                               e.stopPropagation();
                               navigate(`/blocks/${block.id}`);
                             }}
-                            className="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-0.5 hover:underline"
+                            className="text-emerald-600 hover:text-emerald-800 font-semibold inline-flex items-center gap-0.5 hover:underline"
                           >
                             <span>View</span>
                             <span>→</span>
@@ -696,7 +696,7 @@ export default function BlockPlans() {
                 {/* Legend Badges */}
                 <div className="flex items-center gap-2 text-[11px] text-slate-600 font-medium">
                   <span className="flex items-center gap-1">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-blue-600" />
+                    <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600" />
                     AI-Optimized
                   </span>
                   <span className="flex items-center gap-1">
@@ -760,7 +760,7 @@ export default function BlockPlans() {
                 {/* Gantt Row: Engineering */}
                 <div className="flex border-b border-slate-100 h-10 items-center relative z-10 hover:bg-slate-50/40">
                   <div className="w-[140px] flex-shrink-0 px-3 flex items-center gap-2 border-r border-slate-200 bg-white">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-blue-600 flex-shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600 flex-shrink-0" />
                     <span className="text-xs font-bold text-slate-800">Engineering</span>
                   </div>
                   <div className="flex-1 relative h-full">
@@ -776,7 +776,7 @@ export default function BlockPlans() {
                     {/* BR-00231 at 14:00-15:30 */}
                     <div
                       onClick={() => setSelectedId('BR-00231')}
-                      className="absolute top-1.5 h-7 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-xs ring-2 ring-white"
+                      className="absolute top-1.5 h-7 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-xs ring-2 ring-white"
                       style={{ left: `${timeToPct('14:00')}%`, width: `${durationPct('14:00', '15:30')}%` }}
                     >
                       <span className="truncate px-1">BR-00231</span>
@@ -812,7 +812,7 @@ export default function BlockPlans() {
                     {/* BR-00231 at 14:00-15:30 */}
                     <div
                       onClick={() => setSelectedId('BR-00231')}
-                      className="absolute top-1.5 h-7 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-xs ring-2 ring-white"
+                      className="absolute top-1.5 h-7 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-xs ring-2 ring-white"
                       style={{ left: `${timeToPct('14:00')}%`, width: `${durationPct('14:00', '15:30')}%` }}
                     >
                       <span className="truncate px-1">BR-00231</span>
@@ -882,7 +882,7 @@ export default function BlockPlans() {
                 <div className="px-3 pt-2">
                   <button
                     onClick={() => setShowAllTrains(!showAllTrains)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition-colors cursor-pointer"
                   >
                     {showAllTrains ? (
                       <>
@@ -912,7 +912,7 @@ export default function BlockPlans() {
                 <h3 className="text-[18px] font-bold text-slate-900 font-mono leading-none">
                   {selectedBlock.id}
                 </h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-blue-50/80 border-blue-200 text-blue-700">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-emerald-50/80 border-emerald-200 text-emerald-700">
                   {selectedBlock.status}
                 </span>
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded border bg-slate-100 border-slate-200 text-slate-700">
@@ -948,7 +948,7 @@ export default function BlockPlans() {
                 className={clsx(
                   'pb-2 transition-colors relative',
                   activeTab === 'overview'
-                    ? 'text-blue-700 border-b-2 border-blue-600 font-bold'
+                    ? 'text-emerald-700 border-b-2 border-emerald-600 font-bold'
                     : 'text-slate-500 hover:text-slate-800'
                 )}
               >
@@ -959,7 +959,7 @@ export default function BlockPlans() {
                 className={clsx(
                   'pb-2 transition-colors relative',
                   activeTab === 'jobs'
-                    ? 'text-blue-700 border-b-2 border-blue-600 font-bold'
+                    ? 'text-emerald-700 border-b-2 border-emerald-600 font-bold'
                     : 'text-slate-500 hover:text-slate-800'
                 )}
               >
@@ -970,7 +970,7 @@ export default function BlockPlans() {
                 className={clsx(
                   'pb-2 transition-colors relative',
                   activeTab === 'trains'
-                    ? 'text-blue-700 border-b-2 border-blue-600 font-bold'
+                    ? 'text-emerald-700 border-b-2 border-emerald-600 font-bold'
                     : 'text-slate-500 hover:text-slate-800'
                 )}
               >
@@ -981,7 +981,7 @@ export default function BlockPlans() {
                 className={clsx(
                   'pb-2 transition-colors relative',
                   activeTab === 'reasoning'
-                    ? 'text-blue-700 border-b-2 border-blue-600 font-bold'
+                    ? 'text-emerald-700 border-b-2 border-emerald-600 font-bold'
                     : 'text-slate-500 hover:text-slate-800'
                 )}
               >
@@ -1131,7 +1131,7 @@ export default function BlockPlans() {
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setShowApproveDialog(true)}
-                  className="bg-[#0F2240] hover:bg-slate-800 text-white font-semibold text-xs py-2 px-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-xs"
+                  className="bg-[#1B6B45] hover:bg-slate-800 text-white font-semibold text-xs py-2 px-2 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-xs"
                 >
                   <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Approve Block</span>
@@ -1139,7 +1139,7 @@ export default function BlockPlans() {
 
                 <button
                   onClick={() => toast.info('Opening schedule modification window...')}
-                  className="bg-white border border-slate-300 hover:border-blue-600 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2 px-2 rounded-lg transition-colors shadow-xs text-center"
+                  className="bg-white border border-slate-300 hover:border-emerald-600 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2 px-2 rounded-lg transition-colors shadow-xs text-center"
                 >
                   Modify
                 </button>

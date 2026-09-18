@@ -16,7 +16,7 @@ export default function RecommendationCard({ block, selected, onClick, onView }:
       onClick={onClick}
       className={clsx(
         'border rounded p-3 cursor-pointer transition-all',
-        selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'
+        selected ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:border-gray-300'
       )}
     >
       <div className="flex items-center justify-between">
@@ -34,7 +34,7 @@ export default function RecommendationCard({ block, selected, onClick, onView }:
           </span>
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(); }}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+            className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
           >
             VIEW →
           </button>

@@ -4,11 +4,11 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const metrics = [
   { label: 'Asset Availability', direction: 'up', color: '#059669', desc: 'More assets made available through coordinated multi-department block planning.' },
-  { label: 'Block Utilisation', direction: 'up', color: '#1D4ED8', desc: 'Higher proportion of each block window utilized through job consolidation.' },
+  { label: 'Block Utilisation', direction: 'up', color: '#1B6B45', desc: 'Higher proportion of each block window utilized through job consolidation.' },
   { label: 'Train Disruption', direction: 'down', color: '#EF4444', desc: 'Reduced train impact by optimizing block windows around traffic patterns.' },
   { label: 'Multi-Dept. Coordination', direction: 'up', color: '#7C3AED', desc: 'Engineering, S&T, and TRD maintenance consolidated into compatible blocks.' },
-  { label: 'Unplanned Downtime', direction: 'down', color: '#D97706', desc: 'Risk-driven prioritization reduces reactive emergency interventions.' },
-  { label: 'Planning Explainability', direction: 'up', color: '#0EA5E9', desc: 'Every recommendation is traceable, auditable, and human-verifiable.' },
+  { label: 'Unplanned Downtime', direction: 'down', color: '#D4A843', desc: 'Risk-driven prioritization reduces reactive emergency interventions.' },
+  { label: 'Planning Explainability', direction: 'up', color: '#0D9488', desc: 'Every recommendation is traceable, auditable, and human-verifiable.' },
 ];
 
 export default function ImpactMetrics() {
@@ -18,7 +18,7 @@ export default function ImpactMetrics() {
     <section
       ref={ref as unknown as React.RefObject<HTMLElement>}
       className="section-padding"
-      style={{ background: '#EEF3F8' }}
+      style={{ background: '#EDF5F0' }}
       aria-labelledby="impact-heading"
     >
       <div className="container-site">
@@ -61,10 +61,10 @@ export default function ImpactMetrics() {
                   {m.direction === 'up' ? '↑ IMPROVEMENT' : '↓ REDUCTION'}
                 </div>
               </div>
-              <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#101828', marginBottom: '0.5rem', lineHeight: 1.3 }}>
+              <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#122A1F', marginBottom: '0.5rem', lineHeight: 1.3 }}>
                 {m.label}
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#667085', lineHeight: 1.65 }}>{m.desc}</p>
+              <p style={{ fontSize: '0.8rem', color: '#5A7A6C', lineHeight: 1.65 }}>{m.desc}</p>
               <div style={{ height: 2, background: m.color, borderRadius: 1, marginTop: '1.25rem', opacity: 0.2 }} />
             </motion.div>
           ))}

@@ -69,7 +69,7 @@ export default function Navbar() {
               KAVACH
             </div>
             <div style={{ fontSize: '0.6rem', color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase', lineHeight: 1.2, marginTop: 1 }}>
-              SIH26027
+              Central Railway
             </div>
           </div>
         </a>

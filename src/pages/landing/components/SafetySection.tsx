@@ -3,11 +3,11 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { Shield, Eye, Lock, CheckCircle2, UserCheck } from 'lucide-react';
 
 const trustChain = [
-  { label: 'AI Recommendation', icon: <Eye size={18} />, desc: 'Explainable, multi-department optimized block proposal', color: '#1D4ED8' },
+  { label: 'AI Recommendation', icon: <Eye size={18} />, desc: 'Explainable, multi-department optimized block proposal', color: '#1B6B45' },
   { label: 'Dept. Validation', icon: <UserCheck size={18} />, desc: 'Department heads review maintenance jobs and resource assignments', color: '#7C3AED' },
-  { label: 'Safety Verification', icon: <Shield size={18} />, desc: 'Hard constraint checks — safety, timetable, corridor availability', color: '#D97706' },
+  { label: 'Safety Verification', icon: <Shield size={18} />, desc: 'Hard constraint checks — safety, timetable, corridor availability', color: '#D4A843' },
   { label: 'Authorized Approval', icon: <Lock size={18} />, desc: 'Competent railway authority grants or modifies the block', color: '#059669' },
-  { label: 'Execution', icon: <CheckCircle2 size={18} />, desc: 'Block executed under authorized supervision', color: '#0EA5E9' },
+  { label: 'Execution', icon: <CheckCircle2 size={18} />, desc: 'Block executed under authorized supervision', color: '#0D9488' },
 ];
 
 const principles = [
@@ -37,7 +37,7 @@ export default function SafetySection() {
           <span className="section-label" style={{ display: 'block', marginBottom: '0.875rem' }}>Safety & Oversight</span>
           <h2 id="safety-heading" className="section-heading" style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', marginBottom: '1rem' }}>
             AI recommends.
-            <span className="text-gradient-blue"> Railway authorities decide.</span>
+            <span className="text-gradient-accent"> Railway authorities decide.</span>
           </h2>
           <p className="section-subheading" style={{ maxWidth: 540, margin: '0 auto' }}>
             Every block recommendation passes through a rigorous human validation chain before any
@@ -54,10 +54,10 @@ export default function SafetySection() {
           >
             <div style={{
               padding: '1.75rem', borderRadius: 16,
-              background: '#F7F9FC', border: '1px solid #E4EDF6',
-              boxShadow: '0 2px 12px rgba(16,24,40,0.04)',
+              background: '#F4F9F6', border: '1px solid #C5D9CE',
+              boxShadow: '0 2px 12px rgba(16,40,24,0.04)',
             }}>
-              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5A7A6C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
                 Decision Chain
               </div>
               {trustChain.map((step, i) => (
@@ -82,8 +82,8 @@ export default function SafetySection() {
                     )}
                   </div>
                   <div style={{ paddingBottom: i < trustChain.length - 1 ? '0.875rem' : '0' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#101828', marginBottom: 2 }}>{step.label}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#667085', lineHeight: 1.55 }}>{step.desc}</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#122A1F', marginBottom: 2 }}>{step.label}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#5A7A6C', lineHeight: 1.55 }}>{step.desc}</div>
                   </div>
                 </motion.div>
               ))}
@@ -96,7 +96,7 @@ export default function SafetySection() {
             animate={isVisible ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#5A7A6C', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
               Design Principles
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem', marginBottom: '1.5rem' }}>
@@ -109,15 +109,15 @@ export default function SafetySection() {
                   style={{
                     display: 'flex', gap: '1rem', padding: '1.125rem 1.25rem',
                     borderRadius: 10, background: '#FFFFFF',
-                    border: '1px solid #E4EDF6', alignItems: 'flex-start',
-                    boxShadow: '0 1px 4px rgba(16,24,40,0.04)',
+                    border: '1px solid #E6F0EA', alignItems: 'flex-start',
+                    boxShadow: '0 1px 4px rgba(16,40,24,0.04)',
                   }}
                 >
                   <div style={{
                     width: 34, height: 34, borderRadius: 8,
-                    background: '#EFF6FF', border: '1px solid rgba(29,78,216,0.12)',
+                    background: '#F0FBF5', border: '1px solid rgba(27,107,69,0.18)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#1D4ED8', flexShrink: 0,
+                    color: '#1B6B45', flexShrink: 0,
                   }}>
                     {p.icon}
                   </div>

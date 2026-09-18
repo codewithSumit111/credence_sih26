@@ -1,5 +1,5 @@
 // ============================================================
-// CORE DOMAIN TYPES — Railway Intelligence SIH26027
+// CORE DOMAIN TYPES — Central Railway Maintenance Intelligence
 // ============================================================
 
 export type Department = 'Engineering' | 'S&T' | 'Traction';

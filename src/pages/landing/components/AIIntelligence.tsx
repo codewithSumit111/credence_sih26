@@ -18,9 +18,9 @@ const cards = [
   {
     title: 'Hybrid Optimizer',
     subtitle: 'CP-SAT + GNN + ALNS',
-    color: '#1D4ED8',
-    lightBg: '#EFF6FF',
-    border: 'rgba(29,78,216,0.15)',
+    color: '#1B6B45',
+    lightBg: '#ECFDF5',
+    border: 'rgba(27,107,69,0.15)',
     body: 'CP-SAT validates feasibility against hard constraints. GNN guides neighbourhood search. ALNS iteratively refines to optimality.',
     bars: [
       { label: 'Feasibility Check', value: 100 },

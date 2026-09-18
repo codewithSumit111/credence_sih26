@@ -1,6 +1,6 @@
 /**
  * KAVACH Platform Configuration
- * SIH26027 — AI-Powered Block Planning
+ * Central Railway — Automatic Block Planning
  *
  * Set VITE_PROTOTYPE_URL in your .env file to point to the
  * running Python prototype / login page.

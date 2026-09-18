@@ -1,16 +1,27 @@
-import { motion } from 'framer-motion';
-import { ArrowRight, ChevronDown, ShieldCheck, Activity, BrainCircuit, Users, Building2 } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import { ArrowRight, Play, ShieldCheck, Activity, BrainCircuit, Leaf, BarChart3, Calendar } from 'lucide-react';
 import { openPrototype } from '../lib/landingConfig';
+import trainBannerImg from '../../../assets/train_banner.jpg';
 
 export default function Hero() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+
+  // Parallax for background
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
+
   const scrollToNext = () => {
     document.querySelector('#platform')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <section
+      ref={heroRef}
       id="hero"
-      className="mesh-gradient-hero"
       style={{
         minHeight: '100vh',
         display: 'flex',
@@ -21,269 +32,303 @@ export default function Hero() {
       }}
       aria-label="Hero section"
     >
-      {/* ── Background Grid & Gradients ── */}
-      <div className="bg-grid-light" style={{ position: 'absolute', inset: 0, opacity: 0.6 }} />
+      {/* ── Full-bleed Train Photo Background with Parallax ── */}
+      <motion.div
+        style={{
+          position: 'absolute', inset: 0,
+          y: bgY,
+          backgroundImage: `url(${trainBannerImg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%',
+          willChange: 'transform',
+        }}
+      />
+
+      {/* Dark gradient overlay */}
       <div style={{
-        position: 'absolute',
-        top: '-20%', right: '-10%',
-        width: 800, height: 800,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(14,165,233,0.04) 0%, transparent 65%)',
-        pointerEvents: 'none',
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(135deg, rgba(15,42,31,0.92) 0%, rgba(18,42,31,0.85) 40%, rgba(27,59,45,0.65) 100%)',
       }} />
 
-      <div style={{ flex: 1, display: 'flex', position: 'relative', width: '100%', maxWidth: 1440, margin: '0 auto' }}>
-        
-        {/* ── LEFT: Content (~40%) ── */}
+      {/* Subtle grid texture */}
+      <div className="bg-grid-light" style={{ position: 'absolute', inset: 0, opacity: 0.15 }} />
+
+      {/* ── Content ── */}
+      <div style={{
+        flex: 1, display: 'flex', position: 'relative', width: '100%',
+        maxWidth: 1280, margin: '0 auto', zIndex: 10,
+      }}>
+
+        {/* ── LEFT: Text Content (~50%) ── */}
         <div style={{
-          width: '40%',
-          padding: '4rem 2rem 4rem 4rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          position: 'relative',
-          zIndex: 10,
+          width: '50%', padding: '4rem 2rem 4rem 2rem',
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
           {/* Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}
           >
-            <span className="badge badge-blue" style={{ gap: '0.5rem' }}>
-              <span className="glow-dot-blue" />
-              SIH26027
-            </span>
-            <span style={{ color: '#D9E2EC' }}>|</span>
-            <span style={{ fontSize: '0.7rem', color: '#64748B', letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace' }}>
-              SMART INDIA HACKATHON 2025
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+              padding: '0.35rem 0.95rem', borderRadius: 9999,
+              background: 'rgba(27,107,69,0.25)', border: '1px solid rgba(27,107,69,0.4)',
+              fontSize: '0.72rem', fontWeight: 700, color: '#A7F3D0', letterSpacing: '0.06em',
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%', background: '#4ADE80',
+                boxShadow: '0 0 8px rgba(74,222,128,0.5)',
+                animation: 'pulse-node 2s ease-in-out infinite',
+              }} />
+              CENTRAL RAILWAY • NAGPUR DIVISION
             </span>
           </motion.div>
 
           {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.1 }}
-            className="font-display"
-            style={{ fontSize: 'clamp(2.5rem, 4vw, 4rem)', marginBottom: '1.5rem', color: '#0F172A' }}
+            transition={{ duration: 0.65, delay: 0.2 }}
+            style={{
+              fontFamily: 'Inter, sans-serif', fontWeight: 800,
+              fontSize: 'clamp(2.25rem, 3.8vw, 3.5rem)',
+              letterSpacing: '-0.03em', lineHeight: 1.08,
+              color: '#FFFFFF', marginBottom: '1.5rem',
+            }}
           >
-            AI-Powered<br/>
-            Block Planning for<br/>
-            <span className="text-gradient-blue">Smarter Railway</span><br/>
-            <span className="text-gradient-blue">Operations</span>
+            Smarter Planning<br/>
+            for a Stronger<br/>
+            <span style={{
+              background: 'linear-gradient(135deg, #4ADE80 0%, #2DD4BF 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>Rail Network</span>
           </motion.h1>
 
-          {/* Subheading */}
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="section-subheading"
-            style={{ maxWidth: 460, marginBottom: '2.5rem', fontSize: '1.0625rem', color: '#64748B' }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            style={{
+              fontSize: '1.0625rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.7,
+              maxWidth: 460, marginBottom: '2.5rem',
+            }}
           >
-            Coordinate maintenance, infrastructure availability and
-            train operations through <strong style={{ color: '#0F172A', fontWeight: 600 }}>explainable AI-driven block optimization</strong> — from
-            maintenance demand to executable block plan.
+            Optimize block planning, maximize asset availability, and ensure safer,
+            more efficient train operations — with the power of{' '}
+            <strong style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>explainable AI</strong>.
           </motion.p>
 
           {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.3 }}
+            transition={{ duration: 0.55, delay: 0.45 }}
             style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
           >
             <motion.button
-              className="btn-primary"
-              style={{ fontSize: '0.9375rem', padding: '1rem 2rem' }}
-              onClick={scrollToNext}
-              whileHover={{ scale: 1.02, y: -1 }}
+              onClick={openPrototype}
+              whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.98 }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                padding: '0.9rem 2rem', background: '#1B6B45', color: '#fff',
+                fontWeight: 600, fontSize: '0.9375rem', borderRadius: 10, border: 'none',
+                cursor: 'pointer', boxShadow: '0 4px 16px rgba(27,107,69,0.35)',
+                transition: 'all 0.2s ease',
+              }}
             >
-              Explore the Intelligence
-              <ChevronDown size={17} />
+              Get Started
+              <ArrowRight size={17} />
             </motion.button>
             <motion.button
-              className="btn-ghost"
-              style={{ fontSize: '0.9375rem', padding: '1rem 2rem' }}
-              onClick={openPrototype}
-              whileHover={{ scale: 1.02, y: -1 }}
+              onClick={scrollToNext}
+              whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.98 }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                padding: '0.9rem 2rem', background: 'rgba(255,255,255,0.1)',
+                color: '#fff', fontWeight: 600, fontSize: '0.9375rem', borderRadius: 10,
+                border: '1.5px solid rgba(255,255,255,0.25)', cursor: 'pointer',
+                backdropFilter: 'blur(8px)', transition: 'all 0.2s ease',
+              }}
             >
-              Enter Planning System
-              <ArrowRight size={17} />
+              <Play size={15} />
+              Watch Demo
             </motion.button>
           </motion.div>
         </div>
 
-        {/* ── RIGHT: Railway Digital Twin (~60%) ── */}
+        {/* ── RIGHT: Dashboard Preview Card (~50%) ── */}
         <div style={{
-          width: '60%',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '3rem 1rem',
         }}>
-          {/* Fades */}
-          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 120, background: 'linear-gradient(90deg, #FFFFFF, transparent)', zIndex: 5 }} />
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 120, background: 'linear-gradient(-90deg, #FFFFFF, transparent)', zIndex: 5 }} />
-
-          {/* 3D Isometric Railway Placeholder (CSS/SVG based) */}
-          <div style={{ position: 'relative', width: '100%', height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            
-            {/* The Railway Track (isometric transform) */}
-            <div style={{
-              position: 'absolute',
-              width: '120%', height: 120,
-              background: 'rgba(29,78,216,0.05)',
-              transform: 'rotateX(60deg) rotateZ(-45deg)',
-              border: '2px dashed rgba(29,78,216,0.2)',
-              borderRadius: 8,
-              boxShadow: 'inset 0 0 20px rgba(14,165,233,0.1)',
-            }}>
-              {/* Train */}
-              <motion.div
-                style={{
-                  position: 'absolute', top: '40%', left: 0,
-                  width: 120, height: 20, background: 'linear-gradient(90deg, #1D4ED8, #0EA5E9)',
-                  borderRadius: 10, boxShadow: '0 4px 12px rgba(29,78,216,0.3)',
-                }}
-                animate={{ left: ['-20%', '120%'] }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-              />
-            </div>
-
-            {/* AI Optimization Core */}
-            <div style={{
-              position: 'absolute', right: '15%', top: '45%',
-              width: 140, height: 140,
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-            }}>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-                style={{
-                  width: '100%', height: '100%', borderRadius: '50%',
-                  background: 'conic-gradient(from 0deg, rgba(29,78,216,0.1), rgba(14,165,233,0.3), rgba(29,78,216,0.1))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <div style={{
-                  width: 80, height: 80, borderRadius: 16,
-                  background: 'linear-gradient(135deg, #1D4ED8, #0EA5E9)',
-                  boxShadow: '0 12px 32px rgba(29,78,216,0.4)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexDirection: 'column', color: '#fff',
-                  transform: 'rotateX(20deg) rotateY(15deg)',
-                }}>
-                  <BrainCircuit size={32} />
-                  <span style={{ fontSize: '0.55rem', fontWeight: 800, marginTop: 4, letterSpacing: '0.1em' }}>AI CORE</span>
-                </div>
-              </motion.div>
-              
-              {/* Core Output Path */}
-              <svg style={{ position: 'absolute', top: '50%', left: -80, width: 80, height: 20, overflow: 'visible' }}>
-                <line x1="0" y1="10" x2="80" y2="10" stroke="rgba(29,78,216,0.3)" strokeWidth="2" strokeDasharray="4 4" />
-                <motion.circle r="3" fill="#1D4ED8" animate={{ cx: [80, 0], cy: [10, 10] }} transition={{ duration: 1.5, repeat: Infinity }} />
-              </svg>
-            </div>
-
-            {/* Floating Data Cards */}
-            {[
-              { id: 'TMS', label: 'Train Movement', top: '15%', left: '10%' },
-              { id: 'SMMS', label: 'Signal & Telecom', top: '5%', left: '40%' },
-              { id: 'TDMS', label: 'Traction Distribution', top: '45%', left: '5%' },
-              { id: 'BDMS', label: 'Block & Disconnection', top: '25%', left: '60%' },
-              { id: 'COA', label: 'Corridor Availability', top: '70%', left: '35%' },
-            ].map((card, i) => (
-              <motion.div
-                key={card.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1, y: [0, -5, 0] }}
-                transition={{ duration: 3, delay: i * 0.2, repeat: Infinity, ease: 'easeInOut' }}
-                style={{
-                  position: 'absolute', top: card.top, left: card.left,
-                  background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(30,80,150,0.12)', borderRadius: 14,
-                  padding: '0.75rem 1rem', boxShadow: '0 4px 16px rgba(16,24,40,0.06)',
-                  zIndex: 10, minWidth: 140,
-                }}
-              >
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1D4ED8', fontFamily: 'JetBrains Mono' }}>{card.id}</div>
-                <div style={{ fontSize: '0.65rem', color: '#64748B' }}>{card.label}</div>
-                <div style={{ height: 12, marginTop: 6, display: 'flex', gap: 2, alignItems: 'flex-end' }}>
-                  {[0.4, 0.7, 0.5, 0.9, 0.6].map((h, j) => (
-                    <div key={j} style={{ width: 4, height: `${h * 100}%`, background: 'rgba(14,165,233,0.4)', borderRadius: 1 }} />
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Block Window Panel */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              style={{
-                position: 'absolute', bottom: '15%', right: '35%',
-                background: 'rgba(217,119,6,0.1)', border: '1px solid rgba(217,119,6,0.3)',
-                borderRadius: 8, padding: '0.75rem', backdropFilter: 'blur(4px)',
-                zIndex: 8,
-              }}
-            >
-              <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#D97706', letterSpacing: '0.1em' }}>BLOCK WINDOW</div>
-              <div style={{ fontSize: '0.875rem', color: '#D97706', fontFamily: 'JetBrains Mono' }}>01:30 — 03:15</div>
-            </motion.div>
-
-            {/* Subtle Technical Markers */}
-            {[
-              { l: 'OHE', top: '30%', left: '20%' },
-              { l: 'S&T', top: '60%', left: '70%' },
-              { l: 'ENGINEERING', top: '40%', left: '50%' },
-            ].map((m, i) => (
-              <div key={i} style={{
-                position: 'absolute', top: m.top, left: m.left,
-                fontSize: '0.55rem', fontWeight: 700, color: '#94A3B8',
-                letterSpacing: '0.15em', fontFamily: 'JetBrains Mono',
-                display: 'flex', alignItems: 'center', gap: 4, zIndex: 6,
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5, type: 'spring', damping: 20, stiffness: 100 }}
+            style={{
+              width: '100%', maxWidth: 480,
+              background: 'rgba(255,255,255,0.12)',
+              backdropFilter: 'blur(20px) saturate(1.4)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              borderRadius: 20, padding: '1.5rem',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.15)',
+            }}
+          >
+            {/* Mini navbar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: 7,
+                background: 'linear-gradient(135deg, #1B6B45, #0D9488)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#CBD5E1' }} />
-                {m.l}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                </svg>
               </div>
-            ))}
-          </div>
+              <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }}>
+                KAVACH
+              </span>
+              <div style={{ flex: 1 }} />
+              {['Dashboard', 'Block Planning', 'Corridor Map'].map((tab, i) => (
+                <span key={tab} style={{
+                  fontSize: '0.55rem', fontWeight: 600, color: i === 0 ? '#4ADE80' : 'rgba(255,255,255,0.4)',
+                  padding: '0.25rem 0.5rem', borderRadius: 5,
+                  background: i === 0 ? 'rgba(74,222,128,0.12)' : 'transparent',
+                }}>
+                  {tab}
+                </span>
+              ))}
+            </div>
+
+            {/* Block Schedule header */}
+            <div style={{
+              background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '1rem',
+              border: '1px solid rgba(255,255,255,0.1)', marginBottom: '0.75rem',
+            }}>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                BLOCK SCHEDULE
+              </div>
+              {/* Mini Gantt bars */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                {[
+                  { name: 'Delhi – Mumbai', w: '70%', color: '#4ADE80' },
+                  { name: 'Pune – Lonavala', w: '45%', color: '#FBBF24' },
+                  { name: 'Mumbai – Chennai', w: '60%', color: '#2DD4BF' },
+                  { name: 'Howrah – Patna', w: '35%', color: '#F87171' },
+                ].map((bar) => (
+                  <div key={bar.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.5)', width: 72, flexShrink: 0, fontFamily: 'JetBrains Mono' }}>
+                      {bar.name}
+                    </span>
+                    <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 3 }}>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: bar.w }}
+                        transition={{ duration: 1.2, delay: 0.8, ease: 'easeOut' }}
+                        style={{ height: '100%', background: bar.color, borderRadius: 3, opacity: 0.8 }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom row: Corridor Map mini + AI Risk Score */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              {/* Mini corridor map */}
+              <div style={{
+                background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.75rem',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}>
+                <div style={{ fontSize: '0.55rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+                  CORRIDOR MAP
+                </div>
+                <svg viewBox="0 0 120 90" style={{ width: '100%', height: 'auto' }}>
+                  {/* Simplified India rail routes */}
+                  <path d="M60,10 L40,35 L30,70" stroke="#4ADE80" strokeWidth="1.5" fill="none" opacity="0.6" />
+                  <path d="M60,10 L85,40 L90,70" stroke="#2DD4BF" strokeWidth="1.5" fill="none" opacity="0.6" />
+                  <path d="M40,35 L85,40" stroke="#FBBF24" strokeWidth="1.5" fill="none" opacity="0.5" strokeDasharray="3 2" />
+                  <path d="M30,70 L70,80" stroke="#F87171" strokeWidth="1.5" fill="none" opacity="0.4" />
+                  {/* City dots */}
+                  {[
+                    { cx: 60, cy: 10, label: 'Delhi' },
+                    { cx: 40, cy: 35, label: 'Mumbai' },
+                    { cx: 85, cy: 40, label: 'Kolkata' },
+                    { cx: 30, cy: 70, label: 'Bangalore' },
+                    { cx: 90, cy: 70, label: 'Chennai' },
+                  ].map((city) => (
+                    <g key={city.label}>
+                      <circle cx={city.cx} cy={city.cy} r="3" fill="#4ADE80" opacity="0.8" />
+                      <circle cx={city.cx} cy={city.cy} r="5" fill="none" stroke="#4ADE80" strokeWidth="0.5" opacity="0.3" />
+                    </g>
+                  ))}
+                </svg>
+              </div>
+
+              {/* AI Risk Score */}
+              <div style={{
+                background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '0.75rem',
+                border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center',
+              }}>
+                <div style={{ fontSize: '0.55rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+                  AI RISK SCORE
+                </div>
+                <svg viewBox="0 0 80 80" style={{ width: 64, height: 64, margin: '0 auto' }}>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+                  <motion.circle
+                    cx="40" cy="40" r="32" fill="none" stroke="#4ADE80" strokeWidth="6"
+                    strokeLinecap="round"
+                    strokeDasharray={`${0.78 * 2 * Math.PI * 32} ${2 * Math.PI * 32}`}
+                    initial={{ strokeDashoffset: 2 * Math.PI * 32 }}
+                    animate={{ strokeDashoffset: 0.22 * 2 * Math.PI * 32 }}
+                    transition={{ duration: 1.5, delay: 1, ease: 'easeOut' }}
+                    transform="rotate(-90 40 40)"
+                  />
+                  <text x="40" y="38" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="800" fontFamily="Inter">78</text>
+                  <text x="40" y="50" textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="5" fontWeight="600">%</text>
+                </svg>
+                <div style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>
+                  High-Risk Assets: 12 / 156
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
       {/* ── BOTTOM: Value Strip ── */}
       <div style={{
-        background: '#FFFFFF',
-        borderTop: '1px solid #F2F4F7',
-        padding: '1.5rem 0',
-        zIndex: 20,
+        background: 'rgba(0,0,0,0.2)',
+        backdropFilter: 'blur(12px)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+        padding: '1.25rem 0',
+        zIndex: 20, position: 'relative',
       }}>
         <div className="container-site" style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
           {[
             { icon: <ShieldCheck size={18} />, t1: 'Safer Operations', t2: 'Minimize disruptions' },
             { icon: <Activity size={18} />, t1: 'Higher Asset Availability', t2: 'Coordinated planning' },
-            { icon: <BrainCircuit size={18} />, t1: 'Data-Driven Decisions', t2: 'Explainable & transparent' },
-            { icon: <Users size={18} />, t1: 'Multi-Department', t2: 'Engineering • S&T • TRD' },
-            { icon: <Building2 size={18} />, t1: 'Built for Indian Railways', t2: 'Scalable • Responsible AI' },
+            { icon: <BrainCircuit size={18} />, t1: 'Faster Re-planning', t2: 'Rolling-horizon AI' },
+            { icon: <Leaf size={18} />, t1: 'Greener Railways', t2: 'Optimized resource use' },
           ].map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + i * 0.1 }}
+              transition={{ delay: 0.6 + i * 0.1 }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
             >
-              <div style={{ color: '#1D4ED8' }}>{item.icon}</div>
+              <div style={{ color: '#4ADE80' }}>{item.icon}</div>
               <div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0F172A' }}>{item.t1}</div>
-                <div style={{ fontSize: '0.7rem', color: '#64748B' }}>{item.t2}</div>
+                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{item.t1}</div>
+                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)' }}>{item.t2}</div>
               </div>
             </motion.div>
           ))}

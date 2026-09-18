@@ -2,9 +2,9 @@ import './landing.css';
 import LandingNavbar from './components/Navbar';
 import Hero from './components/Hero';
 import ContextStrip from './components/ContextStrip';
-import ProblemSection from './components/ProblemSection';
-import ScrollJourney from './components/ScrollJourney';
-import DynamicReoptimization from './components/DynamicReoptimization';
+import FeaturesGrid from './components/FeaturesGrid';
+import PipelineFlow from './components/PipelineFlow';
+import OperationalView from './components/OperationalView';
 import PlanningHorizons from './components/PlanningHorizons';
 import ImpactMetrics from './components/ImpactMetrics';
 import SafetySection from './components/SafetySection';
@@ -19,9 +19,9 @@ export default function LandingPage() {
       <main>
         <Hero />
         <ContextStrip />
-        <ProblemSection />
-        <ScrollJourney />
-        <DynamicReoptimization />
+        <FeaturesGrid />
+        <PipelineFlow />
+        <OperationalView />
         <PlanningHorizons />
         <ImpactMetrics />
         <SafetySection />

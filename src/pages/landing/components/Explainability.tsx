@@ -63,18 +63,18 @@ export default function Explainability() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div style={{
-              background: '#FFFFFF', border: '2px solid #1D4ED8',
+              background: '#FFFFFF', border: '2px solid #1B6B45',
               borderRadius: 16, padding: '2rem',
-              boxShadow: '0 4px 24px rgba(29,78,216,0.08)',
+              boxShadow: '0 4px 24px rgba(27,107,69,0.1)',
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: '1px solid #F2F4F7' }}>
                 <div>
                   <div style={{ fontSize: '0.65rem', color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>Recommended Block</div>
                   <div style={{ fontWeight: 800, fontSize: '1.125rem', color: '#101828' }}>PUNE — LONAVALA</div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.875rem', color: '#1D4ED8', marginTop: 2 }}>01:30 — 03:15</div>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.875rem', color: '#1B6B45', marginTop: 2 }}>01:30 — 03:15</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span className="badge badge-blue">Optimal</span>
+                  <span className="badge badge-green">Optimal</span>
                   <div className="label-illustrative" style={{ marginTop: 4 }}>Illustrative</div>
                 </div>
               </div>

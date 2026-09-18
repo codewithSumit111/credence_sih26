@@ -1,6 +1,6 @@
 /**
  * Landing Page Configuration
- * SIH26027 — AI-Powered Block Planning
+ * Central Railway — Automatic Block Planning
  *
  * "Enter Planning System" navigates to the main app dashboard.
  */
