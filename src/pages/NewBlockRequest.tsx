@@ -35,7 +35,7 @@ export default function NewBlockRequest() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const newReq = await blocksApi.submitRequest({
+      const newReq = await blocksApi.createRequest({
         department,
         maintenanceType,
         track: trackSection,

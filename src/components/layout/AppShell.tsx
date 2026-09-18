@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import { Toaster } from 'sonner';
 import ReportGeneratorModal from '../reports/ReportGeneratorModal';
+import OnboardingTour from '../onboarding/OnboardingTour';
 
 export default function AppShell() {
   const location = useLocation();
@@ -19,6 +20,7 @@ export default function AppShell() {
       </div>
       <Toaster position="top-right" richColors closeButton />
       <ReportGeneratorModal />
+      <OnboardingTour />
     </div>
   );
 }

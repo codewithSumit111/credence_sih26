@@ -588,11 +588,11 @@ export default function ReportsPage() {
 
                     <button
                       onClick={() => {
-                        triggerDownload(`${report.id}_dossier.pdf`, `INDIAN RAILWAYS\n${report.title}\nID: ${report.id}\n${report.summary}`, 'text/plain');
-                        toast.success(`Downloaded ${report.id} (PDF)`);
+                        triggerDownload(`${report.id}_dossier.txt`, `INDIAN RAILWAYS\n${report.title}\nID: ${report.id}\n${report.summary}`, 'text/plain');
+                        toast.success(`Downloaded ${report.id} (Text)`);
                       }}
                       className="p-1.5 bg-white hover:bg-emerald-50 text-gray-600 hover:text-emerald-700 border border-gray-200 hover:border-emerald-300 rounded-lg transition-colors"
-                      title="Download PDF"
+                      title="Download Text"
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -736,8 +736,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    triggerDownload(`${previewReport.id}_dossier.pdf`, `INDIAN RAILWAYS\n${previewReport.title}\nID: ${previewReport.id}\n${previewReport.summary}`, 'text/plain');
-                    toast.success(`Downloaded ${previewReport.id} (PDF)`);
+                    triggerDownload(`${previewReport.id}_dossier.txt`, `INDIAN RAILWAYS\n${previewReport.title}\nID: ${previewReport.id}\n${previewReport.summary}`, 'text/plain');
+                    toast.success(`Downloaded ${previewReport.id} (Text)`);
                   }}
                   className="flex items-center gap-1.5 bg-[#1B6B45] hover:bg-emerald-800 text-white text-[12px] font-bold px-4 py-2 rounded-lg transition-colors"
                 >

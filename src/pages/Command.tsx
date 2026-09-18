@@ -19,7 +19,7 @@ interface DashboardData {
   expectedTrainDelay: number;
   integratedBlockCount: number;
   priorityQueue: MaintenanceJob[];
-  recommendedBlock: OptimizedBlock;
+  recommendedBlock?: OptimizedBlock;
   allBlocks: OptimizedBlock[];
   allTrains: Train[];
 }

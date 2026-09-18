@@ -67,7 +67,7 @@ export default function Requests() {
     }
     setSubmitting(true);
     try {
-      const result = await blocksApi.submitRequest({
+      const result = await blocksApi.createRequest({
         ...form,
         requestedDuration: Number(form.requestedDuration),
         requiredManpower: Number(form.requiredManpower),

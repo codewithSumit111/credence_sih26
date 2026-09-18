@@ -25,7 +25,7 @@ interface DashboardData {
   expectedTrainDelay: number;
   integratedBlockCount: number;
   priorityQueue: MaintenanceJob[];
-  recommendedBlock: OptimizedBlock;
+  recommendedBlock?: OptimizedBlock;
   allBlocks: OptimizedBlock[];
   allTrains: Train[];
 }
@@ -422,7 +422,7 @@ export default function Overview() {
                     onClick={() => navigate('/priority')}
                     className="hover:bg-slate-50/80 cursor-pointer transition-colors"
                   >
-                    <td className="py-2 px-3 font-semibold text-slate-500">{j.rank}</td>
+                    <td className="py-2 px-3 font-semibold text-slate-500">{(j as any).rank}</td>
                     <td className="py-2 px-2 font-bold font-mono text-[#1B6B45]">{j.id}</td>
                     <td className="py-2 px-2 text-slate-600 font-medium">{j.asset}</td>
                     <td className="py-2 px-2 font-semibold text-slate-700">{j.department}</td>
@@ -433,8 +433,8 @@ export default function Overview() {
                       {j.overdueDays || 0} d
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <span className={clsx('inline-block text-[10px] font-semibold px-2 py-0.5 rounded', j.actionStyle)}>
-                        {j.action}
+                      <span className={clsx('inline-block text-[10px] font-semibold px-2 py-0.5 rounded', (j as any).actionStyle)}>
+                        {(j as any).action}
                       </span>
                     </td>
                   </tr>

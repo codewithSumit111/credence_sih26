@@ -114,17 +114,19 @@ export default function BlockDetail() {
           </div>
         }
         actions={
-          <div className="flex items-center gap-2">
-            <SecondaryButton size="sm" onClick={() => toast.info('Modify possession window workflow opened')}>
-              MODIFY WINDOW
-            </SecondaryButton>
-            <DangerButton size="sm" onClick={() => setShowRejectModal(true)}>
-              REJECT
-            </DangerButton>
-            <PrimaryButton size="sm" variant="green" onClick={() => setShowApproveModal(true)}>
-              ✓ APPROVE BLOCK
-            </PrimaryButton>
-          </div>
+          block.status !== 'APPROVED' ? (
+            <div className="flex items-center gap-2">
+              <SecondaryButton size="sm" onClick={() => toast.info('Modify possession window workflow opened')}>
+                MODIFY WINDOW
+              </SecondaryButton>
+              <DangerButton size="sm" onClick={() => setShowRejectModal(true)}>
+                REJECT
+              </DangerButton>
+              <PrimaryButton size="sm" variant="green" onClick={() => setShowApproveModal(true)}>
+                ✓ APPROVE BLOCK
+              </PrimaryButton>
+            </div>
+          ) : null
         }
       />
 
@@ -264,25 +266,33 @@ export default function BlockDetail() {
             </div>
 
             <div className="space-y-2 pt-2 border-t border-gray-100">
-              <PrimaryButton
-                className="w-full justify-center"
-                variant="green"
-                onClick={() => setShowApproveModal(true)}
-              >
-                ✓ APPROVE POSSESSION
-              </PrimaryButton>
-              <SecondaryButton
-                className="w-full justify-center"
-                onClick={() => toast.info('Modification interface')}
-              >
-                MODIFY TIME WINDOW
-              </SecondaryButton>
-              <DangerButton
-                className="w-full justify-center"
-                onClick={() => setShowRejectModal(true)}
-              >
-                REJECT RECOMMENDATION
-              </DangerButton>
+              {block.status !== 'APPROVED' ? (
+                <>
+                  <PrimaryButton
+                    className="w-full justify-center"
+                    variant="green"
+                    onClick={() => setShowApproveModal(true)}
+                  >
+                    ✓ APPROVE POSSESSION
+                  </PrimaryButton>
+                  <SecondaryButton
+                    className="w-full justify-center"
+                    onClick={() => toast.info('Modification interface')}
+                  >
+                    MODIFY TIME WINDOW
+                  </SecondaryButton>
+                  <DangerButton
+                    className="w-full justify-center"
+                    onClick={() => setShowRejectModal(true)}
+                  >
+                    REJECT RECOMMENDATION
+                  </DangerButton>
+                </>
+              ) : (
+                <div className="text-center p-3 text-sm text-green-700 bg-green-50 rounded border border-green-200">
+                  This block is approved and committed.
+                </div>
+              )}
             </div>
           </div>
         </div>

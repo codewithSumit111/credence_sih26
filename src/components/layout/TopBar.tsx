@@ -34,6 +34,15 @@ export default function TopBar() {
           <span>3 ACTIVE ALERTS</span>
         </Link>
 
+        {/* Help / Tour */}
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('replay-tour'))}
+          className="relative p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-600 flex items-center gap-1 text-xs font-semibold"
+          title="Product Tour"
+        >
+          <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md border border-emerald-200">? Help Tour</span>
+        </button>
+
         {/* Bell */}
         <Link 
           to="/events"
