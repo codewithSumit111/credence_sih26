@@ -28,7 +28,7 @@ export default function TopBar() {
         {/* Active Alerts Pill */}
         <Link
           to="/events"
-          className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs transition-colors"
+          className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-xs transition-colors ml-2"
         >
           <AlertOctagon className="w-3.5 h-3.5" />
           <span>3 ACTIVE ALERTS</span>

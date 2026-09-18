@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarClock,
   Train, AlertTriangle, BarChart3,
-  ClipboardList, Wrench,
+  Wrench, FileText,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -14,7 +14,7 @@ const primaryNav = [
   { path: '/trains', label: 'Trains', icon: Train, matchPaths: ['/trains', '/rerouting'] },
   { path: '/live', label: 'Live', icon: AlertTriangle, matchPaths: ['/live', '/events', '/reoptimization'], badge: 1 },
   { path: '/analytics', label: 'Analytics', icon: BarChart3, matchPaths: ['/analytics', '/what-if'] },
-  { path: '/requests', label: 'Requests', icon: ClipboardList, matchPaths: ['/requests'] },
+  { path: '/reports', label: 'Reports', icon: FileText, matchPaths: ['/reports'] },
   { path: '/field', label: 'Field', icon: Wrench, matchPaths: ['/field'] },
 ];
 

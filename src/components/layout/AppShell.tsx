@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import { Toaster } from 'sonner';
+import ReportGeneratorModal from '../reports/ReportGeneratorModal';
 
 export default function AppShell() {
   const location = useLocation();
@@ -17,6 +18,7 @@ export default function AppShell() {
         </main>
       </div>
       <Toaster position="top-right" richColors closeButton />
+      <ReportGeneratorModal />
     </div>
   );
 }

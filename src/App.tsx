@@ -8,6 +8,7 @@ import Plan from './pages/Plan';
 import TrainsPage from './pages/TrainsPage';
 import Live from './pages/Live';
 import Analytics from './pages/Analytics';
+import ReportsPage from './pages/ReportsPage';
 import Requests from './pages/Requests';
 import FieldExecution from './pages/FieldExecution';
 
@@ -22,12 +23,13 @@ export default function App() {
         {/* Default: redirect to command */}
         <Route path="/app" element={<Navigate to="/command" replace />} />
 
-        {/* ── PRIMARY ROUTES (7) ────────────────────────────────────────── */}
+        {/* ── PRIMARY ROUTES (8) ────────────────────────────────────────── */}
         <Route path="command" element={<Command />} />
         <Route path="plan" element={<Plan />} />
         <Route path="trains" element={<TrainsPage />} />
         <Route path="live" element={<Live />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="requests" element={<Requests />} />
 
         {/* Field is rendered inside AppShell too */}

@@ -287,15 +287,12 @@ export default function Analytics() {
             What-If Simulator
             {showWhatIf && <X className="w-3 h-3" />}
           </button>
-          <SecondaryButton size="sm" onClick={() => handleExport('PDF')}>Export PDF</SecondaryButton>
-          <SecondaryButton size="sm" onClick={() => handleExport('EXCEL')}>Export Excel</SecondaryButton>
         </div>
       </div>
 
       {/* What-If Panel (inline) */}
       {showWhatIf && <WhatIfPanel onClose={() => setSearchParams({})} />}
-
-      {/* KPI Cards */}
+          {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <MetricCard label="ASSET UPTIME" value="94.2%" trend="up" trendValue="+1.8% vs last month" highlight={true} icon={<Activity className="w-5 h-5" />} />
         <MetricCard label="BLOCK UTILIZATION" value="81.6%" trend="up" trendValue="+5.2% possession efficiency" icon={<TrendingUp className="w-5 h-5" />} />

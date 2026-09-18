@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
-import { CheckCircle2, ClipboardList } from 'lucide-react';
+import { CheckCircle2, ClipboardList, ArrowLeft } from 'lucide-react';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import { blocksApi } from '../api';
@@ -130,13 +130,26 @@ export default function Requests() {
     <div className="h-full overflow-auto bg-[#F4F5F7]">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-5 py-4">
-        <div className="max-w-[860px] mx-auto flex items-center gap-3">
-          <ClipboardList className="w-5 h-5 text-emerald-700" />
-          <div>
-            <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">New Block Request</h1>
-            <p className="text-[12px] text-gray-500 mt-0.5">
-              Submit a maintenance block request for CP-SAT scheduling optimization
-            </p>
+        <div className="max-w-[860px] mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/plan?view=blocks')}
+              className="flex items-center gap-1 text-[12px] font-semibold text-gray-600 hover:text-emerald-800 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 px-2.5 py-1.5 rounded-lg transition-colors mr-1"
+              title="Return to Plan"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Plan</span>
+            </button>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+              <ClipboardList className="w-4 h-4" />
+            </div>
+            <div>
+              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">New Block Request</h1>
+              <p className="text-[12px] text-gray-500 mt-0.5">
+                Submit a maintenance block request for CP-SAT scheduling optimization
+              </p>
+            </div>
           </div>
         </div>
       </div>

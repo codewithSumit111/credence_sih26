@@ -24,12 +24,14 @@ interface DashboardData {
   allTrains: Train[];
 }
 
+import DynamicNetworkMap from '../components/network/DynamicNetworkMap';
+
 // ─── Corridor command visualization ──────────────────────────────────────────
 function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () => void; onViewImpact: () => void }) {
-  const trains = [
-    { number: '12123', name: 'Deccan Queen', position: 0.68, status: 'delayed' },
-    { number: '11008', name: 'Pune Express', position: 0.42, status: 'delayed' },
-    { number: '22145', name: 'Nagpur Exp', position: 0.85, status: 'normal' },
+  const trainPositions = [
+    { trainNumber: '12123', trackId: 'TR-01', position: 0.8, status: 'DELAYED' as const },
+    { trainNumber: '11008', trackId: 'TR-02', position: 0.1, status: 'DELAYED' as const },
+    { trainNumber: '22145', trackId: 'TR-05', position: 0.5, status: 'ON_TIME' as const },
   ];
 
   return (
@@ -37,7 +39,7 @@ function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () =>
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Corridor Command View</h3>
-          <p className="text-[11px] text-gray-400 mt-0.5">TR-02 · NGP–BSL · Active block window</p>
+          <p className="text-[11px] text-gray-400 mt-0.5">NGP–BSL Corridor · Live Operational Network</p>
         </div>
         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -45,43 +47,13 @@ function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () =>
         </div>
       </div>
 
-      {/* Train timelines */}
-      <div className="space-y-3 mb-5">
-        {trains.map((train) => (
-          <div key={train.number} className="flex items-center gap-3">
-            <div className="w-28 flex-shrink-0 text-right">
-              <span className="font-mono text-[11px] font-bold text-gray-700">{train.number}</span>
-              <span className="block text-[10px] text-gray-400 truncate">{train.name}</span>
-            </div>
-            <div className="flex-1 relative">
-              {/* Track line */}
-              <div className="h-1.5 bg-gray-100 rounded-full relative overflow-hidden">
-                {/* Blocked zone */}
-                <div
-                  className="absolute top-0 h-full bg-red-200"
-                  style={{ left: '55%', width: '25%' }}
-                />
-                {/* Train position indicator */}
-                <div
-                  className={clsx(
-                    'absolute -top-[3px] w-3 h-3 rounded-full border-2 border-white shadow-sm transition-all',
-                    train.status === 'delayed' ? 'bg-amber-500' : 'bg-emerald-500'
-                  )}
-                  style={{ left: `calc(${train.position * 100}% - 6px)` }}
-                />
-              </div>
-            </div>
-            <div className="w-20 flex-shrink-0">
-              {train.status === 'delayed' ? (
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
-                  DELAYED
-                </span>
-              ) : (
-                <span className="text-[10px] font-semibold text-green-700">ON TIME</span>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="mb-5">
+        <DynamicNetworkMap 
+          blockedTracks={['TR-02']}
+          trainPositions={trainPositions}
+          onTrainClick={onViewImpact}
+          onBlockClick={onViewBlock}
+        />
       </div>
 
       {/* Active block legend */}

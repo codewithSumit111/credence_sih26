@@ -503,9 +503,9 @@ export default function Plan() {
                 disabled={optimizing}
                 className="flex items-center gap-1.5 text-[12px] font-semibold border border-gray-300 bg-white hover:border-emerald-500 hover:text-emerald-700 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
               >
-                {optimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" /> : <Settings className="w-3.5 h-3.5" />}
-                {optimizing ? 'Running...' : 'Run CP-SAT'}
-              </button>
+                  {optimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" /> : <Settings className="w-3.5 h-3.5" />}
+                  {optimizing ? 'Running...' : 'Run CP-SAT'}
+                </button>
             )}
             <button
               onClick={() => navigate('/requests')}

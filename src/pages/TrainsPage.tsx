@@ -3,12 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import {
-  GitBranch, ArrowRight, Clock, MapPin, CheckCircle2, ChevronRight
+  GitBranch, ArrowRight, Clock, CheckCircle2, MapPin
 } from 'lucide-react';
 import Drawer from '../components/common/Drawer';
 import StatusBadge from '../components/common/StatusBadge';
 import FilterBar from '../components/common/FilterBar';
-import RailwayNetwork from '../components/network/RailwayNetwork';
 import LoadingState from '../components/common/LoadingState';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import { trainsApi } from '../api';
@@ -45,7 +44,6 @@ function TrainImpactDrawer({
   onKeepWaiting: () => void;
   loading: boolean;
 }) {
-  const [showMap, setShowMap] = useState(false);
   const isAffected = train.affectedBlockId != null;
 
   return (
@@ -176,31 +174,6 @@ function TrainImpactDrawer({
         </div>
       )}
 
-      {/* Map toggle */}
-      {isAffected && (
-        <button
-          onClick={() => setShowMap(!showMap)}
-          className="w-full text-[11px] font-semibold text-gray-600 hover:text-gray-800 border border-gray-200 bg-gray-50 py-2 rounded-lg flex items-center justify-center gap-1.5 transition-colors"
-        >
-          <MapPin className="w-3.5 h-3.5" />
-          {showMap ? 'Hide' : 'Show'} Network Map
-          <ChevronRight className={clsx('w-3.5 h-3.5 transition-transform', showMap && 'rotate-90')} />
-        </button>
-      )}
-
-      {showMap && (
-        <div className="rounded-lg overflow-hidden border border-gray-200">
-          <RailwayNetwork
-            blockedTrack="TR-02"
-            proposedRoute={['TR-01', 'TR-04', 'TR-05']}
-            originalRoute={['TR-01', 'TR-02']}
-            trainPositions={[
-              { trainNumber: train.number, trackId: 'TR-01', position: 0.7 },
-            ]}
-          />
-        </div>
-      )}
-
       {/* Non-affected train message */}
       {!isAffected && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
@@ -326,9 +299,11 @@ export default function Trains() {
             <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Trains</h1>
             <p className="text-[12px] text-gray-500 mt-0.5">Operations, impact analysis, and rerouting decisions</p>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Time-Dependent A* Active
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Time-Dependent A* Active
+            </div>
           </div>
         </div>
       </div>
