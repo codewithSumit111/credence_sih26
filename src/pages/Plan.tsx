@@ -13,7 +13,7 @@ import StatusBadge from '../components/common/StatusBadge';
 import PriorityBadge from '../components/common/PriorityBadge';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import { priorityApi, blocksApi, approvalsApi } from '../api';
-import type { MaintenanceJob } from '../types';
+import type { MaintenanceJob, BlockRequest } from '../types';
 
 // ─── Block data ───────────────────────────────────────────────────────────────
 interface BlockItem {
@@ -32,14 +32,7 @@ interface BlockItem {
   affectedTrains: number;
 }
 
-const BLOCKS_DATA: BlockItem[] = [
-  { id: 'BR-00231', track: 'TR-02', section: 'NGP-BSL', timeWindow: '14:00 – 15:30', startTime: '14:00', endTime: '15:30', duration: '90 min', departments: ['ENG', 'S&T'], jobs: '2 (Bundled)', jobCount: 2, priority: 'HIGH', status: 'AI-OPTIMIZED', affectedTrains: 3 },
-  { id: 'BR-00232', track: 'TR-04', section: 'NGP-WR', timeWindow: '16:10 – 17:00', startTime: '16:10', endTime: '17:00', duration: '50 min', departments: ['TRD'], jobs: '1', jobCount: 1, priority: 'MEDIUM', status: 'PROPOSED', affectedTrains: 1 },
-  { id: 'BR-00237', track: 'TR-07', section: 'WR-AKO', timeWindow: '19:00 – 19:45', startTime: '19:00', endTime: '19:45', duration: '45 min', departments: ['ENG'], jobs: '1', jobCount: 1, priority: 'LOW', status: 'APPROVED', affectedTrains: 0 },
-  { id: 'BR-00235', track: 'TR-04', section: 'NGP-WR', timeWindow: '04:00 – 05:30', startTime: '04:00', endTime: '05:30', duration: '90 min', departments: ['ENG', 'S&T'], jobs: '2 (Bundled)', jobCount: 2, priority: 'MEDIUM', status: 'PROVISIONAL', affectedTrains: 0 },
-  { id: 'BR-00241', track: 'TR-07', section: 'WR-AKO', timeWindow: '02:00 – 05:00', startTime: '02:00', endTime: '05:00', duration: '180 min', departments: ['TRD'], jobs: '1', jobCount: 1, priority: 'LOW', status: 'DEMANDED', affectedTrains: 0 },
-  { id: 'BR-00244', track: 'TR-01', section: 'NGP-WR', timeWindow: '10:30 – 11:45', startTime: '10:30', endTime: '11:45', duration: '75 min', departments: ['ENG'], jobs: '1', jobCount: 1, priority: 'MEDIUM', status: 'AI-OPTIMIZED', affectedTrains: 1 },
-];
+// No hardcoded blocks — all data comes from /api/blocks
 
 const GANTT_HOURS = ['00', '02', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22', '24'];
 const OPTIMIZER_STEPS = ['Computing Priority Scores...', 'Checking compatibility & bundling...', 'CP-SAT solver running...', 'Validating feasibility...'];
@@ -153,24 +146,15 @@ function BlockGantt({ blocks, selectedId, onSelect }: { blocks: BlockItem[]; sel
 }
 
 // ─── Block Detail Drawer content ──────────────────────────────────────────────
-function BlockDetailContent({ block, onApprove }: { block: BlockItem; onApprove: () => void }) {
+function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: BlockItem; onApprove: () => void; onReject: () => void; onModify: () => void }) {
   const [showOptDetails, setShowOptDetails] = useState(false);
 
-  const jobs: Record<string, { dept: string; type: string; asset: string; duration: string }[]> = {
-    'BR-00231': [
-      { dept: 'Engineering', type: 'Rail Grinding', asset: 'A-TR02-144', duration: '90 min' },
-      { dept: 'S&T', type: 'Signal Inspection', asset: 'SIG-TR02-14A', duration: '30 min' },
-    ],
-    'BR-00232': [{ dept: 'Traction', type: 'OHE Inspection', asset: 'OHE-TR02-K142', duration: '60 min' }],
-    'BR-00235': [
-      { dept: 'Engineering', type: 'Track Inspection', asset: 'A-TR04-088', duration: '60 min' },
-      { dept: 'S&T', type: 'Relay Room Maint.', asset: 'RR-TR04-02', duration: '45 min' },
-    ],
-  };
+  const blockJobs = ((block as any).jobDetails?.length > 0)
+    ? (block as any).jobDetails
+    : block.jobIds?.map((jid: string) => ({ id: jid, maintenanceType: 'Maintenance Job', department: 'Engineering', asset: jid, requiredManpower: 5, machinery: 'Standard', priorityScore: 'N/A', notes: '', estimatedDuration: 90, dueDate: 'N/A' }))
+    || [];
 
-  const blockJobs = jobs[block.id] || [{ dept: 'Engineering', type: 'Maintenance Work', asset: `Asset-${block.track}`, duration: block.duration }];
-
-  const reasons = [
+  const reasons = block.whyThisSlot || [
     'Compatible maintenance — same track section',
     'Timing compatible with train schedule gaps',
     'Safety buffer requirements satisfied',
@@ -190,26 +174,40 @@ function BlockDetailContent({ block, onApprove }: { block: BlockItem; onApprove:
             <StatusBadge status={block.status} size="md" />
           </div>
           <p className="text-gray-500">{block.track} · {block.section}</p>
-          <p className="font-mono font-semibold text-gray-700 mt-0.5">{block.timeWindow} · {block.duration}</p>
+          <p className="font-mono font-semibold text-gray-700 mt-0.5">{block.startTime} - {block.endTime} · {block.duration} min</p>
         </div>
       </div>
 
       {/* Status */}
       <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg text-amber-900 text-[11px] font-medium">
-        Status: Awaiting human approval before this possession can be activated.
+        Status: {block.status === 'APPROVED' ? 'Approved and committed to the schedule.' : 'Awaiting human approval before this possession can be activated.'}
       </div>
 
       {/* Jobs */}
       <div>
         <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Jobs Included ({blockJobs.length})</h4>
         <div className="space-y-2">
-          {blockJobs.map((job, i) => (
+          {blockJobs.map((job: any, i: number) => (
             <div key={i} className="p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className={clsx('w-2 h-2 rounded-full', DEPT_COLORS[job.dept.slice(0, 3)] || 'bg-gray-400')} />
-                <span className="font-semibold text-gray-800">{job.type}</span>
+              <div className="flex items-center gap-2 mb-1">
+                <span className={clsx('w-2 h-2 rounded-full', DEPT_COLORS[job.department?.slice(0, 3) || 'Eng'] || 'bg-gray-400')} />
+                <span className="font-bold text-gray-800">{job.maintenanceType}</span>
+                <span className="font-mono text-gray-500 ml-auto bg-gray-100 px-1.5 py-0.5 rounded text-[10px]">{job.id}</span>
               </div>
-              <p className="text-gray-500 text-[10px] ml-4">{job.dept} · Asset: {job.asset} · Duration: {job.duration}</p>
+              <p className="text-gray-500 text-[10px] ml-4 mb-2">{job.department} · Asset: {job.asset}</p>
+              
+              <div className="grid grid-cols-2 gap-2 bg-white border border-gray-100 rounded p-2 ml-4">
+                <div className="border-r border-gray-100 pr-2">
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Requested</p>
+                  <p className="text-[10px] text-gray-600">Due: {job.dueDate || job.preferredDate || 'Flexible'}</p>
+                  <p className="text-[10px] text-gray-600">Dur: {job.estimatedDuration || job.requestedDuration || block.duration} min</p>
+                </div>
+                <div className="pl-2">
+                  <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Approved</p>
+                  <p className="text-[10px] text-gray-600">Win: {block.startTime}-{block.endTime}</p>
+                  <p className="text-[10px] text-gray-600">Dur: {block.duration} min</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -272,10 +270,16 @@ function BlockDetailContent({ block, onApprove }: { block: BlockItem; onApprove:
       {/* Actions */}
       {canApprove && (
         <div className="flex gap-2 pt-2">
-          <button className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2.5 rounded-lg transition-colors">
+          <button
+            onClick={onModify}
+            className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2.5 rounded-lg transition-colors"
+          >
             Modify
           </button>
-          <button className="flex-1 text-[12px] font-semibold border border-red-200 text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors">
+          <button
+            onClick={onReject}
+            className="flex-1 text-[12px] font-semibold border border-red-200 text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors"
+          >
             Reject
           </button>
           <button
@@ -314,9 +318,26 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
         </div>
         <p className="text-gray-700 font-semibold">{job.maintenanceType}</p>
         <p className="text-gray-500 text-[11px] mt-0.5">{job.department} · {job.track} · {job.section}</p>
-        <p className="text-gray-500 text-[11px]">Asset: {job.asset} · Duration: {job.estimatedDuration} min</p>
+        
+        {/* Requested vs Approved Grid */}
+        <div className="grid grid-cols-2 gap-2 bg-gray-50 border border-gray-200 rounded p-2 mt-3 mb-2">
+          <div className="border-r border-gray-200 pr-2">
+            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Requested Details</p>
+            <p className="text-[11px] text-gray-600"><strong>Date/Due:</strong> {job.dueDate || 'Flexible'}</p>
+            <p className="text-[11px] text-gray-600"><strong>Duration:</strong> {job.estimatedDuration} min</p>
+            <p className="text-[11px] text-gray-600"><strong>Asset:</strong> {job.asset}</p>
+          </div>
+          <div className="pl-2">
+            <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Approval Status</p>
+            <p className="text-[11px] text-gray-600"><strong>Status:</strong> {job.status}</p>
+            <p className="text-[11px] text-gray-600">
+              {job.status === 'PENDING' || job.status === 'OVERDUE' ? 'Awaiting CP-SAT scheduling' : 'Scheduled / Approved in Plan'}
+            </p>
+          </div>
+        </div>
+
         {job.overdueDays > 0 && (
-          <p className="text-red-700 text-[11px] font-bold mt-1">⚠ {job.overdueDays} days overdue</p>
+          <p className="text-red-700 text-[11px] font-bold mt-2">⚠ {job.overdueDays} days overdue</p>
         )}
       </div>
 
@@ -418,6 +439,7 @@ export default function Plan() {
 
   // Maintenance state
   const [jobs, setJobs] = useState<MaintenanceJob[]>([]);
+  const [requests, setRequests] = useState<BlockRequest[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [deptFilter, setDeptFilter] = useState('ALL');
   const [selectedJob, setSelectedJob] = useState<MaintenanceJob | null>(null);
@@ -431,7 +453,7 @@ export default function Plan() {
         const data = await blocksApi.getBlocks();
         setBlocks(data.map(mapApiBlockToBlockItem));
       } catch (e) {
-        setBlocks(BLOCKS_DATA);
+        setBlocks([]);
       }
     };
     fetchBlocks();
@@ -446,9 +468,13 @@ export default function Plan() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    priorityApi.getScores().then(data => {
-      setJobs(data);
-      if (data.length > 0) setSelectedJob(data[0]);
+    Promise.all([
+      priorityApi.getScores(),
+      blocksApi.getRequests()
+    ]).then(([jData, rData]) => {
+      setJobs(jData);
+      setRequests(rData);
+      if (jData.length > 0) setSelectedJob(jData[0]);
       setJobsLoading(false);
     }).catch(() => setJobsLoading(false));
   }, []);
@@ -476,23 +502,46 @@ export default function Plan() {
   };
 
   const handleApproveBlock = async () => {
+    if (!selectedBlock) return;
     setActionLoading(true);
     try {
-      await approvalsApi.approve('APV-001');
-      toast.success(`✓ Block ${selectedBlock?.id} Approved`, {
-        description: 'Schedule committed. Rerouting orders issued.',
+      await approvalsApi.approve(selectedBlock.id, 'Section Controller');
+      toast.success(`✓ Block ${selectedBlock.id} Approved`, {
+        description: 'Persisted to DB. Rerouting orders issued.',
       });
-      
-      if (selectedBlock) {
-        setBlocks(prev => prev.map(b => b.id === selectedBlock.id ? { ...b, status: 'APPROVED' } : b));
-      }
-      
+      setBlocks(prev => prev.map(b => b.id === selectedBlock.id ? { ...b, status: 'APPROVED' } : b));
       setShowApproveDialog(false);
       setSelectedBlock(null);
     } catch {
       toast.error('Failed to approve block');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleRejectBlock = async (block: BlockItem) => {
+    try {
+      await approvalsApi.reject(block.id, 'Rejected by Section Controller');
+      toast.info(`Block ${block.id} rejected and saved to DB.`);
+      setBlocks(prev => prev.map(b => b.id === block.id ? { ...b, status: 'REJECTED' as any } : b));
+      setSelectedBlock(null);
+    } catch {
+      toast.error('Failed to reject block');
+    }
+  };
+
+  const handleModifyBlock = async (block: BlockItem) => {
+    const newStart = prompt(`Modify start time for ${block.id} (current: ${block.startTime}):`, block.startTime);
+    if (!newStart) return;
+    const newEnd = prompt(`Modify end time (current: ${block.endTime}):`, block.endTime);
+    if (!newEnd) return;
+    try {
+      await approvalsApi.modify(block.id, newStart, newEnd);
+      toast.success(`Block ${block.id} modified and saved to DB.`, { description: `New window: ${newStart}–${newEnd}` });
+      setBlocks(prev => prev.map(b => b.id === block.id ? { ...b, startTime: newStart, endTime: newEnd, timeWindow: `${newStart} – ${newEnd}`, status: 'MODIFIED' as any } : b));
+      setSelectedBlock(null);
+    } catch {
+      toast.error('Failed to modify block');
     }
   };
 
@@ -581,10 +630,10 @@ export default function Plan() {
             {/* KPIs */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
               {[
-                { label: 'Open Jobs', value: '12', sub: 'Awaiting scheduling', icon: Layers, color: 'text-gray-800', bg: 'bg-white border-gray-200' },
-                { label: 'Overdue', value: '3', sub: 'High priority escalation', icon: AlertTriangle, color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
-                { label: 'Scheduled', value: '8', sub: 'In active plan', icon: Calendar, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
-                { label: 'Completed', value: '126', sub: 'Past 30 days', icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
+                { label: 'Open Jobs', value: String(jobs.filter(j => j.status === 'PENDING' || j.status === 'IN_PROGRESS').length || jobs.length), sub: 'Awaiting scheduling', icon: Layers, color: 'text-gray-800', bg: 'bg-white border-gray-200' },
+                { label: 'Overdue', value: String(jobs.filter(j => j.overdueDays > 0).length), sub: 'High priority escalation', icon: AlertTriangle, color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
+                { label: 'Scheduled', value: String(jobs.filter(j => j.status === 'SCHEDULED').length), sub: 'In active plan', icon: Calendar, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
+                { label: 'Completed', value: String(jobs.filter(j => j.status === 'COMPLETED').length), sub: 'All time', icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
               ].map(kpi => (
                 <div key={kpi.label} className={clsx('border rounded-lg p-3.5', kpi.bg)}>
                   <div className="flex items-start justify-between">
@@ -680,19 +729,54 @@ export default function Plan() {
                 </div>
               )}
             </div>
+
+            {/* My Requests Table */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-6">
+              <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
+                MY DEPARTMENT BLOCK REQUESTS & POSSESSION STATUS
+              </h4>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-gray-400">
+                      <th className="py-2 font-semibold">REQUEST ID</th>
+                      <th className="py-2 font-semibold">SECTION</th>
+                      <th className="py-2 font-semibold">DATE</th>
+                      <th className="py-2 font-semibold text-right">STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {requests.map(req => (
+                      <tr key={req.id} className="hover:bg-gray-50">
+                        <td className="py-2 font-mono font-bold text-emerald-900">{req.id}</td>
+                        <td className="py-2 text-gray-700 font-semibold">{req.track}</td>
+                        <td className="py-2 text-gray-600">{req.preferredDate}</td>
+                        <td className="py-2 text-right">
+                          <StatusBadge status={req.status as any} size="sm" />
+                        </td>
+                      </tr>
+                    ))}
+                    {requests.length === 0 && (
+                      <tr><td colSpan={4} className="py-4 text-center text-gray-400">No requests found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         )}
 
         {/* ─── BLOCKS TAB ──────────────────────────────────────────────────── */}
         {activeTab === 'blocks' && (
           <div className="space-y-4">
-            {/* Block KPIs */}
+            {/* Block KPIs — live data */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Total Blocks', value: '6', sub: 'Today' },
-                { label: 'Optimized', value: '4', sub: '67% of total' },
-                { label: 'Trains Affected', value: '4', sub: 'Of 32 evaluated' },
-                { label: 'Avg Delay', value: '+6 min', sub: '↓57% vs manual' },
+                { label: 'Total Blocks', value: String(blocks.length), sub: 'From pipeline' },
+                { label: 'Approved', value: String(blocks.filter(b => b.status === 'APPROVED').length), sub: 'Committed to schedule' },
+                { label: 'Pending Approval', value: String(blocks.filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED').length), sub: 'Awaiting decision' },
+                { label: 'Total Delay', value: `${blocks.reduce((sum, b) => sum + b.affectedTrains, 0)} trains`, sub: 'With impact' },
               ].map(kpi => (
                 <div key={kpi.label} className="bg-white border border-gray-200 rounded-lg p-3.5">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{kpi.label}</p>
@@ -832,6 +916,8 @@ export default function Plan() {
           <BlockDetailContent
             block={selectedBlock}
             onApprove={() => setShowApproveDialog(true)}
+            onReject={() => handleRejectBlock(selectedBlock)}
+            onModify={() => handleModifyBlock(selectedBlock)}
           />
         )}
       </Drawer>

@@ -38,7 +38,13 @@ export default function FieldExecution() {
   useEffect(() => {
     async function loadFieldBlock() {
       try {
-        const data = await executionApi.getFieldBlock('BR-00231');
+        const data = await executionApi.getFieldBlock();
+        if (!data || data.blockId === 'N/A') {
+          // No approved block yet
+          setBlock(null);
+          setLoading(false);
+          return;
+        }
         setBlock(data);
         // Init all tasks as unchecked
         const checks: TaskCheck[] = [];
@@ -116,8 +122,20 @@ export default function FieldExecution() {
     }
   };
 
-  if (loading || !block) {
-    return <LoadingState message="Loading Field Execution Dossier..." />;
+  if (loading) return <LoadingState message="Loading active field block from DB..." />;
+
+  if (!block) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-10 text-center">
+        <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mb-4">
+          <AlertTriangle className="w-8 h-8 text-amber-500" />
+        </div>
+        <h2 className="text-[16px] font-bold text-gray-800 mb-2">No Active Field Block</h2>
+        <p className="text-[13px] text-gray-500 max-w-sm">
+          No approved block is currently assigned for field execution. Please approve a block in the <strong>Plan</strong> page first.
+        </p>
+      </div>
+    );
   }
 
   // ── Tab: HOME ──────────────────────────────────────────────────────────────

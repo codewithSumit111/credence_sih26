@@ -16,23 +16,33 @@ interface DashboardData {
   criticalJobCount: number;
   pendingMaintenance: number;
   blocksOptimized: number;
+  pendingApprovals: number;
+  approvedBlocks: number;
   expectedTrainDelay: number;
   integratedBlockCount: number;
   priorityQueue: MaintenanceJob[];
   recommendedBlock?: OptimizedBlock;
   allBlocks: OptimizedBlock[];
   allTrains: Train[];
+  overdueJobs: MaintenanceJob[];
+  delayedTrains: Train[];
 }
 
 import DynamicNetworkMap from '../components/network/DynamicNetworkMap';
 
 // ─── Corridor command visualization ──────────────────────────────────────────
-function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () => void; onViewImpact: () => void }) {
-  const trainPositions = [
-    { trainNumber: '12123', trackId: 'TR-01', position: 0.8, status: 'DELAYED' as const },
-    { trainNumber: '11008', trackId: 'TR-02', position: 0.1, status: 'DELAYED' as const },
-    { trainNumber: '22145', trackId: 'TR-05', position: 0.5, status: 'ON_TIME' as const },
-  ];
+function CorridorCommandView({ onViewBlock, onViewImpact, delayedTrains, pendingBlock }: {
+  onViewBlock: () => void;
+  onViewImpact: () => void;
+  delayedTrains: any[];
+  pendingBlock: any;
+}) {
+  const trainPositions = delayedTrains.slice(0, 3).map((t, i) => ({
+    trainNumber: t.number || t.id,
+    trackId: `TR-0${i + 1}`,
+    position: 0.2 + i * 0.3,
+    status: (t.currentStatus === 'DELAYED' ? 'DELAYED' : 'ON_TIME') as 'DELAYED' | 'ON_TIME',
+  }));
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5">
@@ -49,7 +59,7 @@ function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () =>
 
       <div className="mb-5">
         <DynamicNetworkMap 
-          blockedTracks={['TR-02']}
+          blockedTracks={pendingBlock ? [pendingBlock.track?.split('-')[1] || 'TR-02'] : []}
           trainPositions={trainPositions}
           onTrainClick={onViewImpact}
           onBlockClick={onViewBlock}
@@ -57,35 +67,42 @@ function CorridorCommandView({ onViewBlock, onViewImpact }: { onViewBlock: () =>
       </div>
 
       {/* Active block legend */}
-      <div className="flex items-start gap-4 p-3 bg-red-50 border border-red-100 rounded-lg">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-4 h-3 bg-red-200 rounded-sm" />
-            <span className="font-mono text-[11px] font-bold text-red-800">BR-00231</span>
-            <span className="text-[10px] text-gray-500 font-mono">14:00 – 15:30</span>
-            <span className="text-[10px] bg-red-100 text-red-700 font-semibold px-1.5 py-0.5 rounded border border-red-200">
-              AWAITING APPROVAL
-            </span>
+      {pendingBlock && (
+        <div className="flex items-start gap-4 p-3 bg-red-50 border border-red-100 rounded-lg">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-4 h-3 bg-red-200 rounded-sm" />
+              <span className="font-mono text-[11px] font-bold text-red-800">{pendingBlock.id}</span>
+              <span className="text-[10px] text-gray-500 font-mono">{pendingBlock.startTime}–{pendingBlock.endTime}</span>
+              <span className="text-[10px] bg-red-100 text-red-700 font-semibold px-1.5 py-0.5 rounded border border-red-200">
+                AWAITING APPROVAL
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-600">
+              {pendingBlock.departments?.join(' + ')} · {pendingBlock.track} · <strong>{delayedTrains.length} train(s) affected</strong>
+            </p>
           </div>
-          <p className="text-[11px] text-gray-600">
-            Engineering + S&T · TR-02 · <strong>2 trains affected</strong> · projected +6 min delay
-          </p>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              onClick={onViewImpact}
+              className="text-[11px] font-semibold text-gray-600 hover:text-gray-800 border border-gray-200 bg-white px-2.5 py-1 rounded transition-colors"
+            >
+              View Impact
+            </button>
+            <button
+              onClick={onViewBlock}
+              className="text-[11px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 rounded transition-colors"
+            >
+              Review Block →
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2 flex-shrink-0">
-          <button
-            onClick={onViewImpact}
-            className="text-[11px] font-semibold text-gray-600 hover:text-gray-800 border border-gray-200 bg-white px-2.5 py-1 rounded transition-colors"
-          >
-            View Impact
-          </button>
-          <button
-            onClick={onViewBlock}
-            className="text-[11px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 rounded transition-colors"
-          >
-            Review Block →
-          </button>
+      )}
+      {!pendingBlock && (
+        <div className="p-3 bg-green-50 border border-green-100 rounded-lg text-center">
+          <p className="text-[11px] text-green-700 font-semibold">✓ All blocks approved — No pending possessions</p>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -115,13 +132,17 @@ export default function Command() {
   }, []);
 
   const handleApprove = async () => {
+    if (!data?.recommendedBlock) return;
     setActionLoading(true);
     try {
-      await approvalsApi.approve('APV-001');
-      toast.success('✓ Block BR-00231 Approved', {
-        description: 'Schedule committed. Rerouting orders issued for 2 affected trains.',
+      await approvalsApi.approve(data.recommendedBlock.id, 'Section Controller');
+      toast.success(`✓ Block ${data.recommendedBlock.id} Approved`, {
+        description: 'Schedule committed to DB. Rerouting orders issued.',
       });
       setShowApproveDialog(false);
+      // Reload data
+      const updated = await overviewApi.getDashboardData();
+      setData(updated);
     } catch {
       toast.error('Failed to approve block');
     } finally {
@@ -143,56 +164,57 @@ export default function Command() {
       icon: TrendingUp,
       color: 'text-emerald-700',
       bg: 'bg-emerald-50 border-emerald-200',
-      sub: 'Prototype simulation',
+      sub: 'Pipeline simulation',
     },
     {
       label: 'Active Blocks',
-      value: loading ? '—' : `${data?.blocksOptimized ?? 3}`,
+      value: loading ? '—' : `${data?.blocksOptimized ?? 0}`,
       icon: Layers,
       color: 'text-blue-700',
       bg: 'bg-blue-50 border-blue-200',
-      sub: '1 awaiting approval',
+      sub: `${data?.pendingApprovals ?? 0} awaiting approval`,
     },
     {
       label: 'Trains Affected',
-      value: loading ? '—' : '2',
+      value: loading ? '—' : String(data?.delayedTrains?.length ?? 0),
       icon: AlertTriangle,
       color: 'text-amber-700',
       bg: 'bg-amber-50 border-amber-200',
-      sub: 'By active block BR-00231',
+      sub: 'Delayed by maintenance',
     },
     {
       label: 'Pending Approvals',
-      value: '1',
+      value: loading ? '—' : String(data?.pendingApprovals ?? 0),
       icon: Shield,
       color: 'text-red-700',
       bg: 'bg-red-50 border-red-200',
-      sub: 'BR-00231 requires action',
+      sub: data?.recommendedBlock ? `${data.recommendedBlock.id} requires action` : 'No pending approvals',
     },
   ];
 
+  const overdueJobs = data?.overdueJobs || [];
   const attentionItems = [
-    {
+    ...(overdueJobs.slice(0, 1).map(j => ({
       level: 'red' as const,
-      title: 'JOB-1042 — Rail Grinding overdue',
-      detail: 'TR-02 · Engineering · 14 days overdue · Priority 92',
+      title: `${j.id} — ${j.maintenanceType} overdue`,
+      detail: `${j.track} · ${j.department} · ${j.overdueDays} days overdue · Priority ${j.priorityScore}`,
       action: () => navigate('/plan?view=maintenance'),
       actionLabel: 'Review',
-    },
-    {
+    }))),
+    ...(data?.recommendedBlock ? [{
       level: 'amber' as const,
-      title: 'BR-00231 awaiting approval',
-      detail: 'TR-02 · 14:00–15:30 · 3 jobs bundled · CP-SAT optimized',
+      title: `${data.recommendedBlock.id} awaiting approval`,
+      detail: `${data.recommendedBlock.track} · ${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime} · ${data.recommendedBlock.jobIds?.length || 1} job(s) · CP-SAT optimized`,
       action: () => navigate('/plan?view=blocks'),
       actionLabel: 'Review Block',
-    },
-    {
+    }] : []),
+    ...(data?.delayedTrains && data.delayedTrains.length > 0 ? [{
       level: 'amber' as const,
-      title: '2 trains pending rerouting decision',
-      detail: '12123 · 11008 · Affected by TR-02 possession',
+      title: `${data.delayedTrains.length} train(s) delayed`,
+      detail: data.delayedTrains.slice(0, 3).map(t => t.number).join(' · ') + ' · Affected by maintenance blocks',
       action: () => navigate('/trains'),
       actionLabel: 'View Trains',
-    },
+    }] : []),
   ];
 
   return (
@@ -251,6 +273,8 @@ export default function Command() {
             <CorridorCommandView
               onViewBlock={() => navigate('/plan?view=blocks')}
               onViewImpact={() => navigate('/trains')}
+              delayedTrains={data?.delayedTrains || []}
+              pendingBlock={data?.recommendedBlock}
             />
 
             {/* Attention Required */}
@@ -315,17 +339,19 @@ export default function Command() {
 
               <div className="p-3.5 bg-emerald-50 rounded-lg border border-emerald-100 mb-4">
                 <p className="text-[12.5px] text-emerald-900 font-medium leading-relaxed">
-                  Approve <strong>BR-00231</strong> to complete two compatible maintenance jobs — Rail Grinding (Engineering) and Signal Inspection (S&T) — in a single 90-minute possession on TR-02.
+                  {data?.recommendedBlock
+                    ? <>Approve <strong>{data.recommendedBlock.id}</strong> to complete {data.recommendedBlock.jobIds?.length || 1} maintenance job(s) in a single {data.recommendedBlock.duration}-minute possession on {data.recommendedBlock.track}.</>
+                    : 'All current blocks have been reviewed. No pending approvals.'}
                 </p>
               </div>
 
               <div className="space-y-1.5 mb-4">
-                {[
-                  'Shared possession reduces repeated track disruption',
-                  'Both jobs are spatially compatible on TR-02',
-                  'Timing window satisfies safety buffer requirements',
+                {(data?.recommendedBlock?.whyThisSlot || [
+                  'Scheduled during low-traffic window',
+                  'Compatible jobs on the same track section',
+                  'Safety buffer requirements satisfied',
                   'No resource conflict detected',
-                ].map((reason, i) => (
+                ]).slice(0, 4).map((reason: string, i: number) => (
                   <div key={i} className="flex items-center gap-2 text-[11px] text-gray-600">
                     <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0" />
                     {reason}
@@ -336,35 +362,37 @@ export default function Command() {
               <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                 <div className="flex-1 p-2 bg-gray-50 rounded text-center">
                   <p className="text-[10px] text-gray-400">Impact</p>
-                  <p className="text-[12px] font-bold text-amber-700">+6 min</p>
+                  <p className="text-[12px] font-bold text-amber-700">+{data?.recommendedBlock?.expectedDelay ?? 0} min</p>
                   <p className="text-[10px] text-gray-400">projected delay</p>
                 </div>
                 <div className="flex-1 p-2 bg-gray-50 rounded text-center">
                   <p className="text-[10px] text-gray-400">Trains</p>
-                  <p className="text-[12px] font-bold text-gray-800">2</p>
+                  <p className="text-[12px] font-bold text-gray-800">{data?.delayedTrains?.length ?? 0}</p>
                   <p className="text-[10px] text-gray-400">affected</p>
                 </div>
                 <div className="flex-1 p-2 bg-gray-50 rounded text-center">
                   <p className="text-[10px] text-gray-400">Status</p>
-                  <p className="text-[12px] font-bold text-red-700">Awaiting</p>
+                  <p className="text-[12px] font-bold text-red-700">{data?.pendingApprovals ? 'Awaiting' : 'None'}</p>
                   <p className="text-[10px] text-gray-400">your approval</p>
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-4">
-                <button
-                  onClick={() => navigate('/plan?view=blocks')}
-                  className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2 rounded-lg transition-colors"
-                >
-                  Review Details
-                </button>
-                <button
-                  onClick={() => setShowApproveDialog(true)}
-                  className="flex-1 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-lg transition-colors"
-                >
-                  ✓ Approve Block
-                </button>
-              </div>
+              {data?.recommendedBlock && (
+                <div className="flex gap-2 mt-4">
+                  <button
+                    onClick={() => navigate('/plan?view=blocks')}
+                    className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2 rounded-lg transition-colors"
+                  >
+                    Review Details
+                  </button>
+                  <button
+                    onClick={() => setShowApproveDialog(true)}
+                    className="flex-1 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-lg transition-colors"
+                  >
+                    ✓ Approve Block
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* System Integration — compact */}
@@ -397,7 +425,7 @@ export default function Command() {
                 ))}
               </div>
               <p className="text-[10px] text-amber-600 mt-3 font-medium border-t border-gray-100 pt-2">
-                ⚠ Prototype simulation — not a live railway feed
+                ⚠ Pipeline data — not a live railway operational feed
               </p>
             </div>
 
@@ -427,8 +455,10 @@ export default function Command() {
         open={showApproveDialog}
         onClose={() => setShowApproveDialog(false)}
         onConfirm={handleApprove}
-        title="Approve Block BR-00231?"
-        description="Approving will commit this 90-minute possession on TR-02 (14:00–15:30). Rerouting orders will be issued to 2 affected trains. This action requires Section Controller authorization."
+        title={data?.recommendedBlock ? `Approve Block ${data.recommendedBlock.id}?` : 'Approve Block?'}
+        description={data?.recommendedBlock
+          ? `Approving will commit this ${data.recommendedBlock.duration}-minute possession on ${data.recommendedBlock.track} (${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime}). Rerouting orders will be issued to ${data.delayedTrains?.length || 0} affected train(s). This action requires Section Controller authorization.`
+          : 'Are you sure you want to approve this block?'}
         confirmLabel="Approve & Commit"
         loading={actionLoading}
       />

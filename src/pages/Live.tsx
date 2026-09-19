@@ -248,20 +248,15 @@ export default function Live() {
                 {/* Affected trains list */}
                 <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Affected Trains</h4>
                 <div className="space-y-1.5">
-                  {selectedEvent.affectedTrains.map(tNum => {
-                    const suggestions: Record<string, string> = {
-                      '12123': 'Reroute via TR-04 recommended',
-                      '11008': 'Wait strategy recommended',
-                      '22145': 'No impact',
-                    };
-                    const isReroute = tNum === '12123';
+                  {selectedEvent.affectedTrains.map((tNum, idx) => {
+                    const isFirst = idx === 0;
                     return (
                       <div key={tNum} className="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-200 rounded text-[11px]">
                         <span className="font-mono font-bold text-gray-800">{tNum}</span>
-                        <span className={clsx('font-medium', isReroute ? 'text-amber-700' : 'text-gray-600')}>
-                          {suggestions[tNum] || 'Under evaluation'}
+                        <span className={clsx('font-medium', isFirst ? 'text-amber-700' : 'text-gray-600')}>
+                          {isFirst ? 'Reroute via alternate path recommended' : 'Wait strategy recommended'}
                         </span>
-                        <StatusBadge status={isReroute ? 'DELAYED' : 'ON_TIME'} />
+                        <StatusBadge status={isFirst ? 'DELAYED' : 'ON_TIME'} />
                       </div>
                     );
                   })}
@@ -301,7 +296,10 @@ export default function Live() {
                   </p>
                   {recoveryStep >= 3 && (
                     <div className="ml-6 mt-2 space-y-1">
-                      {['Completed operations frozen & protected', 'BR-00232 shifted by 20 min to accommodate disruption', 'JOB-1041 rescheduled within safe window'].map((item, i) => (
+                      {[
+                        'Completed operations frozen & protected',
+                        ...(plan?.changesMade || selectedEvent.affectedBlocks.map(b => `${b} shifted to accommodate disruption`)),
+                      ].slice(0, 3).map((item, i) => (
                         <div key={i} className="flex items-center gap-2 text-[10px] text-emerald-700">
                           <Check className="w-3 h-3" />{item}
                         </div>
@@ -327,9 +325,13 @@ export default function Live() {
                   </p>
                   {recoveryStep >= 4 && (
                     <div className="ml-6 mt-2 space-y-1">
-                      {['Train 12123 → Route A via TR-04 (Akola bypass)', 'Train 11008 → Wait strategy at ST-B (18 min hold)'].map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-[10px] text-emerald-700">
-                          <Check className="w-3 h-3" />{item}
+                      {selectedEvent.affectedTrains.map((tNum, idx) => (
+                        <div key={tNum} className="flex items-center gap-2 text-[10px] text-emerald-700">
+                          <Check className="w-3 h-3" />
+                          {idx === 0
+                            ? `Train ${tNum} → Reroute via alternate path (A* computed)`
+                            : `Train ${tNum} → Wait strategy at current signal`
+                          }
                         </div>
                       ))}
                     </div>

@@ -143,6 +143,7 @@ export interface BlockAlternative {
 // TRAIN
 // ============================================================
 export interface Train {
+  id?: string;
   number: string;
   name: string;
   type: TrainType;

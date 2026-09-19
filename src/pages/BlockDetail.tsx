@@ -46,11 +46,11 @@ export default function BlockDetail() {
     if (!block) return;
     setActionLoading(true);
     try {
-      await approvalsApi.approve('APV-001');
+      await approvalsApi.approve(block.id, 'Section Controller');
       setBlock(prev => prev ? { ...prev, status: 'APPROVED' } : null);
       setShowApproveModal(false);
-      toast.success(`Possession Block ${block.id} approved by Controller`, {
-        description: 'Orders dispatched to Section Control & Station Masters.',
+      toast.success(`Possession Block ${block.id} approved`, {
+        description: 'Status persisted to DB. Orders dispatched to Section Control & Station Masters.',
       });
     } catch {
       toast.error('Failed to approve block');
@@ -63,10 +63,10 @@ export default function BlockDetail() {
     if (!block) return;
     setActionLoading(true);
     try {
-      await approvalsApi.reject('APV-001', 'Controller timetable reallocation');
+      await approvalsApi.reject(block.id, 'Controller timetable reallocation');
       setBlock(prev => prev ? { ...prev, status: 'REJECTED' } : null);
       setShowRejectModal(false);
-      toast.info(`Possession Block ${block.id} rejected`);
+      toast.info(`Possession Block ${block.id} rejected — saved to DB`);
     } catch {
       toast.error('Failed to reject block');
     } finally {
@@ -185,25 +185,44 @@ export default function BlockDetail() {
             </div>
 
             <div className="border-t border-gray-100 mt-4 pt-4">
-              <h4 className="text-xs font-bold text-gray-700 mb-2">COORDINATED MAINTENANCE JOBS</h4>
-              <div className="space-y-2">
-                <div className="p-3 bg-gray-50 rounded border border-gray-200 text-xs">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-bold text-emerald-900">Engineering / Track — Rail Grinding</span>
-                    <span className="font-mono text-gray-500">JOB-1042 • Priority 92/100</span>
-                  </div>
-                  <p className="text-gray-700">Rail grinding machine deployment at KM 142/3. Requires 90 min track possession.</p>
-                  <p className="text-[11px] text-gray-500 mt-1">Manpower: 8 workers • Machinery: Rail Grinding Machine</p>
-                </div>
+              <h4 className="text-xs font-bold text-gray-700 mb-3">COORDINATED MAINTENANCE JOBS</h4>
+              <div className="space-y-3">
+                {((block as any).jobDetails?.length > 0
+                  ? (block as any).jobDetails
+                  : block.jobIds?.map(jid => ({ id: jid, maintenanceType: 'Maintenance Job', department: 'Engineering', asset: jid, requiredManpower: 5, machinery: 'Standard', priorityScore: 'N/A', notes: '', estimatedDuration: 90, dueDate: 'N/A' }))
+                  || []
+                ).map((job: any) => (
+                  <div key={job.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold text-emerald-900 text-[13px]">{job.department} — {job.maintenanceType}</span>
+                      <span className="font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{job.id}</span>
+                    </div>
+                    <p className="text-gray-700 mb-3">{job.notes || `${job.maintenanceType} on asset ${job.asset}`}</p>
+                    
+                    <div className="grid grid-cols-2 gap-2 bg-white border border-gray-100 rounded p-2 mb-2">
+                      <div className="border-r border-gray-100 pr-2">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Requested By Dept</p>
+                        <p className="text-[11px] text-gray-600"><strong>Date/Due:</strong> {job.dueDate || job.preferredDate || 'Flexible'}</p>
+                        <p className="text-[11px] text-gray-600"><strong>Duration:</strong> {job.estimatedDuration || job.requestedDuration || block.duration} min</p>
+                        <p className="text-[11px] text-gray-600"><strong>Priority:</strong> {typeof job.priorityScore === 'number' ? `${(job.priorityScore * 100).toFixed(0)}/100` : (job.priorityScore || job.priority)}</p>
+                      </div>
+                      <div className="pl-2">
+                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">AI Optimized / Approved</p>
+                        <p className="text-[11px] text-gray-600"><strong>Window:</strong> {block.startTime} – {block.endTime}</p>
+                        <p className="text-[11px] text-gray-600"><strong>Duration:</strong> {block.duration} min</p>
+                        <p className="text-[11px] text-gray-600"><strong>Status:</strong> {block.status}</p>
+                      </div>
+                    </div>
 
-                <div className="p-3 bg-gray-50 rounded border border-gray-200 text-xs">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-bold text-purple-900">S&T (Signals) — Signal Inspection</span>
-                    <span className="font-mono text-gray-500">JOB-1043 • Priority 84/100</span>
+                    <p className="text-[11px] text-gray-500 mt-1 flex items-center justify-between">
+                      <span><strong>Manpower:</strong> {job.requiredManpower} workers</span>
+                      <span><strong>Equipment:</strong> {job.machinery || 'Standard'}</span>
+                    </p>
                   </div>
-                  <p className="text-gray-700">Routine signal circuit check and point machine testing on TR-02.</p>
-                  <p className="text-[11px] text-gray-500 mt-1">Manpower: 3 workers • Bundled inside Engineering possession window</p>
-                </div>
+                ))}
+                {!((block as any).jobDetails?.length) && !block.jobIds?.length && (
+                  <p className="text-xs text-gray-400 italic">No job details available for this block.</p>
+                )}
               </div>
             </div>
           </div>
@@ -277,7 +296,17 @@ export default function BlockDetail() {
                   </PrimaryButton>
                   <SecondaryButton
                     className="w-full justify-center"
-                    onClick={() => toast.info('Modification interface')}
+                    onClick={async () => {
+                      const newStart = prompt(`Modify start time (current: ${block.startTime}):`, block.startTime);
+                      if (!newStart) return;
+                      const newEnd = prompt(`Modify end time (current: ${block.endTime}):`, block.endTime);
+                      if (!newEnd) return;
+                      try {
+                        await approvalsApi.modify(block.id, newStart, newEnd);
+                        setBlock(prev => prev ? { ...prev, startTime: newStart, endTime: newEnd, status: 'MODIFIED' as any } : null);
+                        toast.success(`Block ${block.id} modified — saved to DB`, { description: `New window: ${newStart}–${newEnd}` });
+                      } catch { toast.error('Failed to modify block'); }
+                    }}
                   >
                     MODIFY TIME WINDOW
                   </SecondaryButton>
@@ -304,7 +333,7 @@ export default function BlockDetail() {
         onClose={() => setShowApproveModal(false)}
         onConfirm={handleApprove}
         title={`Approve Block ${block.id}?`}
-        description="Confirming this possession will lock TR-02 from 14:00 to 15:30. Train rerouting order for Train 12123 via Route A will take effect."
+        description={`This will lock ${block.track} from ${block.startTime} to ${block.endTime} (${block.duration} min). ${block.affectedTrains?.length || 0} train(s) will receive rerouting orders. Action will be saved to DB.`}
         confirmLabel="Approve Block"
         loading={actionLoading}
       />

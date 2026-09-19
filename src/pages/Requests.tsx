@@ -72,10 +72,11 @@ export default function Requests() {
         requestedDuration: Number(form.requestedDuration),
         requiredManpower: Number(form.requiredManpower),
       });
-      setSubmittedId(result.id);
+      const reqId = result.id || `REQ-${Date.now().toString(36).toUpperCase()}`;
+      setSubmittedId(reqId);
       setSubmitted(true);
-      toast.success('Block Request Submitted', {
-        description: `${result.id} submitted for CP-SAT scheduling. You will be notified when the optimization is ready.`,
+      toast.success('Block Request Submitted to DB', {
+        description: `${reqId} saved for CP-SAT scheduling. You will be notified when the optimization is ready.`,
       });
     } catch {
       toast.error('Submission failed. Please try again.');

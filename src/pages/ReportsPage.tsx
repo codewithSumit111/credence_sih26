@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import {
@@ -7,18 +7,47 @@ import {
   TrendingUp, AlertTriangle, Printer, Sparkles, X, Check,
   Sliders, ArrowUpRight, BarChart3, Radio
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import * as XLSX from 'xlsx';
+import { blocksApi, jobsApi } from '../api';
 
-// ─── Dummy File Generator ───────────────────────────────────────────────────────
-function triggerDownload(filename: string, content: string, mime: string) {
-  const blob = new Blob([content], { type: mime });
+// ─── Real File Generators ────────────────────────────────────────────────────────
+function generatePDF(title: string, rows: string[][]): void {
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.text('CENTRAL RAILWAY — NAGPUR DIVISION', 14, 18);
+  doc.setFontSize(12);
+  doc.text(title, 14, 28);
+  doc.setFontSize(10);
+  doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, 14, 36);
+  doc.setLineWidth(0.5);
+  doc.line(14, 40, 196, 40);
+
+  let y = 48;
+  rows.forEach(row => {
+    if (y > 270) { doc.addPage(); y = 20; }
+    doc.text(row.join('  |  '), 14, y);
+    y += 8;
+  });
+
+  doc.save(`${title.replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+}
+
+function generateExcel(title: string, headers: string[], data: any[][]): void {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+  XLSX.utils.book_append_sheet(wb, ws, 'Report');
+  XLSX.writeFile(wb, `${title.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
+}
+
+function generateCSV(title: string, headers: string[], data: any[][]): void {
+  const rows = [headers, ...data].map(r => r.join(',')).join('\n');
+  const blob = new Blob([rows], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = `${title}_${Date.now()}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 // ─── Report Archive Items ───────────────────────────────────────────────────────
@@ -170,6 +199,13 @@ export default function ReportsPage() {
   const [includeExplanations, setIncludeExplanations] = useState(true);
   const [includeDelays, setIncludeDelays] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [liveBlocks, setLiveBlocks] = useState<any[]>([]);
+  const [liveJobs, setLiveJobs] = useState<any[]>([]);
+
+  useEffect(() => {
+    blocksApi.getBlocks().then(b => setLiveBlocks(b)).catch(() => {});
+    jobsApi.getJobs().then(j => setLiveJobs(j)).catch(() => {});
+  }, []);
 
   // Preview Modal State
   const [previewReport, setPreviewReport] = useState<ArchiveReport | null>(null);
@@ -186,61 +222,98 @@ export default function ReportsPage() {
   });
 
   // Handle Instant Preset Generation
-  const handleQuickDownload = (presetId: string, format: 'pdf' | 'excel') => {
+  const handleQuickDownload = async (presetId: string, format: 'pdf' | 'excel') => {
     const preset = REPORT_PRESETS.find(p => p.id === presetId);
     if (!preset) return;
+    toast.info(`Preparing ${preset.title}...`);
 
-    toast.info(`Preparing ${preset.title}...`, {
-      description: `Generating high-resolution ${format.toUpperCase()} document.`
-    });
+    const blocks = liveBlocks.length ? liveBlocks : await blocksApi.getBlocks().catch(() => []);
+    const jobs = liveJobs.length ? liveJobs : await jobsApi.getJobs().catch(() => []);
 
-    setTimeout(() => {
-      const ext = format === 'pdf' ? 'pdf' : 'xlsx';
-      const content = `CENTRAL RAILWAY - NAGPUR DIVISION\nREPORT: ${preset.title}\nDATE: 27 AUG 2026\nFORMAT: ${format.toUpperCase()}\n\n-- SECTION METRICS --\nAsset Uptime: 94.2%\nPossession Efficiency: 81.6%\nApproved Blocks: 4\nAverage Recovery Time: 18 min\nStatus: VERIFIED BY OPERATIONAL CONTROLLER\n`;
-      triggerDownload(`${preset.id}_${Date.now()}.${ext}`, content, 'text/plain');
-
-      toast.success(`${format.toUpperCase()} Download Started`, {
-        description: `${preset.title} has been exported to your downloads.`
-      });
-    }, 600);
+    try {
+      if (format === 'pdf') {
+        const rows: string[][] = [
+          ['--- BLOCKS ---'],
+          ['ID', 'Track', 'Window', 'Status', 'Dept'],
+          ...blocks.slice(0, 20).map((b: any) => [
+            b.id, b.track, `${b.startTime}-${b.endTime}`, b.status, (b.departments||[]).join('+')
+          ]),
+          [''],
+          ['--- JOBS (TOP 10) ---'],
+          ['ID', 'Type', 'Track', 'Priority', 'Overdue'],
+          ...jobs.slice(0, 10).map((j: any) => [
+            j.id, j.maintenanceType || '', j.track || '', j.priority || '', String(j.overdueDays || 0)
+          ])
+        ];
+        generatePDF(preset.title, rows);
+      } else {
+        const headers = ['Block ID', 'Track', 'Start', 'End', 'Duration', 'Status', 'Departments', 'Train Impact'];
+        const data = blocks.map((b: any) => [
+          b.id, b.track, b.startTime, b.endTime, b.duration, b.status,
+          (b.departments||[]).join('+'), b.trainImpact || b.expectedDelay || 0
+        ]);
+        generateExcel(preset.title, headers, data);
+      }
+      toast.success(`${format.toUpperCase()} ready!`, { description: `${preset.title} exported from live data.` });
+    } catch (e) {
+      toast.error('Export failed');
+    }
   };
 
   // Handle Custom Generator Submit
-  const handleGenerateCustom = () => {
+  const handleGenerateCustom = async () => {
     setIsGenerating(true);
-
-    setTimeout(() => {
-      setIsGenerating(false);
+    try {
+      const blocks = liveBlocks.length ? liveBlocks : await blocksApi.getBlocks();
+      const jobs = liveJobs.length ? liveJobs : await jobsApi.getJobs();
       const preset = REPORT_PRESETS.find(p => p.id === selectedPreset);
-      const newId = `REP-${Math.floor(1046 + Math.random() * 50)}`;
+      const newId = `REP-${Date.now().toString(36).toUpperCase()}`;
       const title = preset ? preset.title : 'Custom Railway Block Report';
-      
-      // Add to archive
+      const corridorLabel = corridorScope === 'NGP-BSL' ? 'NGP–BSL Main Line' : corridorScope === 'WR-BD' ? 'Wardha–Badnera Section' : 'Nagpur Division All Yards';
+
+      if (exportFormat === 'pdf') {
+        const rows: string[][] = [
+          [`Corridor: ${corridorLabel}`, `Scope: ${dateRange}`, `Solver: CP-SAT + A*`],
+          [''],
+          ['BLOCKS'],
+          ['ID', 'Track', 'Window', 'Status', 'Jobs'],
+          ...blocks.slice(0, 20).map((b: any) => [b.id, b.track, `${b.startTime}-${b.endTime}`, b.status, String((b.jobIds||[]).length)]),
+          [''],
+          ['TOP JOBS BY PRIORITY'],
+          ['ID', 'Type', 'Dept', 'Priority', 'Status'],
+          ...jobs.slice(0, 10).map((j: any) => [j.id, j.maintenanceType||'', j.department||'', j.priority||'', j.status||''])
+        ];
+        generatePDF(`${title} (${corridorScope})`, rows);
+      } else if (exportFormat === 'excel') {
+        const headers = ['Block ID', 'Track', 'Start', 'End', 'Duration', 'Departments', 'Job Count', 'Status', 'Train Impact'];
+        const data = blocks.map((b: any) => [
+          b.id, b.track, b.startTime, b.endTime, b.duration,
+          (b.departments||[]).join('+'), (b.jobIds||[]).length, b.status, b.trainImpact||0
+        ]);
+        generateExcel(`${title} (${corridorScope})`, headers, data);
+      } else {
+        const headers = ['Block ID', 'Track', 'Start', 'End', 'Status'];
+        const data = blocks.map((b: any) => [b.id, b.track, b.startTime, b.endTime, b.status]);
+        generateCSV(`${title}`, headers, data);
+      }
+
       const newReport: ArchiveReport = {
-        id: newId,
-        title: `${title} (${corridorScope})`,
+        id: newId, title: `${title} (${corridorScope})`,
         category: (preset?.id === 'train_impact' ? 'train' : preset?.id === 'disruption' ? 'disruption' : preset?.id === 'corridor' ? 'performance' : 'block'),
         categoryLabel: preset?.category || 'Custom Plan',
-        date: 'Just now (Today, 27 Aug)',
-        corridor: corridorScope === 'NGP-BSL' ? 'NGP–BSL Main Line Corridor' : corridorScope === 'WR-BD' ? 'Wardha–Badnera Section' : 'Nagpur Division All Yards',
+        date: new Date().toLocaleString('en-IN'), corridor: corridorLabel,
         author: 'R. Sharma (Active Session)',
-        size: exportFormat === 'pdf' ? '2.1 MB' : exportFormat === 'excel' ? '3.4 MB' : '820 KB',
-        formats: [exportFormat, 'pdf'],
-        status: 'VERIFIED',
-        summary: `Custom generated report for ${corridorScope} scope with AI solver explanations ${includeExplanations ? 'included' : 'omitted'}.`
+        size: exportFormat === 'pdf' ? `${(blocks.length * 0.1).toFixed(1)} MB` : '1.2 MB',
+        formats: [exportFormat], status: 'VERIFIED',
+        summary: `Generated from live DB: ${blocks.length} blocks, ${jobs.length} jobs. Corridor: ${corridorLabel}.`
       };
-
       setArchive(prev => [newReport, ...prev]);
-
-      // Download file
-      const content = `INDIAN RAILWAYS - CENTRAL RAILWAY\nDIVISION OPERATIONAL REPORT\nID: ${newId}\nTITLE: ${title}\nCORRIDOR: ${newReport.corridor}\nDATE: 27 AUG 2026\nFORMAT: ${exportFormat.toUpperCase()}\nSOLVER: CP-SAT + TIME-DEPENDENT A*\nSTATUS: APPROVED\n`;
-      const ext = exportFormat === 'pdf' ? 'pdf' : exportFormat === 'excel' ? 'xlsx' : 'csv';
-      triggerDownload(`${newId}_${selectedPreset}.${ext}`, content, 'text/plain');
-
-      toast.success('Report Generated & Downloaded!', {
-        description: `${newId}: ${title} exported as ${exportFormat.toUpperCase()} and added to archive.`
-      });
-    }, 1200);
+      toast.success('Report Generated from Live DB!', { description: `${newId}: ${title} exported as ${exportFormat.toUpperCase()}.` });
+    } catch {
+      toast.error('Report generation failed');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -588,8 +661,8 @@ export default function ReportsPage() {
 
                     <button
                       onClick={() => {
-                        triggerDownload(`${report.id}_dossier.txt`, `INDIAN RAILWAYS\n${report.title}\nID: ${report.id}\n${report.summary}`, 'text/plain');
-                        toast.success(`Downloaded ${report.id} (Text)`);
+                        generatePDF(`${report.id} Dossier`, [['ID', report.id], ['Title', report.title], ['Summary', report.summary]]);
+                        toast.success(`Downloaded ${report.id} (PDF)`);
                       }}
                       className="p-1.5 bg-white hover:bg-emerald-50 text-gray-600 hover:text-emerald-700 border border-gray-200 hover:border-emerald-300 rounded-lg transition-colors"
                       title="Download Text"
@@ -599,7 +672,7 @@ export default function ReportsPage() {
 
                     <button
                       onClick={() => {
-                        triggerDownload(`${report.id}_data.csv`, `ID,Title,Corridor,Date,Status\n${report.id},"${report.title}","${report.corridor}","${report.date}",${report.status}`, 'text/csv');
+                        generateCSV(report.id, ['ID', 'Title', 'Corridor', 'Date', 'Status'], [[report.id, report.title, report.corridor, report.date, report.status]]);
                         toast.success(`Downloaded ${report.id} (Spreadsheet)`);
                       }}
                       className="p-1.5 bg-white hover:bg-green-50 text-gray-600 hover:text-green-700 border border-gray-200 hover:border-green-300 rounded-lg transition-colors"
@@ -736,8 +809,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    triggerDownload(`${previewReport.id}_dossier.txt`, `INDIAN RAILWAYS\n${previewReport.title}\nID: ${previewReport.id}\n${previewReport.summary}`, 'text/plain');
-                    toast.success(`Downloaded ${previewReport.id} (Text)`);
+                    generatePDF(`${previewReport.id} Dossier`, [['ID', previewReport.id], ['Title', previewReport.title], ['Summary', previewReport.summary]]);
+                    toast.success(`Downloaded ${previewReport.id} (PDF)`);
                   }}
                   className="flex items-center gap-1.5 bg-[#1B6B45] hover:bg-emerald-800 text-white text-[12px] font-bold px-4 py-2 rounded-lg transition-colors"
                 >
