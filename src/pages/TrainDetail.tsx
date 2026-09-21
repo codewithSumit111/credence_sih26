@@ -78,7 +78,7 @@ export default function TrainDetail() {
         </div>
         <div className="bg-white border border-gray-200 rounded p-4">
           <span className="text-xs text-gray-400 font-semibold uppercase block mb-1">REROUTING ELIGIBILITY</span>
-          <p className="text-sm font-bold text-emerald-700">
+          <p className="text-sm font-bold text-blue-700">
             {train.reroutingEligible ? '✓ Eligible for Dynamic Reroute' : 'Locked to Primary Route'}
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function TrainDetail() {
               <span key={i} className="flex items-center gap-1.5">
                 <span className="font-semibold text-gray-800">{seg.from}</span>
                 <ArrowRight className="w-3 h-3 text-gray-400" />
-                <span className="font-mono text-emerald-700 font-bold bg-white px-1.5 py-0.5 rounded border border-gray-200">{seg.track}</span>
+                <span className="font-mono text-blue-700 font-bold bg-white px-1.5 py-0.5 rounded border border-gray-200">{seg.track}</span>
                 <ArrowRight className="w-3 h-3 text-gray-400" />
                 {i === train.originalRoute.length - 1 && (
                   <span className="font-semibold text-gray-800">{seg.to}</span>
@@ -109,16 +109,16 @@ export default function TrainDetail() {
 
         {train.proposedRoute && (
           <div>
-            <p className="text-xs font-semibold text-emerald-800 mb-1.5">A* Proposed Feasible Route</p>
-            <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded text-xs flex-wrap">
+            <p className="text-xs font-semibold text-blue-800 mb-1.5">A* Proposed Feasible Route</p>
+            <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded text-xs flex-wrap">
               {train.proposedRoute.map((seg, i) => (
                 <span key={i} className="flex items-center gap-1.5">
-                  <span className="font-semibold text-emerald-900">{seg.from}</span>
+                  <span className="font-semibold text-blue-900">{seg.from}</span>
                   <ArrowRight className="w-3 h-3 text-emerald-400" />
-                  <span className="font-mono text-emerald-700 font-bold bg-white px-1.5 py-0.5 rounded border border-emerald-300">{seg.track}</span>
+                  <span className="font-mono text-blue-700 font-bold bg-white px-1.5 py-0.5 rounded border border-emerald-300">{seg.track}</span>
                   <ArrowRight className="w-3 h-3 text-emerald-400" />
                   {i === train.proposedRoute!.length - 1 && (
-                    <span className="font-semibold text-emerald-900">{seg.to}</span>
+                    <span className="font-semibold text-blue-900">{seg.to}</span>
                   )}
                 </span>
               ))}

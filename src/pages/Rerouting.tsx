@@ -143,7 +143,7 @@ export default function Rerouting() {
                     onClick={() => setSelectedTrainNumber(train.number)}
                     className={clsx(
                       'cursor-pointer transition-colors',
-                      isSelected ? 'bg-emerald-50/80 font-medium' : 'hover:bg-gray-50'
+                      isSelected ? 'bg-blue-50/80 font-medium' : 'hover:bg-gray-50'
                     )}
                   >
                     <td className="py-3 px-4">
@@ -156,7 +156,7 @@ export default function Rerouting() {
                     <td className="py-3 px-4 font-mono text-gray-700">TR-02</td>
                     <td className="py-3 px-4">
                       {train.number === '12123' && (
-                        <span className="text-emerald-700 font-semibold bg-emerald-100 px-1.5 py-0.5 rounded">
+                        <span className="text-blue-700 font-semibold bg-blue-100 px-1.5 py-0.5 rounded">
                           Route A (A* Reroute via TR-04)
                         </span>
                       )}
@@ -189,7 +189,7 @@ export default function Rerouting() {
                             e.stopPropagation();
                             setSelectedTrainNumber(train.number);
                           }}
-                          className="text-xs font-bold text-emerald-600 hover:text-emerald-800"
+                          className="text-xs font-bold text-blue-600 hover:text-blue-800"
                         >
                           VIEW →
                         </button>

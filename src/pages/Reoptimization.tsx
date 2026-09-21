@@ -95,14 +95,14 @@ export default function Reoptimization() {
       />
 
       {/* Concept Callout: Frozen vs Repaired */}
-      <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-center justify-between text-xs text-emerald-900">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3.5 flex items-center justify-between text-xs text-blue-900">
         <div className="flex items-center gap-2">
-          <Lock className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <Lock className="w-4 h-4 text-blue-600 flex-shrink-0" />
           <span>
             <strong>ALNS Guarantees:</strong> Past & currently active possession blocks are <strong>FROZEN</strong>. Only future downstream possessions and affected train slots are dynamically repaired.
           </span>
         </div>
-        <span className="font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold">
+        <span className="font-mono text-blue-700 bg-blue-100 px-2 py-0.5 rounded font-bold">
           Engine: ALNS + TD-A*
         </span>
       </div>
@@ -146,17 +146,17 @@ export default function Reoptimization() {
         </div>
 
         {/* AI RE-OPTIMIZED PLAN */}
-        <div className="bg-white border-2 border-emerald-500 rounded-lg p-5 shadow-sm">
+        <div className="bg-white border-2 border-blue-500 rounded-lg p-5 shadow-sm">
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-emerald-100">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wider">
                 AI RE-OPTIMIZED (RECOVERED PLAN)
               </h3>
-              <span className="bg-emerald-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+              <span className="bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
                 RECOMMENDED
               </span>
             </div>
-            <span className="text-[11px] text-emerald-600 font-semibold">Zero Safety Violations</span>
+            <span className="text-[11px] text-blue-600 font-semibold">Zero Safety Violations</span>
           </div>
 
           <div className="space-y-3">
@@ -186,12 +186,12 @@ export default function Reoptimization() {
             </div>
 
             {/* Rerouted train */}
-            <div className="p-3.5 bg-emerald-50 rounded border border-emerald-300 text-xs">
+            <div className="p-3.5 bg-blue-50 rounded border border-emerald-300 text-xs">
               <div className="flex justify-between items-center mb-1">
-                <span className="font-bold text-emerald-900 font-mono">Train 12123</span>
-                <span className="text-emerald-900 font-bold font-mono">Route A (+12 min delay)</span>
+                <span className="font-bold text-blue-900 font-mono">Train 12123</span>
+                <span className="text-blue-900 font-bold font-mono">Route A (+12 min delay)</span>
               </div>
-              <p className="text-emerald-800">
+              <p className="text-blue-800">
                 Rerouted via TR-04 bypass (Time-Dependent A* computed path)
               </p>
             </div>

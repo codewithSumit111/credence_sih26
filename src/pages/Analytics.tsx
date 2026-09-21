@@ -117,7 +117,7 @@ function WhatIfPanel({ onClose }: { onClose: () => void }) {
             <select
               value={trackSection}
               onChange={e => { setTrackSection(e.target.value); setHasRun(false); }}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-emerald-500"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
             >
               {['TR-02', 'TR-04', 'TR-07'].map(t => <option key={t}>{t}</option>)}
             </select>
@@ -147,12 +147,12 @@ function WhatIfPanel({ onClose }: { onClose: () => void }) {
               {SIM_STEPS.map((step, i) => (
                 <div key={step.label} className={clsx(
                   'flex items-center gap-2 text-[10px] transition-all',
-                  i < (simStep === -1 ? SIM_STEPS.length : simStep) ? 'text-emerald-700 font-semibold'
-                    : i === simStep ? 'text-emerald-900 font-bold animate-pulse'
+                  i < (simStep === -1 ? SIM_STEPS.length : simStep) ? 'text-blue-700 font-semibold'
+                    : i === simStep ? 'text-blue-900 font-bold animate-pulse'
                     : 'text-gray-400'
                 )}>
                   {i < (simStep === -1 ? SIM_STEPS.length : simStep) ? (
-                    <Check className="w-3 h-3 text-emerald-600" />
+                    <Check className="w-3 h-3 text-blue-600" />
                   ) : (
                     <span className="w-3 h-3 rounded-full border border-current inline-block" />
                   )}
@@ -214,7 +214,7 @@ function WhatIfPanel({ onClose }: { onClose: () => void }) {
 
               <button
                 onClick={handleApply}
-                className="w-full text-[12px] font-bold border-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50 py-2.5 rounded-lg transition-colors"
+                className="w-full text-[12px] font-bold border-2 border-blue-600 text-blue-700 hover:bg-blue-50 py-2.5 rounded-lg transition-colors"
               >
                 Convert to Draft Block Request
               </button>
@@ -382,7 +382,7 @@ export default function Analytics() {
                   <tr key={d.type} className="hover:bg-gray-50">
                     <td className="py-3 font-semibold text-gray-900">{d.type}</td>
                     <td className="py-3 text-gray-700 font-mono">{d.events} events</td>
-                    <td className="py-3 font-mono font-bold text-emerald-900">{d.avgRecoveryMin} min</td>
+                    <td className="py-3 font-mono font-bold text-blue-900">{d.avgRecoveryMin} min</td>
                     <td className="py-3 text-right text-green-700 font-semibold">{bm}</td>
                   </tr>
                 );

@@ -35,8 +35,8 @@ const HORIZONS = ['Today', 'This Week', 'This Month', '52-Week Plan'] as const;
 
 const PRIORITY_JOBS = [
   { rank: 1, id: 'TRD-3094', asset: 'OHE-142-05', dept: 'TRD', risk: '0.90', overdue: '5 d', action: 'Demand Block', actionStyle: 'bg-rose-50 border border-rose-200 text-rose-700', riskColor: 'text-rose-700', overdueColor: 'text-rose-700' },
-  { rank: 2, id: 'ENG-1042', asset: 'Rail-142-03', dept: 'ENG', risk: '0.84', overdue: '7 d', action: 'Bundle', actionStyle: 'bg-emerald-50 border border-emerald-200 text-emerald-800', riskColor: 'text-rose-700', overdueColor: 'text-rose-700' },
-  { rank: 3, id: 'SNT-2081', asset: 'SIG-142-06', dept: 'S&T', risk: '0.78', overdue: '3 d', action: 'Bundle', actionStyle: 'bg-emerald-50 border border-emerald-200 text-emerald-800', riskColor: 'text-amber-700', overdueColor: 'text-rose-700' },
+  { rank: 2, id: 'ENG-1042', asset: 'Rail-142-03', dept: 'ENG', risk: '0.84', overdue: '7 d', action: 'Bundle', actionStyle: 'bg-blue-50 border border-blue-200 text-blue-800', riskColor: 'text-rose-700', overdueColor: 'text-rose-700' },
+  { rank: 3, id: 'SNT-2081', asset: 'SIG-142-06', dept: 'S&T', risk: '0.78', overdue: '3 d', action: 'Bundle', actionStyle: 'bg-blue-50 border border-blue-200 text-blue-800', riskColor: 'text-amber-700', overdueColor: 'text-rose-700' },
   { rank: 4, id: 'TRD-3110', asset: 'OHE-143-01', dept: 'TRD', risk: '0.72', overdue: '2 d', action: 'Schedule', actionStyle: 'bg-slate-50 border border-slate-200 text-slate-700', riskColor: 'text-amber-700', overdueColor: 'text-amber-700' },
   { rank: 5, id: 'ENG-1187', asset: 'Track-145-02', dept: 'ENG', risk: '0.68', overdue: '1 d', action: 'Schedule', actionStyle: 'bg-slate-50 border border-slate-200 text-slate-700', riskColor: 'text-slate-600', overdueColor: 'text-amber-700' },
   { rank: 6, id: 'SNT-2201', asset: 'LC-143-04', dept: 'S&T', risk: '0.66', overdue: '4 d', action: 'Review', actionStyle: 'bg-slate-50 border border-slate-200 text-slate-600', riskColor: 'text-slate-600', overdueColor: 'text-rose-700' },
@@ -119,7 +119,7 @@ export default function Overview() {
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 border border-emerald-200/90 text-[#1B6B45]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 border border-blue-200/90 text-[#1B6B45]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
                 CENTRAL RAILWAY
               </span>
@@ -183,7 +183,7 @@ export default function Overview() {
 
               {/* User Avatar */}
               <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-                <div className="w-7 h-7 rounded-full bg-[#1B6B45] text-white text-[11px] font-bold flex items-center justify-center shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-[#0A3D80] text-white text-[11px] font-bold flex items-center justify-center shadow-xs">
                   RS
                 </div>
                 <div className="text-left leading-tight hidden sm:block">
@@ -219,7 +219,7 @@ export default function Overview() {
                   className={clsx(
                     'px-3.5 py-1 text-xs font-semibold rounded-md transition-all',
                     active
-                      ? 'bg-[#1B6B45] text-white shadow-xs'
+                      ? 'bg-[#0A3D80] text-white shadow-xs'
                       : 'text-slate-600 hover:text-[#1B6B45] hover:bg-white'
                   )}
                 >
@@ -257,14 +257,14 @@ export default function Overview() {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Asset Availability
             </p>
-            <div className="w-7 h-7 rounded-md bg-emerald-50 text-[#1B6B45] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-md bg-blue-50 text-[#1B6B45] flex items-center justify-center">
               <BarChart3 className="w-4 h-4" />
             </div>
           </div>
           <p className="text-[24px] font-extrabold font-mono text-slate-900 leading-tight">
             96.8%
           </p>
-          <p className="text-[11px] font-semibold text-emerald-700 flex items-center gap-0.5 mt-1">
+          <p className="text-[11px] font-semibold text-blue-700 flex items-center gap-0.5 mt-1">
             <span>↑ +1.2%</span>
             <span className="font-normal text-slate-500 ml-1">vs target 95%</span>
           </p>
@@ -302,7 +302,7 @@ export default function Overview() {
           <p className="text-[24px] font-extrabold font-mono text-slate-900 leading-tight">
             42
           </p>
-          <p className="text-[11px] font-semibold text-emerald-700 flex items-center gap-0.5 mt-1">
+          <p className="text-[11px] font-semibold text-blue-700 flex items-center gap-0.5 mt-1">
             <span>↓ 18%</span>
             <span className="font-normal text-slate-500 ml-1">down from 51</span>
           </p>
@@ -333,14 +333,14 @@ export default function Overview() {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Projected Delay
             </p>
-            <div className="w-7 h-7 rounded-md bg-emerald-50 text-[#1B6B45] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-md bg-blue-50 text-[#1B6B45] flex items-center justify-center">
               <TrainIcon className="w-4 h-4" />
             </div>
           </div>
           <p className="text-[24px] font-extrabold font-mono text-slate-900 leading-tight">
             37 min
           </p>
-          <p className="text-[11px] font-semibold text-emerald-700 flex items-center gap-0.5 mt-1">
+          <p className="text-[11px] font-semibold text-blue-700 flex items-center gap-0.5 mt-1">
             <span>↓ 57%</span>
             <span className="font-normal text-slate-500 ml-1">vs uncoordinated</span>
           </p>
@@ -352,7 +352,7 @@ export default function Overview() {
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Integrated Bundles
             </p>
-            <div className="w-7 h-7 rounded-md bg-emerald-50 text-[#1B6B45] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-md bg-blue-50 text-[#1B6B45] flex items-center justify-center">
               <Link2 className="w-4 h-4" />
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function Overview() {
         </div>
 
         {/* ── Column 2: RECOMMENDED POSSESSION BLOCK (TR-02) ────────────────── */}
-        <div className="bg-white rounded-xl border border-emerald-200/90 shadow-xs flex flex-col overflow-hidden">
+        <div className="bg-white rounded-xl border border-blue-200/90 shadow-xs flex flex-col overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-white">
             <div className="flex items-center gap-1.5">
@@ -454,7 +454,7 @@ export default function Overview() {
                 Recommended Possession Block
               </h2>
             </div>
-            <span className="bg-emerald-50 text-[#1B6B45] border border-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
+            <span className="bg-blue-50 text-[#1B6B45] border border-blue-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs">
               Optimal Window
             </span>
           </div>
@@ -476,7 +476,7 @@ export default function Overview() {
 
               {/* Department tags */}
               <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
                   Engineering
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
@@ -521,7 +521,7 @@ export default function Overview() {
                   <TrainIcon className="w-3.5 h-3.5 text-[#1B6B45]" />
                   <span>Projected train delay</span>
                 </div>
-                <span className="font-bold text-emerald-700 font-mono">+6 min</span>
+                <span className="font-bold text-blue-700 font-mono">+6 min</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -537,7 +537,7 @@ export default function Overview() {
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#1B6B45]" />
                   <span>Isolated block windows saved</span>
                 </div>
-                <span className="font-bold text-emerald-700 font-mono">2 possessions</span>
+                <span className="font-bold text-blue-700 font-mono">2 possessions</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -545,7 +545,7 @@ export default function Overview() {
                   <BarChart3 className="w-3.5 h-3.5 text-[#1B6B45]" />
                   <span>Corridor capacity utilization</span>
                 </div>
-                <span className="font-bold text-emerald-700 font-mono">86%</span>
+                <span className="font-bold text-blue-700 font-mono">86%</span>
               </div>
             </div>
 
@@ -553,14 +553,14 @@ export default function Overview() {
             <div className="grid grid-cols-2 gap-2 pt-2">
               <button
                 onClick={() => setShowApproveDialog(true)}
-                className="bg-[#1B6B45] hover:bg-[#135F3A] text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                className="bg-[#0A3D80] hover:bg-[#135F3A] text-white text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <Check className="w-4 h-4" />
                 <span>Approve Window</span>
               </button>
               <button
                 onClick={() => navigate('/blocks/BR-00231')}
-                className="border border-[#1B6B45] text-[#1B6B45] hover:bg-emerald-50 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
+                className="border border-[#1B6B45] text-[#1B6B45] hover:bg-blue-50 text-xs font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-1"
               >
                 <span>Optimization Details</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -621,22 +621,22 @@ export default function Overview() {
               </div>
 
               {/* Synchronized Block */}
-              <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-3">
-                <p className="text-[11px] font-bold text-emerald-900">Synchronized Block</p>
-                <p className="text-[11px] font-semibold text-emerald-800 mt-0.5 mb-2">1 integrated window</p>
-                <div className="space-y-1 text-[11px] mb-2 text-emerald-800">
-                  <p className="font-medium text-[11px] text-emerald-900 leading-snug">
+              <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-3">
+                <p className="text-[11px] font-bold text-blue-900">Synchronized Block</p>
+                <p className="text-[11px] font-semibold text-blue-800 mt-0.5 mb-2">1 integrated window</p>
+                <div className="space-y-1 text-[11px] mb-2 text-blue-800">
+                  <p className="font-medium text-[11px] text-blue-900 leading-snug">
                     ENG + S&T + TRD Bundled
                   </p>
-                  <p className="text-[10px] text-emerald-700">Joint Corridor Possession</p>
+                  <p className="text-[10px] text-blue-700">Joint Corridor Possession</p>
                 </div>
-                <div className="mt-2.5 pt-2 border-t border-emerald-200/80 space-y-1 text-[11px]">
+                <div className="mt-2.5 pt-2 border-t border-blue-200/80 space-y-1 text-[11px]">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-emerald-800">Possession</span>
+                    <span className="text-blue-800">Possession</span>
                     <span className="font-bold text-emerald-950 font-mono">105 min</span>
                   </div>
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-emerald-800">Train Delay</span>
+                    <span className="text-blue-800">Train Delay</span>
                     <span className="font-bold text-emerald-950 font-mono">6 min</span>
                   </div>
                 </div>
@@ -698,7 +698,7 @@ export default function Overview() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-1.5 mb-1">
-              <MapPin className="w-4 h-4 text-emerald-600" />
+              <MapPin className="w-4 h-4 text-blue-600" />
               <h3 className="text-[12px] font-bold text-[#1B6B45] uppercase tracking-wider">
                 CORRIDOR HEALTH
               </h3>
@@ -720,10 +720,10 @@ export default function Overview() {
 
                 {/* Pune */}
                 <div className="relative z-10 flex flex-col items-center cursor-pointer" onClick={() => setSelectedStation('Pune')}>
-                  <span className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white ring-2 ring-emerald-200 flex items-center justify-center shadow-xs" />
+                  <span className="w-5 h-5 rounded-full bg-blue-500 border-2 border-white ring-2 ring-emerald-200 flex items-center justify-center shadow-xs" />
                   <p className="text-[10px] font-bold text-slate-700 mt-1.5">Pune</p>
-                  <p className="text-[13px] font-black font-mono text-emerald-600">96%</p>
-                  <p className="text-[10px] font-semibold text-emerald-600">Good</p>
+                  <p className="text-[13px] font-black font-mono text-blue-600">96%</p>
+                  <p className="text-[10px] font-semibold text-blue-600">Good</p>
                 </div>
 
                 {/* Lonavala */}
@@ -744,10 +744,10 @@ export default function Overview() {
 
                 {/* Mumbai */}
                 <div className="relative z-10 flex flex-col items-center cursor-pointer" onClick={() => setSelectedStation('Mumbai')}>
-                  <span className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white ring-2 ring-emerald-200 flex items-center justify-center shadow-xs" />
+                  <span className="w-5 h-5 rounded-full bg-blue-500 border-2 border-white ring-2 ring-emerald-200 flex items-center justify-center shadow-xs" />
                   <p className="text-[10px] font-bold text-slate-700 mt-1.5">Mumbai</p>
-                  <p className="text-[13px] font-black font-mono text-emerald-600">97%</p>
-                  <p className="text-[10px] font-semibold text-emerald-600">Good</p>
+                  <p className="text-[13px] font-black font-mono text-blue-600">97%</p>
+                  <p className="text-[10px] font-semibold text-blue-600">Good</p>
                 </div>
               </div>
             </div>
@@ -759,7 +759,7 @@ export default function Overview() {
                 document.getElementById('corridor-gis-map')?.scrollIntoView({ behavior: 'smooth' });
                 toast.success('Navigated to Corridor GIS Network Map');
               }}
-              className="border border-emerald-600 text-emerald-700 hover:bg-emerald-50 text-[11px] font-semibold px-3 py-1 rounded-lg transition-colors flex items-center gap-1"
+              className="border border-blue-600 text-blue-700 hover:bg-blue-50 text-[11px] font-semibold px-3 py-1 rounded-lg transition-colors flex items-center gap-1"
             >
               View GIS Map <ArrowRight className="w-3 h-3" />
             </button>
@@ -770,7 +770,7 @@ export default function Overview() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-1.5 mb-4">
-              <TrainIcon className="w-4 h-4 text-emerald-600" />
+              <TrainIcon className="w-4 h-4 text-blue-600" />
               <h3 className="text-[12px] font-bold text-[#1B6B45] uppercase tracking-wider">
                 TRAIN IMPACT SUMMARY
               </h3>
@@ -810,7 +810,7 @@ export default function Overview() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => navigate('/trains')}
-              className="border border-emerald-600 text-emerald-600 hover:bg-emerald-50 text-[11px] font-semibold px-4 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+              className="border border-blue-600 text-blue-600 hover:bg-blue-50 text-[11px] font-semibold px-4 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
             >
               View Affected Trains <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -822,13 +822,13 @@ export default function Overview() {
           <div>
             <div className="flex items-center justify-between mb-2 pb-1 border-b border-slate-100">
               <div className="flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-emerald-600" />
+                <Database className="w-4 h-4 text-blue-600" />
                 <h3 className="text-[12px] font-bold text-[#1B6B45] uppercase tracking-wider">
                   DATA INTEGRATION STATUS
                 </h3>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-1 text-[10px] text-blue-700 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                 Last synced: 2 min ago
               </div>
             </div>
@@ -849,8 +849,8 @@ export default function Overview() {
                     <tr key={src.name} className="py-1 hover:bg-slate-50/50">
                       <td className="py-1 font-bold text-slate-800">{src.name}</td>
                       <td className="py-1">
-                        <span className="flex items-center gap-1 text-emerald-600 font-semibold">
-                          <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
+                        <span className="flex items-center gap-1 text-blue-600 font-semibold">
+                          <Check className="w-3 h-3 text-blue-600 stroke-[3]" />
                           <span>{src.status}</span>
                         </span>
                       </td>

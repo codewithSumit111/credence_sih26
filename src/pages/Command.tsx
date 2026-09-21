@@ -6,11 +6,13 @@ import { overviewApi, approvalsApi } from '../api';
 import type { MaintenanceJob, OptimizedBlock, Train } from '../types';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import {
-  AlertTriangle, AlertOctagon, Clock, CheckCircle2,
-  ChevronRight, Radio, TrendingUp, Shield, Layers
+  AlertTriangle, Shield, Layers, TrendingUp, CheckCircle2, Link as LinkIcon, Radio, AlertOctagon, ChevronRight
 } from 'lucide-react';
+import DynamicNetworkMap from '../components/network/DynamicNetworkMap';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Import the background image
+import bgImage from '../assets/background_image.png';
+
 interface DashboardData {
   assetAvailability: number;
   criticalJobCount: number;
@@ -28,12 +30,7 @@ interface DashboardData {
   delayedTrains: Train[];
 }
 
-import DynamicNetworkMap from '../components/network/DynamicNetworkMap';
-
-// ─── Corridor command visualization ──────────────────────────────────────────
-function CorridorCommandView({ onViewBlock, onViewImpact, delayedTrains, pendingBlock }: {
-  onViewBlock: () => void;
-  onViewImpact: () => void;
+function CorridorCommandView({ delayedTrains, pendingBlock }: {
   delayedTrains: any[];
   pendingBlock: any;
 }) {
@@ -45,81 +42,62 @@ function CorridorCommandView({ onViewBlock, onViewImpact, delayedTrains, pending
   }));
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-5">
+    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Corridor Command View</h3>
-          <p className="text-[11px] text-gray-400 mt-0.5">NGP–BSL Corridor · Live Operational Network</p>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <Layers className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-gray-900">Corridor Command View</h3>
+            <p className="text-xs text-gray-500">NGP–BSL Corridor · Live Operational Network</p>
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="flex items-center gap-1.5 text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-2 py-1 rounded-full uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           MONITORING ACTIVE
         </div>
       </div>
 
-      <div className="mb-5">
+      <div className="flex gap-4 text-xs font-semibold text-gray-600 mb-6 justify-end px-2">
+         <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500" /> On Time</div>
+         <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" /> Delayed</div>
+         <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500" /> Rerouted</div>
+         <div className="flex items-center gap-2 ml-4">
+           <span className="h-0.5 w-4 bg-blue-600" /> Route
+           <span className="h-0.5 w-4 bg-blue-300 border-dashed border-b-2" /> Alternate
+           <span className="h-0.5 w-4 bg-red-500 border-dashed border-b-2" /> Blocked
+         </div>
+      </div>
+
+      <div className="mb-2 relative h-[250px] bg-blue-50/30 rounded-xl border border-gray-100 p-2 overflow-hidden">
         <DynamicNetworkMap 
           blockedTracks={pendingBlock ? [pendingBlock.track?.split('-')[1] || 'TR-02'] : []}
           trainPositions={trainPositions}
-          onTrainClick={onViewImpact}
-          onBlockClick={onViewBlock}
+          onTrainClick={() => {}}
+          onBlockClick={() => {}}
         />
+        
+        {/* Statistics Overlay */}
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm border border-gray-200 p-3 rounded-lg shadow-sm">
+           <div className="space-y-1.5 text-[11px] font-medium text-gray-600">
+              <div className="flex justify-between gap-6"><div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500"/> On Time</div> <span className="font-bold text-gray-900">12</span></div>
+              <div className="flex justify-between gap-6"><div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500"/> Delayed</div> <span className="font-bold text-gray-900">2</span></div>
+              <div className="flex justify-between gap-6"><div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500"/> Rerouted</div> <span className="font-bold text-gray-900">1</span></div>
+              <div className="flex justify-between gap-6"><div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500"/> Blocked</div> <span className="font-bold text-gray-900">0</span></div>
+           </div>
+        </div>
       </div>
-
-      {/* Active block legend */}
-      {pendingBlock && (
-        <div className="flex items-start gap-4 p-3 bg-red-50 border border-red-100 rounded-lg">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-4 h-3 bg-red-200 rounded-sm" />
-              <span className="font-mono text-[11px] font-bold text-red-800">{pendingBlock.id}</span>
-              <span className="text-[10px] text-gray-500 font-mono">{pendingBlock.startTime}–{pendingBlock.endTime}</span>
-              <span className="text-[10px] bg-red-100 text-red-700 font-semibold px-1.5 py-0.5 rounded border border-red-200">
-                AWAITING APPROVAL
-              </span>
-            </div>
-            <p className="text-[11px] text-gray-600">
-              {pendingBlock.departments?.join(' + ')} · {pendingBlock.track} · <strong>{delayedTrains.length} train(s) affected</strong>
-            </p>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
-            <button
-              onClick={onViewImpact}
-              className="text-[11px] font-semibold text-gray-600 hover:text-gray-800 border border-gray-200 bg-white px-2.5 py-1 rounded transition-colors"
-            >
-              View Impact
-            </button>
-            <button
-              onClick={onViewBlock}
-              className="text-[11px] font-bold text-white bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 rounded transition-colors"
-            >
-              Review Block →
-            </button>
-          </div>
-        </div>
-      )}
-      {!pendingBlock && (
-        <div className="p-3 bg-green-50 border border-green-100 rounded-lg text-center">
-          <p className="text-[11px] text-green-700 font-semibold">✓ All blocks approved — No pending possessions</p>
-        </div>
-      )}
     </div>
   );
 }
 
-// ─── Command Page ─────────────────────────────────────────────────────────────
 export default function Command() {
   const navigate = useNavigate();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     overviewApi.getDashboardData().then(d => {
@@ -140,7 +118,6 @@ export default function Command() {
         description: 'Schedule committed to DB. Rerouting orders issued.',
       });
       setShowApproveDialog(false);
-      // Reload data
       const updated = await overviewApi.getDashboardData();
       setData(updated);
     } catch {
@@ -149,48 +126,6 @@ export default function Command() {
       setActionLoading(false);
     }
   };
-
-  const timeFormatted = currentTime.toLocaleTimeString('en-IN', {
-    hour: '2-digit', minute: '2-digit', hour12: true,
-  });
-  const dateFormatted = currentTime.toLocaleDateString('en-IN', {
-    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
-  });
-
-  const kpis = [
-    {
-      label: 'Asset Availability',
-      value: loading ? '—' : `${data?.assetAvailability ?? 94}%`,
-      icon: TrendingUp,
-      color: 'text-emerald-700',
-      bg: 'bg-emerald-50 border-emerald-200',
-      sub: 'Pipeline simulation',
-    },
-    {
-      label: 'Active Blocks',
-      value: loading ? '—' : `${data?.blocksOptimized ?? 0}`,
-      icon: Layers,
-      color: 'text-blue-700',
-      bg: 'bg-blue-50 border-blue-200',
-      sub: `${data?.pendingApprovals ?? 0} awaiting approval`,
-    },
-    {
-      label: 'Trains Affected',
-      value: loading ? '—' : String(data?.delayedTrains?.length ?? 0),
-      icon: AlertTriangle,
-      color: 'text-amber-700',
-      bg: 'bg-amber-50 border-amber-200',
-      sub: 'Delayed by maintenance',
-    },
-    {
-      label: 'Pending Approvals',
-      value: loading ? '—' : String(data?.pendingApprovals ?? 0),
-      icon: Shield,
-      color: 'text-red-700',
-      bg: 'bg-red-50 border-red-200',
-      sub: data?.recommendedBlock ? `${data.recommendedBlock.id} requires action` : 'No pending approvals',
-    },
-  ];
 
   const overdueJobs = data?.overdueJobs || [];
   const attentionItems = [
@@ -217,247 +152,298 @@ export default function Command() {
     }] : []),
   ];
 
+  const kpis = [
+    {
+      label: 'Asset Availability',
+      value: loading ? '—' : `${data?.assetAvailability ?? 96.8}%`,
+      icon: TrendingUp,
+      color: 'text-green-600',
+      bg: 'bg-green-50',
+      iconBg: 'bg-green-100 text-green-700',
+      sub: 'Pipeline simulation',
+    },
+    {
+      label: 'Active Blocks',
+      value: loading ? '—' : `${data?.blocksOptimized ?? 0}`,
+      icon: Layers,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      iconBg: 'bg-blue-100 text-blue-700',
+      sub: `${data?.pendingApprovals ?? 0} awaiting approval`,
+    },
+    {
+      label: 'Trains Affected',
+      value: loading ? '—' : String(data?.delayedTrains?.length ?? 0),
+      icon: AlertTriangle,
+      color: 'text-orange-500',
+      bg: 'bg-orange-50',
+      iconBg: 'bg-orange-100 text-orange-600',
+      sub: 'Delayed by maintenance',
+    },
+    {
+      label: 'Pending Approvals',
+      value: loading ? '—' : String(data?.pendingApprovals ?? 0),
+      icon: Shield,
+      color: 'text-red-600',
+      bg: 'bg-red-50',
+      iconBg: 'bg-red-100 text-red-700',
+      sub: 'No pending approvals',
+    },
+  ];
+
   return (
-    <div className="h-full overflow-auto bg-[#F4F5F7]">
-      {/* Command Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-[1400px] mx-auto flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">KAVACH</h1>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                Railway Block Intelligence
-              </span>
-            </div>
-            <p className="text-[12px] text-gray-500 font-medium">
-              Central Railway · Nagpur Division · <span className="font-semibold text-gray-700">Section Controller</span>
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-[15px] font-mono font-bold text-gray-900">{timeFormatted}</p>
-            <p className="text-[11px] text-gray-500">{dateFormatted}</p>
-            <div className="flex items-center justify-end gap-1.5 mt-1">
-              <Radio className="w-3 h-3 text-emerald-500" />
-              <span className="text-[10px] font-semibold text-emerald-700">System Online</span>
-            </div>
-          </div>
+    <div className="h-full overflow-auto bg-[#F8FAFC]">
+      
+      {/* Hero Section */}
+      <div className="relative h-[280px] bg-[#0A3D80] overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90 mix-blend-overlay"
+          style={{ backgroundImage: `url(${bgImage})` }}
+        />
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent w-2/3" />
+        
+        <div className="relative max-w-[1400px] mx-auto px-8 py-14 h-full flex flex-col justify-center">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#0A3D80] tracking-tight leading-tight mb-2 drop-shadow-sm">
+            Smarter Block Planning.<br />
+            <span className="text-[#E85D04]">Higher Asset Availability.</span>
+          </h1>
+          <p className="text-sm md:text-base text-gray-700 font-medium max-w-lg mt-4 leading-relaxed">
+            AI-driven block planning for efficient maintenance, 
+            optimized corridor usage and uninterrupted train operations.
+          </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto p-5 space-y-5">
-
-        {/* 4 KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {kpis.map((kpi) => (
-            <div
-              key={kpi.label}
-              className={clsx('bg-white border rounded-lg p-4', kpi.bg)}
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{kpi.label}</p>
-                  <p className={clsx('text-2xl font-bold', kpi.color)}>{kpi.value}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
-                </div>
-                <kpi.icon className={clsx('w-5 h-5 flex-shrink-0 mt-0.5', kpi.color)} />
+      <div className="max-w-[1400px] mx-auto px-8 -mt-10 relative z-10 pb-12 space-y-6">
+        
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {kpis.map((kpi, idx) => (
+            <div key={idx} className="bg-white rounded-xl shadow-md border border-gray-100 p-5 flex items-center gap-4 hover:shadow-lg transition-shadow">
+              <div className={clsx('w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0', kpi.iconBg)}>
+                 <kpi.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-gray-500">{kpi.label}</p>
+                <p className={clsx('text-2xl font-black mt-0.5', kpi.color)}>{kpi.value}</p>
+                <p className="text-[11px] text-gray-400 font-medium mt-1">{kpi.sub}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Main 2-col layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Left — Corridor + Attention */}
-          <div className="lg:col-span-7 space-y-4">
+        {/* 2-Col Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+          
+          {/* Left Column */}
+          <div className="lg:col-span-7 space-y-6">
             <CorridorCommandView
-              onViewBlock={() => navigate('/plan?view=blocks')}
-              onViewImpact={() => navigate('/trains')}
               delayedTrains={data?.delayedTrains || []}
               pendingBlock={data?.recommendedBlock}
             />
 
             {/* Attention Required */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
-                Attention Required
-              </h3>
-              <div className="space-y-2">
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                 <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                    <AlertOctagon className="w-4 h-4" />
+                 </div>
+                 <h3 className="text-sm font-bold text-gray-900">Attention Required</h3>
+              </div>
+              <div className="space-y-3">
                 {attentionItems.map((item, i) => (
                   <div
                     key={i}
                     className={clsx(
-                      'flex items-center justify-between p-3 rounded-lg border',
+                      'flex items-center justify-between p-3.5 rounded-lg border',
                       item.level === 'red'
                         ? 'bg-red-50 border-red-100'
                         : 'bg-amber-50 border-amber-100'
                     )}
                   >
-                    <div className="flex items-start gap-2.5 min-w-0">
+                    <div className="flex items-start gap-3 min-w-0">
                       <AlertOctagon className={clsx(
-                        'w-3.5 h-3.5 flex-shrink-0 mt-0.5',
+                        'w-4 h-4 flex-shrink-0 mt-0.5',
                         item.level === 'red' ? 'text-red-600' : 'text-amber-600'
                       )} />
                       <div className="min-w-0">
                         <p className={clsx(
-                          'text-[12px] font-semibold truncate',
+                          'text-[13px] font-bold truncate',
                           item.level === 'red' ? 'text-red-900' : 'text-amber-900'
                         )}>
                           {item.title}
                         </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">{item.detail}</p>
+                        <p className="text-[11px] text-gray-600 mt-0.5">{item.detail}</p>
                       </div>
                     </div>
                     <button
                       onClick={item.action}
                       className={clsx(
-                        'text-[11px] font-bold ml-3 flex-shrink-0 flex items-center gap-0.5',
-                        item.level === 'red' ? 'text-red-700 hover:text-red-900' : 'text-amber-700 hover:text-amber-900'
+                        'text-[12px] font-bold ml-3 flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded bg-white/50 hover:bg-white',
+                        item.level === 'red' ? 'text-red-700 hover:text-red-900 shadow-sm border border-red-200' : 'text-amber-700 hover:text-amber-900 shadow-sm border border-amber-200'
                       )}
                     >
                       {item.actionLabel}
-                      <ChevronRight className="w-3 h-3" />
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
 
-          {/* Right — Recommendation + System Status */}
-          <div className="lg:col-span-5 space-y-4">
+          {/* Right Column */}
+          <div className="lg:col-span-5 space-y-6">
             {/* System Recommendation */}
-            <div className="bg-white border-2 border-emerald-300 rounded-lg p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                  System Recommendation
-                </h3>
-                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded uppercase">
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <Layers className="w-5 h-5" />
+                   </div>
+                   <h3 className="text-sm font-bold text-gray-900">System Recommendation</h3>
+                </div>
+                <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full uppercase tracking-wide">
                   CP-SAT Optimized
                 </span>
               </div>
 
-              <div className="p-3.5 bg-emerald-50 rounded-lg border border-emerald-100 mb-4">
-                <p className="text-[12.5px] text-emerald-900 font-medium leading-relaxed">
-                  {data?.recommendedBlock
-                    ? <>Approve <strong>{data.recommendedBlock.id}</strong> to complete {data.recommendedBlock.jobIds?.length || 1} maintenance job(s) in a single {data.recommendedBlock.duration}-minute possession on {data.recommendedBlock.track}.</>
-                    : 'All current blocks have been reviewed. No pending approvals.'}
-                </p>
+              <div className="p-4 bg-green-50/50 rounded-lg border border-green-100 mb-5 flex items-start gap-3">
+                 <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                 <p className="text-[13px] text-gray-700 font-medium leading-relaxed">
+                   {data?.recommendedBlock
+                     ? `Approve ${data.recommendedBlock.id} to complete jobs in a single ${data.recommendedBlock.duration}-minute possession on ${data.recommendedBlock.track}.`
+                     : 'All current blocks have been reviewed. No pending approvals.'}
+                 </p>
               </div>
 
-              <div className="space-y-1.5 mb-4">
+              <div className="space-y-2.5 mb-6 pl-2">
                 {(data?.recommendedBlock?.whyThisSlot || [
                   'Scheduled during low-traffic window',
                   'Compatible jobs on the same track section',
                   'Safety buffer requirements satisfied',
                   'No resource conflict detected',
                 ]).slice(0, 4).map((reason: string, i: number) => (
-                  <div key={i} className="flex items-center gap-2 text-[11px] text-gray-600">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                  <div key={i} className="flex items-center gap-2.5 text-[12px] font-medium text-gray-600">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
                     {reason}
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
-                <div className="flex-1 p-2 bg-gray-50 rounded text-center">
-                  <p className="text-[10px] text-gray-400">Impact</p>
-                  <p className="text-[12px] font-bold text-amber-700">+{data?.recommendedBlock?.expectedDelay ?? 0} min</p>
+              <div className="flex items-center justify-between py-4 border-t border-b border-gray-100 mb-6 bg-gray-50/50 px-4 rounded-lg">
+                <div className="text-center">
+                  <p className="text-[11px] text-gray-500 font-medium">Impact</p>
+                  <p className="text-[14px] font-bold text-orange-600 mt-0.5">
+                    +{data?.recommendedBlock?.expectedDelay ?? 0} min
+                  </p>
                   <p className="text-[10px] text-gray-400">projected delay</p>
                 </div>
-                <div className="flex-1 p-2 bg-gray-50 rounded text-center">
-                  <p className="text-[10px] text-gray-400">Trains</p>
-                  <p className="text-[12px] font-bold text-gray-800">{data?.delayedTrains?.length ?? 0}</p>
+                <div className="w-px h-10 bg-gray-200"></div>
+                <div className="text-center">
+                  <p className="text-[11px] text-gray-500 font-medium">Trains</p>
+                  <p className="text-[14px] font-bold text-gray-900 mt-0.5">
+                    {data?.delayedTrains?.length ?? 0}
+                  </p>
                   <p className="text-[10px] text-gray-400">affected</p>
                 </div>
-                <div className="flex-1 p-2 bg-gray-50 rounded text-center">
-                  <p className="text-[10px] text-gray-400">Status</p>
-                  <p className="text-[12px] font-bold text-red-700">{data?.pendingApprovals ? 'Awaiting' : 'None'}</p>
+                <div className="w-px h-10 bg-gray-200"></div>
+                <div className="text-center">
+                  <p className="text-[11px] text-gray-500 font-medium">Status</p>
+                  <p className="text-[14px] font-bold text-red-600 mt-0.5">
+                    {data?.pendingApprovals ? 'Awaiting' : 'None'}
+                  </p>
                   <p className="text-[10px] text-gray-400">your approval</p>
                 </div>
               </div>
 
-              {data?.recommendedBlock && (
-                <div className="flex gap-2 mt-4">
-                  <button
-                    onClick={() => navigate('/plan?view=blocks')}
-                    className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2 rounded-lg transition-colors"
-                  >
-                    Review Details
-                  </button>
-                  <button
-                    onClick={() => setShowApproveDialog(true)}
-                    className="flex-1 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2 rounded-lg transition-colors"
-                  >
-                    ✓ Approve Block
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* System Integration — compact */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
-                System Integration
-              </h3>
-              <div className="space-y-1.5">
-                {[
-                  { name: 'TMS', status: 'Connected', time: '2 min ago', live: false },
-                  { name: 'SMMS', status: 'Connected', time: '3 min ago', live: false },
-                  { name: 'TDMS', status: 'Connected', time: '2 min ago', live: false },
-                  { name: 'BDMS', status: 'Connected', time: '1 min ago', live: false },
-                  { name: 'COA', status: 'Live', time: '30 sec ago', live: true },
-                ].map(src => (
-                  <div key={src.name} className="flex items-center justify-between text-[11px]">
-                    <div className="flex items-center gap-2">
-                      <span className={clsx(
-                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                        src.live ? 'bg-green-500 animate-pulse' : 'bg-emerald-400'
-                      )} />
-                      <span className="font-semibold text-gray-700 w-10">{src.name}</span>
-                      <span className={clsx(
-                        'font-medium',
-                        src.live ? 'text-green-700' : 'text-emerald-700'
-                      )}>{src.status}</span>
-                    </div>
-                    <span className="text-gray-400 text-[10px]">{src.time}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-[10px] text-amber-600 mt-3 font-medium border-t border-gray-100 pt-2">
-                ⚠ Pipeline data — not a live railway operational feed
-              </p>
+              <button
+                onClick={() => {
+                  if (data?.recommendedBlock) setShowApproveDialog(true);
+                  else navigate('/plan?view=blocks');
+                }}
+                className={clsx(
+                  "w-full flex items-center justify-center gap-2 text-[13px] font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all",
+                  data?.recommendedBlock 
+                    ? "bg-[#E85D04] hover:bg-[#D05303] text-white"
+                    : "bg-[#E85D04] hover:bg-[#D05303] text-white opacity-90"
+                )}
+              >
+                {data?.recommendedBlock ? "Review & Approve Block" : "Generate Block Plan"} 
+                <span className="text-lg leading-none mb-0.5">→</span>
+              </button>
             </div>
 
             {/* Quick links */}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-4">
               {[
                 { label: 'Open Jobs', value: '12', sub: 'Maintenance queue', path: '/plan?view=maintenance', color: 'text-gray-800' },
-                { label: 'Recovery Time', value: '18 min', sub: 'Avg this month', path: '/analytics', color: 'text-emerald-700' },
+                { label: 'Recovery Time', value: '18 min', sub: 'Avg this month', path: '/analytics', color: 'text-blue-700' },
               ].map(item => (
                 <button
                   key={item.label}
                   onClick={() => navigate(item.path)}
-                  className="bg-white border border-gray-200 rounded-lg p-3 text-left hover:border-emerald-300 hover:bg-emerald-50/30 transition-colors group"
+                  className="bg-white border border-gray-200 rounded-xl p-5 text-left hover:border-blue-300 hover:bg-blue-50/50 hover:shadow-md transition-all group"
                 >
-                  <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">{item.label}</p>
-                  <p className={clsx('text-lg font-bold', item.color)}>{item.value}</p>
-                  <p className="text-[10px] text-gray-400">{item.sub}</p>
+                  <p className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">{item.label}</p>
+                  <p className={clsx('text-2xl font-black mt-1', item.color)}>{item.value}</p>
+                  <p className="text-[11px] text-gray-400 font-medium mt-1">{item.sub}</p>
                 </button>
               ))}
+            </div>
+
+            {/* System Integration */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <LinkIcon className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-gray-900">System Integration</h3>
+              </div>
+              
+              <div className="space-y-4">
+                {[
+                  { name: 'TMS', desc: 'Train Movement System', status: 'Connected' },
+                  { name: 'SMMS', desc: 'Signal & Telecom Maintenance', status: 'Connected' },
+                  { name: 'TDMS', desc: 'Traction Distribution System', status: 'Connected' },
+                ].map(sys => (
+                  <div key={sys.name} className="flex justify-between items-center border-b border-gray-100 last:border-0 pb-3 last:pb-0">
+                    <div>
+                      <p className="text-sm font-bold text-gray-800">{sys.name}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">{sys.desc}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      <span className="text-[10px] font-bold text-green-700 uppercase">{sys.status}</span>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="pt-2 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-gray-500 text-[11px] font-medium">
+                     <Radio className="w-3.5 h-3.5 text-blue-500 animate-pulse" /> Last Sync
+                  </div>
+                  <p className="text-[10px] text-gray-800 font-bold">
+                     21 Sep 2026, 10:18 AM
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Approval Dialog */}
       <ConfirmationDialog
         open={showApproveDialog}
         onClose={() => setShowApproveDialog(false)}
         onConfirm={handleApprove}
         title={data?.recommendedBlock ? `Approve Block ${data.recommendedBlock.id}?` : 'Approve Block?'}
         description={data?.recommendedBlock
-          ? `Approving will commit this ${data.recommendedBlock.duration}-minute possession on ${data.recommendedBlock.track} (${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime}). Rerouting orders will be issued to ${data.delayedTrains?.length || 0} affected train(s). This action requires Section Controller authorization.`
+          ? `Approving will commit this ${data.recommendedBlock.duration}-minute possession on ${data.recommendedBlock.track} (${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime}).`
           : 'Are you sure you want to approve this block?'}
         confirmLabel="Approve & Commit"
         loading={actionLoading}

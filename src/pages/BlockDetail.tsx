@@ -194,7 +194,7 @@ export default function BlockDetail() {
                 ).map((job: any) => (
                   <div key={job.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="font-bold text-emerald-900 text-[13px]">{job.department} — {job.maintenanceType}</span>
+                      <span className="font-bold text-blue-900 text-[13px]">{job.department} — {job.maintenanceType}</span>
                       <span className="font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{job.id}</span>
                     </div>
                     <p className="text-gray-700 mb-3">{job.notes || `${job.maintenanceType} on asset ${job.asset}`}</p>
@@ -207,7 +207,7 @@ export default function BlockDetail() {
                         <p className="text-[11px] text-gray-600"><strong>Priority:</strong> {typeof job.priorityScore === 'number' ? `${(job.priorityScore * 100).toFixed(0)}/100` : (job.priorityScore || job.priority)}</p>
                       </div>
                       <div className="pl-2">
-                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">AI Optimized / Approved</p>
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1">AI Optimized / Approved</p>
                         <p className="text-[11px] text-gray-600"><strong>Window:</strong> {block.startTime} – {block.endTime}</p>
                         <p className="text-[11px] text-gray-600"><strong>Duration:</strong> {block.duration} min</p>
                         <p className="text-[11px] text-gray-600"><strong>Status:</strong> {block.status}</p>
@@ -248,7 +248,7 @@ export default function BlockDetail() {
                   className={clsx(
                     'border rounded p-3 cursor-pointer transition-all',
                     selectedOption === alt.label
-                      ? 'border-emerald-500 bg-emerald-50/60 ring-1 ring-emerald-500'
+                      ? 'border-blue-500 bg-blue-50/60 ring-1 ring-blue-500'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   )}
                 >
@@ -278,7 +278,7 @@ export default function BlockDetail() {
           {/* Human Authority Card */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
             <div className="flex items-center gap-2 text-xs text-gray-700">
-              <ShieldAlert className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+              <ShieldAlert className="w-4 h-4 text-blue-600 flex-shrink-0" />
               <span>
                 <strong>Human-in-the-Loop:</strong> The optimization system recommends. The Section Controller retains final authority.
               </span>

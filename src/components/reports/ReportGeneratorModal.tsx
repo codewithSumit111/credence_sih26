@@ -67,7 +67,7 @@ export default function ReportGeneratorModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded bg-emerald-100 flex items-center justify-center text-emerald-700">
+            <div className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-700">
               <FileText className="w-4 h-4" />
             </div>
             <div>
@@ -100,7 +100,7 @@ export default function ReportGeneratorModal() {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               {REPORT_TYPES.map(type => (
                 <option key={type.id} value={type.id}>
@@ -115,7 +115,7 @@ export default function ReportGeneratorModal() {
               <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">
                 Date Range
               </label>
-              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option>Today (27 Aug 2026)</option>
                 <option>Last 7 Days</option>
                 <option>This Month</option>
@@ -126,7 +126,7 @@ export default function ReportGeneratorModal() {
               <label className="block text-[11px] font-bold text-gray-700 uppercase tracking-wider mb-2">
                 Corridor / Section
               </label>
-              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option>NGP-BSL (All)</option>
                 <option>TR-01 (NGP-WR)</option>
                 <option>TR-02 (WR-BD)</option>
@@ -137,10 +137,10 @@ export default function ReportGeneratorModal() {
 
           {/* Success State Overlay or Generation state */}
           {isGenerating && (
-            <div className="flex flex-col items-center justify-center py-6 text-emerald-700">
+            <div className="flex flex-col items-center justify-center py-6 text-blue-700">
               <RefreshCw className="w-6 h-6 animate-spin mb-3" />
               <p className="text-[13px] font-bold">Compiling Report Data...</p>
-              <p className="text-[11px] text-emerald-600 mt-1">Aggregating KAVACH simulations</p>
+              <p className="text-[11px] text-blue-600 mt-1">Aggregating KAVACH simulations</p>
             </div>
           )}
           
@@ -158,7 +158,7 @@ export default function ReportGeneratorModal() {
           <div className="bg-gray-50 border-t border-gray-200 px-5 py-4 flex gap-3">
             <button
               onClick={() => handleGenerate('pdf')}
-              className="flex-1 flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white text-[13px] font-bold py-2.5 rounded-lg transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 bg-[#E85D04] hover:bg-[#D05303] text-white text-[13px] font-bold py-2.5 rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               Export as PDF

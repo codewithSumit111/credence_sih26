@@ -54,7 +54,7 @@ const DEPT_COLORS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  'AI-OPTIMIZED': 'bg-emerald-500',
+  'AI-OPTIMIZED': 'bg-blue-500',
   'PROPOSED': 'bg-indigo-400',
   'APPROVED': 'bg-green-600',
   'PROVISIONAL': 'bg-yellow-500',
@@ -151,10 +151,9 @@ function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: B
 
   const blockJobs = ((block as any).jobDetails?.length > 0)
     ? (block as any).jobDetails
-    : block.jobIds?.map((jid: string) => ({ id: jid, maintenanceType: 'Maintenance Job', department: 'Engineering', asset: jid, requiredManpower: 5, machinery: 'Standard', priorityScore: 'N/A', notes: '', estimatedDuration: 90, dueDate: 'N/A' }))
-    || [];
+    : ((block as any).jobIds || []).map((jid: string) => ({ id: jid, maintenanceType: 'Maintenance Job', department: 'Engineering', asset: jid, requiredManpower: 5, machinery: 'Standard', priorityScore: 'N/A', notes: '', estimatedDuration: 90, dueDate: 'N/A' }));
 
-  const reasons = block.whyThisSlot || [
+  const reasons = (block as any).whyThisSlot || [
     'Compatible maintenance — same track section',
     'Timing compatible with train schedule gaps',
     'Safety buffer requirements satisfied',
@@ -203,7 +202,7 @@ function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: B
                   <p className="text-[10px] text-gray-600">Dur: {job.estimatedDuration || job.requestedDuration || block.duration} min</p>
                 </div>
                 <div className="pl-2">
-                  <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Approved</p>
+                  <p className="text-[9px] font-bold text-blue-600 uppercase tracking-wider mb-1">Approved</p>
                   <p className="text-[10px] text-gray-600">Win: {block.startTime}-{block.endTime}</p>
                   <p className="text-[10px] text-gray-600">Dur: {block.duration} min</p>
                 </div>
@@ -239,9 +238,9 @@ function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: B
       <div>
         <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Why This Block?</h4>
         <div className="space-y-1.5">
-          {reasons.map((r, i) => (
+          {reasons.map((r: string, i: number) => (
             <div key={i} className="flex items-center gap-2 text-gray-600">
-              <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+              <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
               {r}
             </div>
           ))}
@@ -261,7 +260,7 @@ function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: B
           <div className="p-3 space-y-1.5 text-[11px] text-gray-600">
             <p className="font-semibold text-gray-700 mb-1.5">Hard Constraints Satisfied:</p>
             {['Track availability verified', 'Safety buffer applied (5 min)', 'Resource availability confirmed', 'No maintenance dependency violations', 'Train conflict minimized'].map((c, i) => (
-              <div key={i} className="flex items-center gap-2"><Check className="w-3 h-3 text-emerald-500" />{c}</div>
+              <div key={i} className="flex items-center gap-2"><Check className="w-3 h-3 text-green-500" />{c}</div>
             ))}
           </div>
         )}
@@ -284,7 +283,7 @@ function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: B
           </button>
           <button
             onClick={onApprove}
-            className="flex-2 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 px-4 rounded-lg transition-colors"
+            className="flex-2 text-[12px] font-bold bg-[#E85D04] hover:bg-blue-900 text-white py-2.5 px-4 rounded-lg transition-colors"
           >
             ✓ Approve Block
           </button>
@@ -328,7 +327,7 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
             <p className="text-[11px] text-gray-600"><strong>Asset:</strong> {job.asset}</p>
           </div>
           <div className="pl-2">
-            <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Approval Status</p>
+            <p className="text-[9px] font-bold text-blue-600 uppercase tracking-wider mb-1">Approval Status</p>
             <p className="text-[11px] text-gray-600"><strong>Status:</strong> {job.status}</p>
             <p className="text-[11px] text-gray-600">
               {job.status === 'PENDING' || job.status === 'OVERDUE' ? 'Awaiting CP-SAT scheduling' : 'Scheduled / Approved in Plan'}
@@ -356,7 +355,7 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
                 <span className="font-semibold">{item.value}%</span>
               </div>
               <div className="h-1.5 bg-gray-100 rounded-full">
-                <div className="h-full bg-emerald-600 rounded-full" style={{ width: `${item.value}%` }} />
+                <div className="h-full bg-blue-600 rounded-full" style={{ width: `${item.value}%` }} />
               </div>
             </div>
           ))}
@@ -364,27 +363,27 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
       </div>
 
       {/* Why this job */}
-      <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
-        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-1.5">Why This Job?</p>
-        <p className="text-emerald-800 leading-relaxed">{job.notes}</p>
+      <div className="p-3 bg-blue-50 border border-emerald-100 rounded-lg">
+        <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-1.5">Why This Job?</p>
+        <p className="text-blue-800 leading-relaxed">{job.notes}</p>
       </div>
 
       {/* Compatible work */}
       {compatibleJob && (
-        <div className="border border-emerald-200 rounded-lg p-3 bg-emerald-50/50">
-          <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide mb-2">Compatible Work Found</p>
+        <div className="border border-blue-200 rounded-lg p-3 bg-blue-50/50">
+          <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-2">Compatible Work Found</p>
           <div className="flex items-center gap-2 mb-2">
-            <div className="flex-1 p-2 bg-white border border-emerald-200 rounded text-center">
+            <div className="flex-1 p-2 bg-white border border-blue-200 rounded text-center">
               <p className="font-bold text-gray-800 text-[11px]">{job.id}</p>
               <p className="text-[10px] text-gray-500">{job.department}</p>
             </div>
-            <span className="text-emerald-600 font-bold">+</span>
-            <div className="flex-1 p-2 bg-white border border-emerald-200 rounded text-center">
+            <span className="text-blue-600 font-bold">+</span>
+            <div className="flex-1 p-2 bg-white border border-blue-200 rounded text-center">
               <p className="font-bold text-gray-800 text-[11px]">{compatibleJob.id}</p>
               <p className="text-[10px] text-gray-500">{compatibleJob.dept}</p>
             </div>
           </div>
-          <div className="space-y-1 text-[10px] text-emerald-700 mb-2">
+          <div className="space-y-1 text-[10px] text-blue-700 mb-2">
             {['Spatial overlap', 'Timing compatible', 'Safety conditions satisfied', 'No resource conflict'].map((r, i) => (
               <div key={i} className="flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" />{r}</div>
             ))}
@@ -546,7 +545,7 @@ export default function Plan() {
   };
 
   const statusBadgeColor: Record<string, string> = {
-    'AI-OPTIMIZED': 'text-emerald-700 bg-emerald-50 border-emerald-200',
+    'AI-OPTIMIZED': 'text-blue-700 bg-blue-50 border-blue-200',
     'PROPOSED': 'text-indigo-700 bg-indigo-50 border-indigo-200',
     'APPROVED': 'text-green-700 bg-green-50 border-green-200',
     'PROVISIONAL': 'text-yellow-700 bg-yellow-50 border-yellow-200',
@@ -554,7 +553,7 @@ export default function Plan() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-[#F4F5F7]">
+    <div className="h-full overflow-auto bg-[#F8FAFC]">
       {/* Page header */}
       <div className="bg-white border-b border-gray-200 px-5 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-3">
@@ -585,15 +584,15 @@ export default function Plan() {
               <button
                 onClick={handleRunOptimizer}
                 disabled={optimizing}
-                className="flex items-center gap-1.5 text-[12px] font-semibold border border-gray-300 bg-white hover:border-emerald-500 hover:text-emerald-700 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 text-[12px] font-semibold border border-gray-300 bg-white hover:border-blue-500 hover:text-blue-700 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
               >
-                  {optimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" /> : <Settings className="w-3.5 h-3.5" />}
+                  {optimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <Settings className="w-3.5 h-3.5" />}
                   {optimizing ? 'Running...' : 'Run CP-SAT'}
                 </button>
             )}
             <button
               onClick={() => navigate('/requests')}
-              className="flex items-center gap-1.5 text-[12px] font-bold bg-[#1B6B45] hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-[12px] font-bold bg-[#0A3D80] hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               New Request
@@ -604,16 +603,16 @@ export default function Plan() {
 
       {/* Optimizer progress */}
       {optimizing && (
-        <div className="bg-emerald-50 border-b border-emerald-200 px-5 py-2.5">
+        <div className="bg-blue-50 border-b border-blue-200 px-5 py-2.5">
           <div className="max-w-[1600px] mx-auto flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-              <span className="text-[11px] font-bold text-emerald-900 uppercase tracking-wide">CP-SAT Solver Active</span>
+              <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+              <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wide">CP-SAT Solver Active</span>
             </div>
             {OPTIMIZER_STEPS.map((step, i) => (
               <div key={step} className={clsx(
                 'flex items-center gap-1.5 text-[11px]',
-                i < optimizerStep ? 'text-emerald-600 font-semibold' : i === optimizerStep ? 'text-emerald-800 font-bold' : 'text-gray-400'
+                i < optimizerStep ? 'text-blue-600 font-semibold' : i === optimizerStep ? 'text-blue-800 font-bold' : 'text-gray-400'
               )}>
                 {i < optimizerStep ? <Check className="w-3 h-3" /> : <span className="w-3 h-3 rounded-full border border-current inline-block" />}
                 {step}
@@ -686,7 +685,7 @@ export default function Plan() {
                         onClick={() => setSelectedJob(job)}
                         className={clsx(
                           'px-4 py-3 cursor-pointer flex items-center justify-between gap-4 transition-colors',
-                          isSelected ? 'bg-emerald-50 border-l-2 border-emerald-600' : 'hover:bg-gray-50 border-l-2 border-transparent'
+                          isSelected ? 'bg-blue-50 border-l-2 border-blue-600' : 'hover:bg-gray-50 border-l-2 border-transparent'
                         )}
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -699,7 +698,7 @@ export default function Plan() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-mono font-bold text-[12px] text-gray-900">{job.id}</span>
                               <span className="text-[11px] font-medium text-gray-700">{job.maintenanceType}</span>
-                              <span className="font-bold text-[11px] text-emerald-800">· {job.track}</span>
+                              <span className="font-bold text-[11px] text-blue-800">· {job.track}</span>
                               {job.overdueDays > 0 && (
                                 <span className="text-[9px] bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded border border-red-200">
                                   {job.overdueDays}d OVERDUE
@@ -715,7 +714,7 @@ export default function Plan() {
                           <PriorityBadge priority={job.priority} />
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedJob(job); }}
-                            className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-800 flex items-center gap-0.5"
+                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
                           >
                             Detail <ArrowRight className="w-3 h-3" />
                           </button>
@@ -748,7 +747,7 @@ export default function Plan() {
                   <tbody className="divide-y divide-gray-100">
                     {requests.map(req => (
                       <tr key={req.id} className="hover:bg-gray-50">
-                        <td className="py-2 font-mono font-bold text-emerald-900">{req.id}</td>
+                        <td className="py-2 font-mono font-bold text-blue-900">{req.id}</td>
                         <td className="py-2 text-gray-700 font-semibold">{req.track}</td>
                         <td className="py-2 text-gray-600">{req.preferredDate}</td>
                         <td className="py-2 text-right">
@@ -795,7 +794,7 @@ export default function Plan() {
 
             {/* Filters */}
             <div className="bg-white border border-gray-200 rounded-lg p-3 flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-[300px] bg-gray-50 border border-gray-200 rounded px-3 py-1.5 focus-within:border-emerald-500 transition-colors">
+              <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-[300px] bg-gray-50 border border-gray-200 rounded px-3 py-1.5 focus-within:border-blue-500 transition-colors">
                 <Search className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                 <input
                   type="text"
@@ -846,7 +845,7 @@ export default function Plan() {
                         onClick={() => setSelectedBlock(block)}
                         className={clsx(
                           'cursor-pointer transition-colors',
-                          isSelected ? 'bg-emerald-50' : 'hover:bg-gray-50'
+                          isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                         )}
                       >
                         <td className="py-3 px-4">
@@ -878,7 +877,7 @@ export default function Plan() {
                         <td className="py-3 px-4 text-right">
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedBlock(block); }}
-                            className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-800"
+                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-800"
                           >
                             Open →
                           </button>

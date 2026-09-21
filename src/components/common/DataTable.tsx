@@ -68,7 +68,7 @@ export default function DataTable<T extends object>({
                     'border-b border-gray-100 transition-colors',
                     onRowClick && 'cursor-pointer',
                     isSelected
-                      ? 'bg-emerald-50 hover:bg-emerald-50'
+                      ? 'bg-blue-50 hover:bg-blue-50'
                       : onRowClick ? 'hover:bg-gray-50' : ''
                   )}
                 >

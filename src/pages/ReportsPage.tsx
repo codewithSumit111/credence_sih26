@@ -317,14 +317,14 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-[#F4F5F7]">
+    <div className="h-full overflow-auto bg-[#F8FAFC]">
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Reports & Documentation Center</h1>
-              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-blue-800 bg-blue-100 border border-emerald-300 px-2 py-0.5 rounded-full">
                 Division Central
               </span>
             </div>
@@ -338,7 +338,7 @@ export default function ReportsPage() {
               <p className="text-[11px] font-bold text-gray-700">Nagpur Division (CR)</p>
               <p className="text-[10px] text-gray-400">NGP–BSL Corridor · 27 Aug 2026</p>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+            <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
               <FileText className="w-5 h-5" />
             </div>
           </div>
@@ -356,7 +356,7 @@ export default function ReportsPage() {
               </h2>
               <p className="text-[11px] text-gray-500">One-click exports calibrated for DRM, Section Controllers, and Safety Officers</p>
             </div>
-            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
+            <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md">
               4 Core Templates Ready
             </span>
           </div>
@@ -371,14 +371,14 @@ export default function ReportsPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
                         {preset.category}
                       </span>
-                      <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-emerald-50 text-gray-600 group-hover:text-emerald-700 flex items-center justify-center transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-blue-50 text-gray-600 group-hover:text-blue-700 flex items-center justify-center transition-colors">
                         <Icon className="w-4 h-4" />
                       </div>
                     </div>
-                    <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-emerald-800 transition-colors mb-1.5">
+                    <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-blue-800 transition-colors mb-1.5">
                       {preset.title}
                     </h3>
                     <p className="text-[11.5px] text-gray-500 leading-relaxed line-clamp-3 mb-4">
@@ -389,7 +389,7 @@ export default function ReportsPage() {
                   <div className="pt-3 border-t border-gray-100 flex items-center gap-2">
                     <button
                       onClick={() => handleQuickDownload(preset.id, 'pdf')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] font-bold py-2 rounded-lg transition-colors shadow-xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-[#E85D04] hover:bg-[#D05303] text-white text-[11px] font-bold py-2 rounded-lg transition-colors shadow-xs"
                       title="Download PDF"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -397,7 +397,7 @@ export default function ReportsPage() {
                     </button>
                     <button
                       onClick={() => handleQuickDownload(preset.id, 'excel')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-800 border border-gray-200 hover:border-emerald-300 text-[11px] font-bold py-2 rounded-lg transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-800 border border-gray-200 hover:border-emerald-300 text-[11px] font-bold py-2 rounded-lg transition-colors"
                       title="Download Excel Spreadsheet"
                     >
                       <FileSpreadsheet className="w-3.5 h-3.5" />
@@ -414,7 +414,7 @@ export default function ReportsPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
           <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center">
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
@@ -436,7 +436,7 @@ export default function ReportsPage() {
               <select
                 value={selectedPreset}
                 onChange={e => setSelectedPreset(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
+                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
               >
                 <option value="daily_block">Daily Integrated Block Plan</option>
                 <option value="train_impact">Train Impact & Rerouting Audit</option>
@@ -453,7 +453,7 @@ export default function ReportsPage() {
               <select
                 value={corridorScope}
                 onChange={e => setCorridorScope(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
+                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
               >
                 <option value="NGP-BSL">NGP–BSL Main Line (All 8 Tracks)</option>
                 <option value="WR-BD">Wardha–Badnera Section</option>
@@ -470,7 +470,7 @@ export default function ReportsPage() {
               <select
                 value={dateRange}
                 onChange={e => setDateRange(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
+                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
               >
                 <option value="today">Today (27 Aug 2026 - Operational)</option>
                 <option value="24h">Last 24 Hours</option>
@@ -492,7 +492,7 @@ export default function ReportsPage() {
                     className={clsx(
                       'py-2 text-[11px] font-bold rounded-lg border transition-all text-center uppercase',
                       exportFormat === fmt
-                        ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs'
+                        ? 'bg-blue-700 text-white border-emerald-700 shadow-xs'
                         : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                     )}
                   >
@@ -511,7 +511,7 @@ export default function ReportsPage() {
                   type="checkbox"
                   checked={includeExplanations}
                   onChange={e => setIncludeExplanations(e.target.checked)}
-                  className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="font-medium">Include AI Solver Decision Explanations</span>
               </label>
@@ -521,7 +521,7 @@ export default function ReportsPage() {
                   type="checkbox"
                   checked={includeDelays}
                   onChange={e => setIncludeDelays(e.target.checked)}
-                  className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="font-medium">Include Train-by-Train Impact Ledger</span>
               </label>
@@ -530,7 +530,7 @@ export default function ReportsPage() {
             <button
               onClick={handleGenerateCustom}
               disabled={isGenerating}
-              className="flex items-center gap-2 bg-[#1B6B45] hover:bg-emerald-800 active:scale-98 text-white font-bold text-[12.5px] px-5 py-2.5 rounded-lg shadow-sm transition-all disabled:opacity-60"
+              className="flex items-center gap-2 bg-[#0A3D80] hover:bg-blue-800 active:scale-98 text-white font-bold text-[12.5px] px-5 py-2.5 rounded-lg shadow-sm transition-all disabled:opacity-60"
             >
               {isGenerating ? (
                 <>
@@ -574,7 +574,7 @@ export default function ReportsPage() {
                   placeholder="Search archive..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-[12px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:bg-white w-52 transition-all"
+                  className="bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-3 py-1.5 text-[12px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:bg-white w-52 transition-all"
                 />
               </div>
 
@@ -617,7 +617,7 @@ export default function ReportsPage() {
                   className="p-4 hover:bg-gray-50/80 transition-colors flex items-center justify-between flex-wrap gap-4"
                 >
                   <div className="flex items-start gap-3.5 min-w-[280px]">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-emerald-100 text-blue-800 flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
@@ -629,7 +629,7 @@ export default function ReportsPage() {
                         <span className={clsx(
                           'text-[9.5px] font-bold px-1.5 py-0.5 rounded uppercase',
                           report.status === 'VERIFIED'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-blue-100 text-blue-800'
                             : 'bg-blue-100 text-blue-800'
                         )}>
                           {report.status}
@@ -664,7 +664,7 @@ export default function ReportsPage() {
                         generatePDF(`${report.id} Dossier`, [['ID', report.id], ['Title', report.title], ['Summary', report.summary]]);
                         toast.success(`Downloaded ${report.id} (PDF)`);
                       }}
-                      className="p-1.5 bg-white hover:bg-emerald-50 text-gray-600 hover:text-emerald-700 border border-gray-200 hover:border-emerald-300 rounded-lg transition-colors"
+                      className="p-1.5 bg-white hover:bg-blue-50 text-gray-600 hover:text-blue-700 border border-gray-200 hover:border-emerald-300 rounded-lg transition-colors"
                       title="Download Text"
                     >
                       <Download className="w-4 h-4" />
@@ -696,7 +696,7 @@ export default function ReportsPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                <ShieldCheck className="w-5 h-5 text-blue-700" />
                 <span className="text-[13px] font-bold text-gray-900 uppercase tracking-wider">
                   Official Railway Document Preview
                 </span>
@@ -719,7 +719,7 @@ export default function ReportsPage() {
                 <h2 className="text-[18px] font-black text-gray-900 uppercase mt-1">
                   Central Railway · Nagpur Division Operations
                 </h2>
-                <div className="text-[12px] font-semibold text-emerald-800 mt-1 uppercase tracking-wide">
+                <div className="text-[12px] font-semibold text-blue-800 mt-1 uppercase tracking-wide">
                   {previewReport.title}
                 </div>
                 <div className="flex items-center justify-center gap-4 text-[11px] text-gray-500 mt-2">
@@ -732,8 +732,8 @@ export default function ReportsPage() {
               </div>
 
               {/* Summary Box */}
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-lg p-4">
-                <h4 className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider mb-1">
+              <div className="bg-blue-50/70 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-1">
                   Executive Summary
                 </h4>
                 <p className="text-[12px] text-emerald-950 leading-relaxed font-medium">
@@ -761,23 +761,23 @@ export default function ReportsPage() {
                       <tr>
                         <td className="py-2.5 px-3 font-mono font-bold text-gray-900">TR-02 (WR-BD)</td>
                         <td className="py-2.5 px-3 text-gray-700">10:00 - 11:30</td>
-                        <td className="py-2.5 px-3 font-bold text-emerald-700">90 min</td>
+                        <td className="py-2.5 px-3 font-bold text-blue-700">90 min</td>
                         <td className="py-2.5 px-3 text-gray-600">ENG + S&T (Bundled)</td>
-                        <td className="py-2.5 px-3 text-right text-emerald-700 font-bold">APPROVED</td>
+                        <td className="py-2.5 px-3 text-right text-blue-700 font-bold">APPROVED</td>
                       </tr>
                       <tr>
                         <td className="py-2.5 px-3 font-mono font-bold text-gray-900">TR-04 (Akola Byp)</td>
                         <td className="py-2.5 px-3 text-gray-700">12:30 - 13:45</td>
-                        <td className="py-2.5 px-3 font-bold text-emerald-700">75 min</td>
+                        <td className="py-2.5 px-3 font-bold text-blue-700">75 min</td>
                         <td className="py-2.5 px-3 text-gray-600">Traction (TRD)</td>
-                        <td className="py-2.5 px-3 text-right text-emerald-700 font-bold">APPROVED</td>
+                        <td className="py-2.5 px-3 text-right text-blue-700 font-bold">APPROVED</td>
                       </tr>
                       <tr>
                         <td className="py-2.5 px-3 font-mono font-bold text-gray-900">TR-07 (Loop Alternate)</td>
                         <td className="py-2.5 px-3 text-gray-700">15:00 - 16:35</td>
-                        <td className="py-2.5 px-3 font-bold text-emerald-700">95 min</td>
+                        <td className="py-2.5 px-3 font-bold text-blue-700">95 min</td>
                         <td className="py-2.5 px-3 text-gray-600">ENG (Tamping)</td>
-                        <td className="py-2.5 px-3 text-right text-emerald-700 font-bold">APPROVED</td>
+                        <td className="py-2.5 px-3 text-right text-blue-700 font-bold">APPROVED</td>
                       </tr>
                     </tbody>
                   </table>
@@ -796,7 +796,7 @@ export default function ReportsPage() {
                 </div>
                 <div>
                   <div className="text-[11px] font-bold text-gray-900">Kavach-CR AI 2.0</div>
-                  <div className="text-[10px] text-emerald-700 font-bold">CP-SAT Solver Verified</div>
+                  <div className="text-[10px] text-blue-700 font-bold">CP-SAT Solver Verified</div>
                 </div>
               </div>
             </div>
@@ -812,7 +812,7 @@ export default function ReportsPage() {
                     generatePDF(`${previewReport.id} Dossier`, [['ID', previewReport.id], ['Title', previewReport.title], ['Summary', previewReport.summary]]);
                     toast.success(`Downloaded ${previewReport.id} (PDF)`);
                   }}
-                  className="flex items-center gap-1.5 bg-[#1B6B45] hover:bg-emerald-800 text-white text-[12px] font-bold px-4 py-2 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 bg-[#0A3D80] hover:bg-blue-800 text-white text-[12px] font-bold px-4 py-2 rounded-lg transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download PDF

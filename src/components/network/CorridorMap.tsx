@@ -149,7 +149,7 @@ export default function CorridorMap() {
       {/* Header bar */}
       <div className="px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-slate-50 via-white to-emerald-50/20">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600/10 border border-emerald-600/20 flex items-center justify-center text-emerald-700">
+          <div className="w-8 h-8 rounded-lg bg-blue-600/10 border border-blue-600/20 flex items-center justify-center text-blue-700">
             <Radio className="w-4 h-4 animate-pulse" />
           </div>
           <div>
@@ -157,7 +157,7 @@ export default function CorridorMap() {
               <h3 className="text-[13px] font-bold text-slate-900 tracking-wide uppercase">
                 Active Corridor GIS Network
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                 LIVE TELEMETRY
               </span>
             </div>
@@ -189,7 +189,7 @@ export default function CorridorMap() {
             onClick={() => setShowLiveTrains(!showLiveTrains)}
             className={`px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition-all ${
               showLiveTrains
-                ? 'bg-emerald-600 text-white shadow-xs font-semibold'
+                ? 'bg-blue-600 text-white shadow-xs font-semibold'
                 : 'bg-white text-slate-600 border border-slate-200'
             }`}
           >
@@ -425,7 +425,7 @@ export default function CorridorMap() {
           {/* Floating mini legend overlay in bottom-left */}
           <div className="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-2 text-[10px] text-slate-300 flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-blue-500/20" />
               <span>Normal Route</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -449,7 +449,7 @@ export default function CorridorMap() {
             {/* Context Badge */}
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                <Navigation className="w-3 h-3 text-emerald-600" />
+                <Navigation className="w-3 h-3 text-blue-600" />
                 CORRIDOR TELEMETRY
               </span>
               {selectedRoute?.status === 'active-block' ? (
@@ -457,7 +457,7 @@ export default function CorridorMap() {
                   CRITICAL BLOCK ACTIVE
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">
                   OPTIMAL FLOW
                 </span>
               )}
@@ -477,7 +477,7 @@ export default function CorridorMap() {
                     <p className="text-[11px] text-slate-500 mt-0.5">{selectedStation.zone}</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-mono font-black text-emerald-600">
+                    <span className="text-xs font-mono font-black text-blue-600">
                       {selectedStation.health}%
                     </span>
                     <p className="text-[9px] text-slate-400 uppercase font-semibold">Health Score</p>
@@ -494,7 +494,7 @@ export default function CorridorMap() {
                     <p className="text-[9px] text-slate-400 uppercase font-medium">Blocks 24h</p>
                   </div>
                   <div className="bg-slate-50 rounded-lg p-1.5">
-                    <p className="text-[14px] font-bold font-mono text-emerald-600">{selectedStation.pendingJobs}</p>
+                    <p className="text-[14px] font-bold font-mono text-blue-600">{selectedStation.pendingJobs}</p>
                     <p className="text-[9px] text-slate-400 uppercase font-medium">Job Queue</p>
                   </div>
                 </div>
@@ -523,7 +523,7 @@ export default function CorridorMap() {
                         ? 'bg-amber-100 text-amber-700'
                         : selectedRoute.status === 'consolidated'
                         ? 'bg-purple-100 text-purple-700'
-                        : 'bg-emerald-100 text-emerald-700'
+                        : 'bg-blue-100 text-blue-700'
                     }`}
                   >
                     {selectedRoute.status.replace('-', ' ').toUpperCase()}
@@ -573,7 +573,7 @@ export default function CorridorMap() {
                 setSelectedRoute(ROUTES[7]); // Karjat-Lonavala
                 setSelectedStation(STATIONS[6]);
               }}
-              className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-[11px] flex items-center gap-1 transition-colors shadow-xs"
+              className="px-3 py-1.5 rounded-lg bg-[#E85D04] hover:bg-[#D05303] text-white font-medium text-[11px] flex items-center gap-1 transition-colors shadow-xs"
             >
               Focus Critical Zone <ChevronRight className="w-3.5 h-3.5" />
             </button>

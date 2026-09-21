@@ -115,15 +115,15 @@ function TrainImpactDrawer({
                 key={option.label}
                 className={clsx(
                   'border rounded-lg p-3',
-                  option.recommended ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-gray-50'
+                  option.recommended ? 'border-emerald-300 bg-blue-50' : 'border-gray-200 bg-gray-50'
                 )}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className={clsx('text-[11px] font-bold uppercase', option.recommended ? 'text-emerald-800' : 'text-gray-600')}>
+                  <span className={clsx('text-[11px] font-bold uppercase', option.recommended ? 'text-blue-800' : 'text-gray-600')}>
                     {option.label}
                   </span>
                   {option.recommended && (
-                    <span className="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">RECOMMENDED</span>
+                    <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">RECOMMENDED</span>
                   )}
                 </div>
                 <p className="text-[10px] text-gray-600 mb-1.5">{option.segments}</p>
@@ -161,7 +161,7 @@ function TrainImpactDrawer({
               'No conflicting train on alternate path',
             ].map((r, i) => (
               <div key={i} className="flex items-center gap-2 text-gray-600">
-                <CheckCircle2 className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
                 {r}
               </div>
             ))}
@@ -195,7 +195,7 @@ function TrainImpactDrawer({
           <button
             onClick={onAcceptReroute}
             disabled={loading}
-            className="flex-1 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-lg transition-colors disabled:opacity-50"
+            className="flex-1 text-[12px] font-bold bg-[#E85D04] hover:bg-[#D05303] text-white py-2.5 rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? 'Processing...' : '✓ Accept Reroute'}
           </button>
@@ -291,7 +291,7 @@ export default function Trains() {
   if (loading) return <LoadingState message="Loading train operations data..." />;
 
   return (
-    <div className="h-full overflow-auto bg-[#F4F5F7]">
+    <div className="h-full overflow-auto bg-[#F8FAFC]">
       {/* Page header */}
       <div className="bg-white border-b border-gray-200 px-5 py-4">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between flex-wrap gap-3">
@@ -300,8 +300,8 @@ export default function Trains() {
             <p className="text-[12px] text-gray-500 mt-0.5">Operations, impact analysis, and rerouting decisions</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1.5 rounded-lg">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
               Time-Dependent A* Active
             </div>
           </div>
@@ -315,7 +315,7 @@ export default function Trains() {
             { label: 'Total Active', value: trains.length.toString(), sub: 'On corridor', color: 'text-gray-800', bg: 'bg-white border-gray-200' },
             { label: 'Affected', value: affectedCount.toString(), sub: 'By active blocks', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
             { label: 'Delayed', value: delayedCount.toString(), sub: 'Requires attention', color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
-            { label: 'Rerouted', value: reroutedCount.toString(), sub: 'Alternate routes active', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-200' },
+            { label: 'Rerouted', value: reroutedCount.toString(), sub: 'Alternate routes active', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
           ].map(kpi => (
             <div key={kpi.label} className={clsx('border rounded-lg p-3.5', kpi.bg)}>
               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{kpi.label}</p>
@@ -382,7 +382,7 @@ export default function Trains() {
                     onClick={() => setSelectedTrain(train)}
                     className={clsx(
                       'cursor-pointer transition-colors',
-                      isSelected ? 'bg-emerald-50' : 'hover:bg-gray-50'
+                      isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                     )}
                   >
                     <td className="py-3 px-4">
@@ -412,7 +412,7 @@ export default function Trains() {
                       {isAffected ? (
                         <button
                           onClick={(e) => { e.stopPropagation(); setSelectedTrain(train); }}
-                          className="text-[11px] font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-0.5 ml-auto"
+                          className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 ml-auto"
                         >
                           <GitBranch className="w-3 h-3" /> Reroute
                         </button>

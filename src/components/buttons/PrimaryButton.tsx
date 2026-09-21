@@ -17,7 +17,7 @@ export default function PrimaryButton({ children, loading, size = 'md', icon, cl
   }[size];
 
   const variantClass = {
-    primary: 'bg-[#1B6B45] hover:bg-[#135F3A]',
+    primary: 'bg-[#0A3D80] hover:bg-[#135F3A]',
     green: 'bg-green-700 hover:bg-green-800',
     danger: 'bg-red-600 hover:bg-red-700',
   }[variant];

@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Plus, Minus, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Maximize, X } from 'lucide-react';
 
 interface Station {
   id: string;
@@ -68,6 +69,36 @@ export default function DynamicNetworkMap({
   compact = false,
 }: DynamicNetworkMapProps) {
   
+  const [zoom, setZoom] = useState(1);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.5));
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    
+    // Scale movement based on zoom for a natural feel
+    setPanX(prev => prev - dx * (2 / zoom));
+    setPanY(prev => prev - dy * (2 / zoom));
+    
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+  
   function getTrackStyle(trackId: string) {
     if (blockedTracks.includes(trackId)) {
       return { color: '#dc2626', dash: '6,4', width: 4 }; // Red blocked
@@ -91,27 +122,33 @@ export default function DynamicNetworkMap({
     }
   }
 
-  return (
-    <div className={clsx('bg-white border border-gray-200 rounded overflow-hidden shadow-sm relative', className)}>
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 bg-gray-50/50">
-        <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wide">Live Operational Network</h3>
-        <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-[10px] font-bold text-green-700 uppercase">Live</span>
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const mapContent = (isModal: boolean) => (
+    <>
+      <div className={clsx("absolute right-4 flex flex-col gap-2 z-10 bg-white/90 p-1.5 rounded-lg border border-gray-200 shadow-sm backdrop-blur-sm", isModal ? "top-4" : "top-12")}>
+        <div className="flex justify-center gap-1">
+          <button onClick={handleZoomIn} className="p-1 hover:bg-gray-100 rounded text-gray-700" title="Zoom In"><Plus className="w-4 h-4" /></button>
+          <button onClick={handleZoomOut} className="p-1 hover:bg-gray-100 rounded text-gray-700" title="Zoom Out"><Minus className="w-4 h-4" /></button>
         </div>
       </div>
 
       <svg
-        viewBox="0 0 800 300"
+        viewBox={`${panX} ${panY} ${800 / zoom} ${300 / zoom}`}
         width="100%"
-        height={compact ? 220 : 300}
-        className="block"
+        height={isModal ? "100%" : (compact ? 220 : 300)}
+        className={clsx("block bg-gray-50/30", isDragging ? 'cursor-grabbing' : 'cursor-grab')}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUpOrLeave}
+        onMouseLeave={handleMouseUpOrLeave}
       >
         {/* Background Grid for better operational feel */}
         <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
           <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
         </pattern>
-        <rect width="800" height="300" fill="url(#grid)" />
+        {/* Infinite grid rectangle so panning doesn't show edges */}
+        <rect x={-5000} y={-5000} width="10000" height="10000" fill="url(#grid)" />
 
         {/* Tracks */}
         {TRACKS.map(track => {
@@ -185,7 +222,7 @@ export default function DynamicNetworkMap({
         {/* Stations */}
         {STATIONS.map(station => (
           <g key={station.id}>
-            <circle cx={station.x} cy={station.y} r={14} fill="#1B6B45" stroke="white" strokeWidth={3} />
+            <circle cx={station.x} cy={station.y} r={14} fill="#007ad9" stroke="white" strokeWidth={3} />
             <text x={station.x} y={station.y + 6} textAnchor="middle" fontSize="9" fill="white" fontWeight="800" fontFamily="Inter, sans-serif" className="select-none">
               {station.label1.split('-')[1]}
             </text>
@@ -246,10 +283,10 @@ export default function DynamicNetworkMap({
         })}
 
         {/* Legend */}
-        <g transform="translate(16, 220)">
+        <g transform={`translate(${panX + 16 / zoom}, ${panY + 300 / zoom - 76 / zoom}) scale(${1 / zoom})`}>
           <rect x={0} y={0} width={130} height={70} fill="white" fillOpacity={0.9} stroke="#e5e7eb" rx="4" />
           
-          <circle cx={15} cy={15} r={4} fill="#10b981" />
+          <circle cx={15} cy={15} r={4} fill="#22c55e" />
           <text x={26} y={18} fontSize="10" fill="#4b5563" fontFamily="Inter, sans-serif">On Time</text>
           
           <circle cx={15} cy={30} r={4} fill="#ef4444" />
@@ -268,6 +305,62 @@ export default function DynamicNetworkMap({
           <text x={105} y={48} fontSize="10" fill="#4b5563" fontFamily="Inter, sans-serif">Blocked</text>
         </g>
       </svg>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      <div className={clsx('bg-white border border-gray-200 rounded overflow-hidden shadow-sm relative', className)}>
+        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 bg-gray-50/50">
+          <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wide">Live Operational Network</h3>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-green-700 uppercase">Live</span>
+            </div>
+            {!isExpanded && (
+              <button 
+                onClick={() => setIsExpanded(true)}
+                className="text-gray-400 hover:text-blue-600 transition-colors p-1"
+                title="Expand Map"
+              >
+                <Maximize className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {mapContent(false)}
+      </div>
+
+      {isExpanded && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-8">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[80vh] flex flex-col overflow-hidden relative border border-gray-200">
+            {/* Expanded Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+              <div className="flex items-center gap-3">
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">Expanded View: Live Operational Network</h3>
+                <div className="flex items-center gap-1.5 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[10px] font-bold text-green-700 uppercase">Live</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsExpanded(false)}
+                className="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition-colors"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Expanded SVG Container */}
+            <div className="flex-1 relative overflow-hidden flex items-stretch">
+              {mapContent(true)}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

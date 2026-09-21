@@ -96,7 +96,7 @@ export default function WhatIf() {
                 name="scenario"
                 checked={scenarioType === 'block'}
                 onChange={() => setScenarioType('block')}
-                className="text-emerald-600 focus:ring-0"
+                className="text-blue-600 focus:ring-0"
               />
               <span>Block track possession</span>
             </label>
@@ -106,7 +106,7 @@ export default function WhatIf() {
                 name="scenario"
                 checked={scenarioType === 'failure'}
                 onChange={() => setScenarioType('failure')}
-                className="text-emerald-600 focus:ring-0"
+                className="text-blue-600 focus:ring-0"
               />
               <span>Unplanned Track Failure</span>
             </label>
@@ -116,7 +116,7 @@ export default function WhatIf() {
                 name="scenario"
                 checked={scenarioType === 'delay'}
                 onChange={() => setScenarioType('delay')}
-                className="text-emerald-600 focus:ring-0"
+                className="text-blue-600 focus:ring-0"
               />
               <span>Major Train Delay (+30m)</span>
             </label>
@@ -172,20 +172,20 @@ export default function WhatIf() {
 
       {/* Stepped simulation progress */}
       {simulating && (
-        <div className="bg-white border border-emerald-200 rounded-lg p-5 shadow-sm space-y-3">
+        <div className="bg-white border border-blue-200 rounded-lg p-5 shadow-sm space-y-3">
           <div className="flex items-center gap-2 mb-1">
-            <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
-            <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider">SIMULATION IN PROGRESS</span>
+            <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+            <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">SIMULATION IN PROGRESS</span>
           </div>
           {SIM_STEPS.map((step, i) => (
             <div key={i} className={clsx(
               'flex items-center gap-3 text-xs transition-all duration-300',
-              i < simStep ? 'text-green-700 font-semibold' : i === simStep - 1 && simulating ? 'text-emerald-700 font-semibold' : 'text-gray-400',
+              i < simStep ? 'text-green-700 font-semibold' : i === simStep - 1 && simulating ? 'text-blue-700 font-semibold' : 'text-gray-400',
             )}>
               {i < simStep
                 ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
                 : i === simStep - 1 && simulating
-                ? <Loader2 className="w-3.5 h-3.5 text-emerald-500 animate-spin flex-shrink-0" />
+                ? <Loader2 className="w-3.5 h-3.5 text-green-500 animate-spin flex-shrink-0" />
                 : <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex-shrink-0" />}
               {step.label}
             </div>
@@ -208,7 +208,7 @@ export default function WhatIf() {
               </div>
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <span className="text-xs text-gray-400 font-semibold uppercase block mb-1">FEASIBLE ALTERNATE ROUTES</span>
-                <p className="text-2xl font-bold text-emerald-700">{scenario.routes}</p>
+                <p className="text-2xl font-bold text-blue-700">{scenario.routes}</p>
                 <p className="text-[11px] text-gray-500 mt-1">Via {scenario.via}</p>
               </div>
               <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -258,28 +258,28 @@ export default function WhatIf() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-blue-900 uppercase tracking-wider">
                     SIMULATED PLAN • CP-SAT + A*
                   </span>
-                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded">
                     FEASIBLE
                   </span>
                 </div>
-                <span className="text-[11px] text-emerald-600 font-semibold">
+                <span className="text-[11px] text-blue-600 font-semibold">
                   1 Train Rerouted via Route A
                 </span>
               </div>
-              <div className="space-y-2 p-3 bg-emerald-50/50 rounded border border-emerald-200 text-xs">
+              <div className="space-y-2 p-3 bg-blue-50/50 rounded border border-blue-200 text-xs">
                 <div className="flex items-center gap-3">
                   <span className="w-16 font-bold text-emerald-950">ENG</span>
-                  <div className="flex-1 bg-emerald-100/50 h-6 rounded relative overflow-hidden">
+                  <div className="flex-1 bg-blue-100/50 h-6 rounded relative overflow-hidden">
                     <div className="absolute left-[20%] h-full bg-emerald-900 rounded transition-all duration-500" style={{ width: `${barW}%` }} />
                   </div>
                   <span className="text-[10px] text-emerald-400 font-mono w-10 text-right">{durationMin}m</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="w-16 font-bold text-emerald-950">S&T</span>
-                  <div className="flex-1 bg-emerald-100/50 h-6 rounded relative overflow-hidden">
+                  <div className="flex-1 bg-blue-100/50 h-6 rounded relative overflow-hidden">
                     <div className="absolute left-[20%] h-full bg-purple-900 rounded transition-all duration-500" style={{ width: `${Math.round(barW * 0.75)}%` }} />
                   </div>
                   <span className="text-[10px] text-emerald-400 font-mono w-10 text-right">{Math.round(durationMin * 0.75)}m</span>
@@ -287,8 +287,8 @@ export default function WhatIf() {
                 {scenario.rerouted > 0 && (
                   <div className="flex items-center gap-3">
                     <span className="w-16 font-bold text-emerald-950">TR-{scenario.trainNums.split(',')[0]?.trim()}</span>
-                    <div className="flex-1 bg-emerald-100/50 h-6 rounded relative overflow-hidden">
-                      <div className="absolute left-[32%] h-full bg-emerald-600 rounded flex items-center px-2 transition-all duration-500" style={{ width: `${Math.round(barW * 0.6)}%` }}>
+                    <div className="flex-1 bg-blue-100/50 h-6 rounded relative overflow-hidden">
+                      <div className="absolute left-[32%] h-full bg-blue-600 rounded flex items-center px-2 transition-all duration-500" style={{ width: `${Math.round(barW * 0.6)}%` }}>
                         <span className="text-[10px] text-white font-bold truncate">Route A (+{Math.round(scenario.delay * 0.6)}m)</span>
                       </div>
                     </div>
@@ -297,7 +297,7 @@ export default function WhatIf() {
                 {scenario.rerouted === 0 && (
                   <div className="flex items-center gap-3">
                     <span className="w-16 font-bold text-emerald-950">TR-{scenario.trainNums.split(',')[0]?.trim()}</span>
-                    <div className="flex-1 bg-emerald-100/50 h-6 rounded relative overflow-hidden">
+                    <div className="flex-1 bg-blue-100/50 h-6 rounded relative overflow-hidden">
                       <div className="h-full flex items-center px-2">
                         <span className="text-[10px] text-green-700 font-bold">✓ No rerouting needed</span>
                       </div>

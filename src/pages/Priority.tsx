@@ -128,7 +128,7 @@ export default function Priority() {
                 className={clsx(
                   'border rounded-lg p-3.5 cursor-pointer transition-all flex items-center justify-between',
                   selectedJob?.id === job.id
-                    ? 'border-emerald-500 bg-emerald-50/70 shadow-sm'
+                    ? 'border-blue-500 bg-blue-50/70 shadow-sm'
                     : 'border-gray-200 bg-white hover:border-gray-300'
                 )}
               >
@@ -138,7 +138,7 @@ export default function Priority() {
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-xs text-gray-900">{job.id}</span>
                       <span className="text-xs font-medium text-gray-700">
-                        {job.maintenanceType} • <span className="font-semibold text-emerald-900">{job.track}</span>
+                        {job.maintenanceType} • <span className="font-semibold text-blue-900">{job.track}</span>
                       </span>
                       {job.overdueDays > 0 && (
                         <span className="text-[10px] bg-red-100 text-red-700 font-bold px-1.5 py-0.2 rounded">
@@ -155,14 +155,14 @@ export default function Priority() {
                 <div className="flex items-center gap-4 text-right">
                   <div>
                     <span className="text-[10px] text-gray-400 block uppercase">Priority Score</span>
-                    <span className="text-lg font-bold text-emerald-900">{job.priorityScore}</span>
+                    <span className="text-lg font-bold text-blue-900">{job.priorityScore}</span>
                   </div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedJobId(job.id);
                     }}
-                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 flex items-center"
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center"
                   >
                     VIEW <ArrowRight className="w-3 h-3 ml-0.5" />
                   </button>
@@ -189,7 +189,7 @@ export default function Priority() {
                 <tbody className="divide-y divide-gray-100">
                   {requests.map(req => (
                     <tr key={req.id} className="hover:bg-gray-50">
-                      <td className="py-2 font-mono font-bold text-emerald-900">{req.id}</td>
+                      <td className="py-2 font-mono font-bold text-blue-900">{req.id}</td>
                       <td className="py-2 text-gray-700 font-semibold">{req.track}</td>
                       <td className="py-2 text-gray-600">{req.preferredDate}</td>
                       <td className="py-2 text-right">
@@ -239,7 +239,7 @@ export default function Priority() {
                 <div className="pt-2 flex justify-end">
                   <button
                     onClick={() => navigate('/blocks/BR-00231')}
-                    className="text-xs font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
                     View Bundled Block (BR-00231) →
                   </button>

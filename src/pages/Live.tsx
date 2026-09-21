@@ -22,8 +22,8 @@ function WorkflowIndicator({ currentStep }: { currentStep: number }) {
         <div key={step} className="flex items-center">
           <div className={clsx(
             'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold transition-all',
-            i < currentStep ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-              : i === currentStep ? 'bg-emerald-700 text-white shadow-sm'
+            i < currentStep ? 'bg-blue-100 text-blue-700 border border-blue-200'
+              : i === currentStep ? 'bg-blue-700 text-white shadow-sm'
               : 'bg-gray-100 text-gray-400 border border-gray-200'
           )}>
             {i < currentStep ? (
@@ -175,15 +175,15 @@ export default function Live() {
   const currentWorkflowStep = plan?.status === 'APPROVED' ? 5 : recoveryStep;
 
   return (
-    <div className="h-full overflow-auto bg-[#F4F5F7]">
+    <div className="h-full overflow-auto bg-[#F8FAFC]">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-5 py-4">
         <div className="max-w-[1400px] mx-auto flex items-start justify-between flex-wrap gap-3">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Live Recovery</h1>
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                 Monitoring Active
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function Live() {
           <div className="space-y-2">
             {events.length === 0 && (
               <div className="p-6 bg-white border border-gray-200 rounded-lg text-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
+                <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-2" />
                 <p className="text-[12px] font-semibold text-gray-600">No active disruptions</p>
                 <p className="text-[11px] text-gray-400">All corridor operations nominal</p>
               </div>
@@ -279,12 +279,12 @@ export default function Live() {
                 </div>
 
                 {/* ALNS section */}
-                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 2 ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200')}>
+                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 2 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200')}>
                   <div className="flex items-center gap-2 mb-2">
                     {recoveryStep >= 3 ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
                     ) : recoveryStep === 2 ? (
-                      <RefreshCw className="w-4 h-4 text-emerald-600 animate-spin" />
+                      <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
                     ) : (
                       <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
                     )}
@@ -300,7 +300,7 @@ export default function Live() {
                         'Completed operations frozen & protected',
                         ...(plan?.changesMade || selectedEvent.affectedBlocks.map(b => `${b} shifted to accommodate disruption`)),
                       ].slice(0, 3).map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-[10px] text-emerald-700">
+                        <div key={i} className="flex items-center gap-2 text-[10px] text-blue-700">
                           <Check className="w-3 h-3" />{item}
                         </div>
                       ))}
@@ -309,12 +309,12 @@ export default function Live() {
                 </div>
 
                 {/* A* section */}
-                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 3 ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200')}>
+                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 3 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200')}>
                   <div className="flex items-center gap-2 mb-2">
                     {recoveryStep >= 4 ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
                     ) : recoveryStep === 3 ? (
-                      <RefreshCw className="w-4 h-4 text-emerald-600 animate-spin" />
+                      <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
                     ) : (
                       <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
                     )}
@@ -326,7 +326,7 @@ export default function Live() {
                   {recoveryStep >= 4 && (
                     <div className="ml-6 mt-2 space-y-1">
                       {selectedEvent.affectedTrains.map((tNum, idx) => (
-                        <div key={tNum} className="flex items-center gap-2 text-[10px] text-emerald-700">
+                        <div key={tNum} className="flex items-center gap-2 text-[10px] text-blue-700">
                           <Check className="w-3 h-3" />
                           {idx === 0
                             ? `Train ${tNum} → Reroute via alternate path (A* computed)`
@@ -352,7 +352,7 @@ export default function Live() {
 
                 {recovering && (
                   <div className="text-center py-2">
-                    <p className="text-[11px] text-emerald-700 font-semibold animate-pulse">
+                    <p className="text-[11px] text-blue-700 font-semibold animate-pulse">
                       {recoveryStep === 1 && 'Assessing impact area...'}
                       {recoveryStep === 2 && 'ALNS re-optimizing remaining schedule...'}
                       {recoveryStep === 3 && 'A* computing rerouting paths...'}
@@ -376,7 +376,7 @@ export default function Live() {
                       <div className="flex flex-col items-center flex-shrink-0">
                         <div className={clsx(
                           'w-2.5 h-2.5 rounded-full mt-0.5',
-                          entry.isAlert ? 'bg-red-600 ring-3 ring-red-100' : 'bg-emerald-500'
+                          entry.isAlert ? 'bg-red-600 ring-3 ring-red-100' : 'bg-blue-500'
                         )} />
                         {i < selectedEvent.timeline.length - 1 && (
                           <div className="w-px h-4 bg-gray-200 mt-0.5" />
@@ -394,21 +394,21 @@ export default function Live() {
                   {/* Add recovery steps to timeline */}
                   {recoveryStep >= 2 && (
                     <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-emerald-700 w-10 flex-shrink-0 text-right">Now</span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 mt-0.5 flex-shrink-0" />
-                      <span className="pt-0.5 text-emerald-800 font-semibold">ALNS recovery started</span>
+                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0" />
+                      <span className="pt-0.5 text-blue-800 font-semibold">ALNS recovery started</span>
                     </div>
                   )}
                   {recoveryStep >= 3 && (
                     <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-emerald-700 w-10 flex-shrink-0 text-right">Now</span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 mt-0.5 flex-shrink-0" />
-                      <span className="pt-0.5 text-emerald-800 font-semibold">A* rerouting computed</span>
+                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
+                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0" />
+                      <span className="pt-0.5 text-blue-800 font-semibold">A* rerouting computed</span>
                     </div>
                   )}
                   {plan && (
                     <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-emerald-700 w-10 flex-shrink-0 text-right">Now</span>
+                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
                       <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0 animate-pulse" />
                       <span className="pt-0.5 text-blue-800 font-bold">New plan generated — awaiting approval</span>
                     </div>
@@ -421,7 +421,7 @@ export default function Live() {
                 <div className="bg-white border-2 border-emerald-400 rounded-lg p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">New Operating Plan</h3>
+                      <h3 className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">New Operating Plan</h3>
                       <p className="text-[10px] text-gray-400 mt-0.5">Generated by ALNS + Time-Dependent A*</p>
                     </div>
                     <span className="text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded uppercase">
@@ -451,12 +451,12 @@ export default function Live() {
                     </div>
 
                     {/* Rerouted train */}
-                    <div className="p-3 bg-emerald-50 border border-emerald-300 rounded text-[11px]">
+                    <div className="p-3 bg-blue-50 border border-emerald-300 rounded text-[11px]">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-mono font-bold text-emerald-900">Train 12123</span>
-                        <span className="font-mono font-bold text-emerald-900">Route A (+12 min)</span>
+                        <span className="font-mono font-bold text-blue-900">Train 12123</span>
+                        <span className="font-mono font-bold text-blue-900">Route A (+12 min)</span>
                       </div>
-                      <p className="text-emerald-700 text-[10px]">Rerouted via TR-04 — Time-Dependent A*</p>
+                      <p className="text-blue-700 text-[10px]">Rerouted via TR-04 — Time-Dependent A*</p>
                     </div>
                   </div>
 
@@ -486,7 +486,7 @@ export default function Live() {
                   {showOptDetails && (
                     <div className="p-3 bg-gray-50 border border-gray-200 rounded mb-3 space-y-1.5 text-[10px] text-gray-600">
                       {['Past operations frozen and not modified', 'All safety buffers maintained', 'Resource availability verified', 'No constraint violations in recovered plan'].map((c, i) => (
-                        <div key={i} className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-emerald-500" />{c}</div>
+                        <div key={i} className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />{c}</div>
                       ))}
                     </div>
                   )}
@@ -506,7 +506,7 @@ export default function Live() {
                       </button>
                       <button
                         onClick={() => setShowApproveDialog(true)}
-                        className="flex-1 text-[12px] font-bold bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-lg transition-colors"
+                        className="flex-1 text-[12px] font-bold bg-[#E85D04] hover:bg-[#D05303] text-white py-2.5 rounded-lg transition-colors"
                       >
                         ✓ Approve Plan
                       </button>

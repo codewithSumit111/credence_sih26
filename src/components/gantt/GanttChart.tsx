@@ -71,7 +71,7 @@ export default function GanttChart({
       {/* ── Gantt Header Toolbar ────────────────────────────────────────── */}
       <div className="p-3 sm:px-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-2.5 bg-white">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-emerald-600" />
+          <Layers className="w-4 h-4 text-blue-600" />
           <h3 className="text-[13px] font-bold text-[#1B6B45] tracking-wider uppercase">
             TODAY'S OPTIMIZED BLOCK PLAN
           </h3>
@@ -84,8 +84,8 @@ export default function GanttChart({
             className={clsx(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs transition-all border shadow-sm',
               isFocused
-                ? 'bg-emerald-600 text-white border-emerald-700 ring-2 ring-emerald-200'
-                : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                ? 'bg-blue-600 text-white border-emerald-700 ring-2 ring-emerald-200'
+                : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
             )}
             title={isFocused ? 'Switch to Full Day View' : 'Zoom to ±3h around peak possession window'}
           >
@@ -98,7 +98,7 @@ export default function GanttChart({
             <select
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value as any)}
-              className="appearance-none bg-white border border-gray-200 hover:border-gray-300 text-gray-700 font-medium text-xs px-2.5 py-1.5 pr-7 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+              className="appearance-none bg-white border border-gray-200 hover:border-gray-300 text-gray-700 font-medium text-xs px-2.5 py-1.5 pr-7 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
             >
               <option value="departments">Departments View</option>
               <option value="departments_trains">Departments + Key Trains</option>
@@ -181,14 +181,14 @@ export default function GanttChart({
             {/* ── Integrated TR-02 Highlight Container Overlay ───────────── */}
             {isVisibleInWindow('14:00', '15:30') && (
               <div
-                className="absolute top-0 bottom-0 bg-emerald-50/40 border-x border-dashed border-emerald-300 z-10 pointer-events-none"
+                className="absolute top-0 bottom-0 bg-blue-50/40 border-x border-dashed border-emerald-300 z-10 pointer-events-none"
                 style={{
                   left: `${getPct('14:00')}%`,
                   width: `${getWidthPct('14:00', '15:30')}%`,
                 }}
               >
                 {/* Header Tag for the integrated window */}
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded shadow pointer-events-auto flex items-center gap-1 z-20 whitespace-nowrap">
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded shadow pointer-events-auto flex items-center gap-1 z-20 whitespace-nowrap">
                   <span>TR-02</span>
                   <span className="text-emerald-200">14:00 - 15:30</span>
                 </div>
@@ -199,7 +199,7 @@ export default function GanttChart({
           {/* ── Row 1: Engineering ──────────────────────────────────────── */}
           <div className="flex border-b border-gray-100 hover:bg-slate-50/40 transition-colors relative z-10" style={{ height: 48 }}>
             <div className="w-[180px] flex-shrink-0 flex items-center gap-2 px-4 border-r border-gray-200 bg-white">
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-600 flex-shrink-0" />
+              <span className="w-2.5 h-2.5 rounded-sm bg-blue-600 flex-shrink-0" />
               <span className="text-xs font-semibold text-gray-800">Engineering</span>
             </div>
             <div className="flex-1 relative">
@@ -231,7 +231,7 @@ export default function GanttChart({
                     if (rect) setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: 'TR-02 (ENG-1042) • 14:00–15:30 • Engineering Component' });
                   }}
                   onMouseLeave={() => setTooltip(null)}
-                  className="absolute top-2 h-8 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow ring-2 ring-white ring-offset-1 z-20"
+                  className="absolute top-2 h-8 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow ring-2 ring-white ring-offset-1 z-20"
                   style={{
                     left: `${getPct('14:00')}%`,
                     width: `${getWidthPct('14:00', '15:30')}%`,
@@ -250,7 +250,7 @@ export default function GanttChart({
                     if (rect) setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text: 'BR-00244 • 20:15–22:30 • Engineering' });
                   }}
                   onMouseLeave={() => setTooltip(null)}
-                  className="absolute top-2.5 h-7 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-sm transition-transform hover:scale-[1.01]"
+                  className="absolute top-2.5 h-7 rounded bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold flex items-center justify-center cursor-pointer shadow-sm transition-transform hover:scale-[1.01]"
                   style={{
                     left: `${getPct('20:15')}%`,
                     width: `${getWidthPct('20:15', '22:30')}%`,
@@ -423,7 +423,7 @@ export default function GanttChart({
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="fixed z-50 bg-[#1B6B45] text-white text-xs px-2.5 py-1.5 rounded-md shadow-xl pointer-events-none border border-emerald-900/40"
+          className="fixed z-50 bg-[#0A3D80] text-white text-xs px-2.5 py-1.5 rounded-md shadow-xl pointer-events-none border border-emerald-900/40"
           style={{ left: tooltip.x + 16, top: tooltip.y - 30 }}
         >
           {tooltip.text}

@@ -9,14 +9,14 @@ const steps = [
   {
     title: 'Welcome to the Railway Maintenance Planning System',
     description: 'Explore how maintenance requests are prioritized, optimized into possession blocks, and evaluated for their impact on train operations.',
-    icon: <LayoutDashboard className="w-8 h-8 text-emerald-500" />,
+    icon: <LayoutDashboard className="w-8 h-8 text-green-500" />,
     path: '/command',
     target: null,
   },
   {
     title: 'Dashboard',
     description: 'Get a quick overview of maintenance priorities, scheduled work, deferred jobs, possession time, and train impact.',
-    icon: <LayoutDashboard className="w-8 h-8 text-emerald-500" />,
+    icon: <LayoutDashboard className="w-8 h-8 text-green-500" />,
     path: '/command',
     target: null,
   },
@@ -153,7 +153,7 @@ export default function OnboardingTour() {
                 key={i} 
                 className={clsx(
                   "h-1.5 rounded-full transition-all duration-300",
-                  i === currentStep ? "w-4 bg-emerald-600" : "w-1.5 bg-slate-300"
+                  i === currentStep ? "w-4 bg-blue-600" : "w-1.5 bg-slate-300"
                 )}
               />
             ))}
@@ -179,7 +179,7 @@ export default function OnboardingTour() {
 
             <button
               onClick={handleNext}
-              className="px-4 py-2 text-sm font-medium bg-[#1B6B45] text-white hover:bg-emerald-800 rounded-lg transition-colors flex items-center"
+              className="px-4 py-2 text-sm font-medium bg-[#0A3D80] text-white hover:bg-blue-800 rounded-lg transition-colors flex items-center"
             >
               {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
               {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
