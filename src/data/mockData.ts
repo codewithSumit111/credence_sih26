@@ -220,10 +220,48 @@ export const mockBlocks: OptimizedBlock[] = [
       'Existing block opportunity reduces total possession time',
       'Lowest disruption compared to all feasible alternatives',
     ],
+    score: 98,
+    utilization: 85,
+    advantages: ['Reduced train delay', 'Shared possession (bundled jobs)', 'Required resources available'],
+    tradeoffs: ['One lower-priority train delayed by 18 min'],
+    constraintStatus: {
+      hard: ['Track available', 'Safety buffer maintained', 'Resources available'],
+      soft: ['Train delay minimized', 'Asset downtime reduced']
+    },
+    scoreBreakdown: [
+      { label: 'Train Impact', value: 92, weight: 40 },
+      { label: 'Maintenance Benefit', value: 98, weight: 30 },
+      { label: 'Resource Utilization', value: 85, weight: 15 },
+      { label: 'Operational Disruption', value: 95, weight: 15 },
+    ],
     alternatives: [
-      { label: 'Option A', startTime: '14:00', endTime: '15:30', delay: 18, recommended: true },
-      { label: 'Option B', startTime: '16:00', endTime: '17:30', delay: 31, recommended: false },
-      { label: 'Option C (Night)', startTime: '02:00', endTime: '03:30', delay: 5, recommended: false },
+      { 
+        id: 'PLAN-A',
+        label: 'Minimum Train Disruption', 
+        startTime: '14:00', endTime: '15:30', delay: 18, recommended: true,
+        advantages: ['Minimal train conflict', 'Compatible jobs bundled'],
+        tradeoffs: ['18 min delay for Train 11008'],
+        score: 98, utilization: 85,
+        reasoning: ['Highest overall score', 'Best balance of maintenance vs delay']
+      },
+      { 
+        id: 'PLAN-B',
+        label: 'Maximum Maintenance Coordination', 
+        startTime: '16:00', endTime: '17:30', delay: 31, recommended: false,
+        advantages: ['Could add a 3rd minor job', 'Better daylight visibility'],
+        tradeoffs: ['31 min delay across two passenger trains'],
+        score: 82, utilization: 90,
+        reasoning: ['Rejected due to higher train delay penalty']
+      },
+      { 
+        id: 'PLAN-C',
+        label: 'Maximum Robustness (Night)', 
+        startTime: '02:00', endTime: '03:30', delay: 5, recommended: false,
+        advantages: ['Almost zero train delay'],
+        tradeoffs: ['Requires night-shift crew', 'Lower resource efficiency'],
+        score: 75, utilization: 60,
+        reasoning: ['Not recommended due to resource constraints at night']
+      },
     ],
     createdAt: '2026-08-27T13:55:00',
     assetBenefit: 'High',
@@ -254,9 +292,31 @@ export const mockBlocks: OptimizedBlock[] = [
       'OHE inspection crew available',
       'Low disruption window',
     ],
+    score: 88,
+    utilization: 75,
+    advantages: ['No passenger trains delayed', 'OHE crew available immediately'],
+    tradeoffs: ['Minor delay (10 min) to one goods train'],
+    constraintStatus: {
+      hard: ['OHE isolation possible', 'Resources available'],
+      soft: ['Goods train delayed']
+    },
     alternatives: [
-      { label: 'Option A', startTime: '16:10', endTime: '17:00', delay: 10, recommended: true },
-      { label: 'Option B', startTime: '18:00', endTime: '18:50', delay: 22, recommended: false },
+      { 
+        id: 'PLAN-A',
+        label: 'Balanced Window', 
+        startTime: '16:10', endTime: '17:00', delay: 10, recommended: true,
+        advantages: ['Crew available', 'Low passenger disruption'],
+        tradeoffs: ['Goods train delayed'],
+        score: 88, utilization: 75
+      },
+      { 
+        id: 'PLAN-B',
+        label: 'Zero Disruption', 
+        startTime: '18:00', endTime: '18:50', delay: 22, recommended: false,
+        advantages: ['No goods trains affected'],
+        tradeoffs: ['Clashes with evening peak preparation', 'Crew overtime required'],
+        score: 72, utilization: 75
+      },
     ],
     createdAt: '2026-08-27T13:55:00',
     assetBenefit: 'Medium',
@@ -720,7 +780,29 @@ export const mockAnalytics: AnalyticsData = {
     { type: 'Signal faults', events: 8, avgRecoveryMin: 28 },
   ],
   maintenanceCompletion: 87.3,
+  
+  baselineBlockHours: 185,
+  optimizedBlockHours: 153,
+  baselineDelay: 412,
+  optimizedDelay: 286,
+  baselineMaintenanceCompleted: 98,
+  optimizedMaintenanceCompleted: 126,
+  baselineBundled: 8,
+  optimizedBundled: 31,
+  baselineResourceUtil: 64,
+  optimizedResourceUtil: 81,
+  planningTimeManual: 45,
+  planningTimeOptimized: 12,
+  decisionLatency: 5,
 };
+
+export const mockDecisionHistory = [
+  { decisionId: 'DH-001', planId: 'BR-00231', timestamp: '14:35', action: 'AI generated Plan A', userRole: 'System', status: 'COMPLETED' },
+  { decisionId: 'DH-002', planId: 'BR-00231', timestamp: '14:37', action: 'Controller modified start time', modifiedFields: [{ field: 'Start Time', previousValue: '14:40', newValue: '14:50' }], userRole: 'Ctrl. R. Sharma', status: 'COMPLETED' },
+  { decisionId: 'DH-003', planId: 'BR-00231', timestamp: '14:38', action: 'Train 12003 handling changed', modifiedFields: [{ field: 'Train 12003 Action', previousValue: 'Wait', newValue: 'Reroute' }], userRole: 'Ctrl. R. Sharma', status: 'COMPLETED' },
+  { decisionId: 'DH-004', planId: 'BR-00231', timestamp: '14:39', action: 'Plan re-evaluated', userRole: 'System', status: 'COMPLETED' },
+  { decisionId: 'DH-005', planId: 'BR-00231', timestamp: '14:40', action: 'Approved', userRole: 'Ctrl. R. Sharma', status: 'APPROVED' },
+];
 
 // ============================================================
 // FIELD BLOCK — Synthetic data for demo
