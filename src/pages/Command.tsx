@@ -10,7 +10,7 @@ import {
   Link as LinkIcon, Radio, AlertOctagon, ChevronRight,
   ArrowRight, MapPin, Clock, FileText
 } from 'lucide-react';
-import DynamicNetworkMap from '../components/network/DynamicNetworkMap';
+import RailwayNetworkMap from '../components/network/RailwayNetworkMap';
 
 // Use existing background image as hero
 import bgImage from '../assets/background_image.png';
@@ -30,71 +30,6 @@ interface DashboardData {
   allTrains: Train[];
   overdueJobs: MaintenanceJob[];
   delayedTrains: Train[];
-}
-
-function CorridorCommandView({ delayedTrains, pendingBlock }: {
-  delayedTrains: any[];
-  pendingBlock: any;
-}) {
-  const trainPositions = delayedTrains.slice(0, 3).map((t, i) => ({
-    trainNumber: t.number || t.id,
-    trackId: `TR-0${i + 1}`,
-    position: 0.2 + i * 0.3,
-    status: (t.currentStatus === 'DELAYED' ? 'DELAYED' : 'ON_TIME') as 'DELAYED' | 'ON_TIME',
-  }));
-
-  return (
-    <div className="irctc-card">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h3 className="irctc-card-title">Corridor Command View</h3>
-          <p className="text-[13px] text-irctc-muted mt-0.5">NGP–BSL Corridor · Live Operational Network</p>
-        </div>
-        <div className="flex items-center gap-1.5 text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-          MONITORING ACTIVE
-        </div>
-      </div>
-
-      <div className="flex gap-5 text-[12px] font-semibold text-irctc-muted mb-4 flex-wrap">
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-500" />On Time</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-irctc-orange" />Delayed</div>
-        <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-irctc-blue" />Rerouted</div>
-        <div className="flex items-center gap-3 ml-auto">
-          <span className="h-0.5 w-5 bg-irctc-blue inline-block" />Route
-          <span className="h-0.5 w-5 bg-irctc-blue/40 border-dashed border-b-2 inline-block" />Alternate
-          <span className="h-0.5 w-5 bg-red-500 inline-block" />Blocked
-        </div>
-      </div>
-
-      <div className="relative h-[240px] bg-blue-50/40 rounded-xl border border-irctc-border-light overflow-hidden">
-        <DynamicNetworkMap
-          blockedTracks={pendingBlock ? [pendingBlock.track?.split('-')[1] || 'TR-02'] : []}
-          trainPositions={trainPositions}
-          onTrainClick={() => {}}
-          onBlockClick={() => {}}
-        />
-
-        {/* Statistics Overlay */}
-        <div className="absolute bottom-3 left-3 bg-white/95 border border-irctc-border p-3 rounded-lg shadow-irctc-sm">
-          <div className="space-y-1.5 text-[12px] text-irctc-text">
-            <div className="flex justify-between gap-8 font-medium">
-              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500" />On Time</div>
-              <span className="font-bold text-irctc-navy">12</span>
-            </div>
-            <div className="flex justify-between gap-8 font-medium">
-              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-irctc-orange" />Delayed</div>
-              <span className="font-bold text-irctc-navy">2</span>
-            </div>
-            <div className="flex justify-between gap-8 font-medium">
-              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-irctc-blue" />Rerouted</div>
-              <span className="font-bold text-irctc-navy">1</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function Command() {
@@ -407,9 +342,9 @@ export default function Command() {
 
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6">
-            <CorridorCommandView
-              delayedTrains={data?.delayedTrains || []}
-              pendingBlock={data?.recommendedBlock}
+            <RailwayNetworkMap
+              blocks={data?.allBlocks || []}
+              onApproveBlock={() => setShowApproveDialog(true)}
             />
 
             {/* Attention Required — IRCTC alert-list style */}

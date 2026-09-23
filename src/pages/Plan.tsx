@@ -16,7 +16,9 @@ import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import { priorityApi, blocksApi, approvalsApi } from '../api';
 import type { MaintenanceJob, BlockRequest, OptimizedBlock } from '../types';
 import { mockDecisionHistory } from '../data/mockData';
-
+import RegionSelector from '../components/blocks/RegionSelector';
+import RailwayTrackView from '../components/blocks/RailwayTrackView';
+import TrackBlockDetails from '../components/blocks/TrackBlockDetails';
 
 // ─── Block data ───────────────────────────────────────────────────────────────
 interface BlockItem {
@@ -362,6 +364,7 @@ export default function Plan() {
   }, []);
 
   const [selectedBlock, setSelectedBlock] = useState<BlockItem | null>(null);
+  const [region, setRegion] = useState(() => localStorage.getItem('irctc_selected_region') || 'Central Railway');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [optimizing, setOptimizing] = useState(false);
@@ -667,6 +670,8 @@ export default function Plan() {
         {/* ─── BLOCKS TAB ──────────────────────────────────────────────────── */}
         {activeTab === 'blocks' && (
           <div className="space-y-4">
+            <RegionSelector selectedRegion={region} onRegionChange={setRegion} />
+
             {/* Block KPIs — live data */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
@@ -683,8 +688,9 @@ export default function Plan() {
               ))}
             </div>
 
-            {/* Gantt */}
-            <BlockGantt
+            {/* Railway Track Visualization */}
+            <RailwayTrackView
+              region={region}
               blocks={filteredBlocks}
               selectedId={selectedBlock?.id || ''}
               onSelect={(id) => setSelectedBlock(blocks.find(b => b.id === id) || null)}
@@ -810,13 +816,9 @@ export default function Plan() {
         width="md"
       >
         {selectedBlock && (
-          <BlockDetailContent
-            block={selectedBlock}
-            onApprove={(altId) => {
-              // Optionally log the selected plan alternative
-              console.log(`Approving with alternative ${altId}`);
-              setShowApproveDialog(true);
-            }}
+          <TrackBlockDetails
+            block={selectedBlock.rawBlock}
+            onApprove={() => setShowApproveDialog(true)}
             onReject={() => handleRejectBlock(selectedBlock)}
             onModify={() => handleModifyBlock(selectedBlock)}
           />
