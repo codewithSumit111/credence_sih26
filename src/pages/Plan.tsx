@@ -332,10 +332,22 @@ const mapApiBlockToBlockItem = (b: any): BlockItem => ({
   rawBlock: b as OptimizedBlock,
 });
 
+import { useAuth } from '../contexts/AuthContext';
+
+const DEPT_MAP: Record<number, string> = {
+  1: 'ENG',
+  2: 'S&T',
+  3: 'TRD',
+};
+
 export default function Plan() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = (searchParams.get('view') as 'maintenance' | 'blocks') || 'maintenance';
+  const { user } = useAuth();
+
+  const isBDMS = user?.role === 'BDMS_INCHARGE';
+  const userDept = isBDMS && user.department_id ? DEPT_MAP[user.department_id] : 'ALL';
 
   const setTab = (tab: 'maintenance' | 'blocks') => {
     setSearchParams({ view: tab });
@@ -345,11 +357,12 @@ export default function Plan() {
   const [jobs, setJobs] = useState<MaintenanceJob[]>([]);
   const [requests, setRequests] = useState<BlockRequest[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
-  const [deptFilter, setDeptFilter] = useState('ALL');
+  const [deptFilter, setDeptFilter] = useState(userDept);
   const [selectedJob, setSelectedJob] = useState<MaintenanceJob | null>(null);
 
   // Blocks state
   const [blocks, setBlocks] = useState<BlockItem[]>([]);
+  const [selectedDate, setSelectedDate] = useState(''); // empty means all dates
   
   useEffect(() => {
     const fetchBlocks = async () => {
@@ -379,17 +392,24 @@ export default function Plan() {
     ]).then(([jData, rData]) => {
       setJobs(jData);
       setRequests(rData);
-      if (jData.length > 0) setSelectedJob(jData[0]);
+      const filtered = userDept !== 'ALL' ? jData.filter(j => j.department === userDept) : jData;
+      if (filtered.length > 0) setSelectedJob(filtered[0]);
       setJobsLoading(false);
     }).catch(() => setJobsLoading(false));
-  }, []);
+  }, [userDept]);
 
   const filteredJobs = jobs.filter(j => deptFilter === 'ALL' || j.department === deptFilter);
   const filteredBlocks = blocks.filter(b => {
     if (statusFilter !== 'ALL' && b.status !== statusFilter) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return b.id.toLowerCase().includes(q) || b.track.toLowerCase().includes(q) || b.section.toLowerCase().includes(q);
+      if (!(b.id.toLowerCase().includes(q) || b.track.toLowerCase().includes(q) || b.section.toLowerCase().includes(q))) {
+        return false;
+      }
+    }
+    if (selectedDate) {
+      const blockDate = new Date(b.rawBlock?.createdAt || Date.now()).toISOString().split('T')[0];
+      if (blockDate !== selectedDate) return false;
     }
     return true;
   });
@@ -551,15 +571,17 @@ export default function Plan() {
             {/* Filters */}
             <div className="flex items-center gap-2 mb-4">
               <span className="text-[11px] text-gray-500 font-medium">Filter:</span>
-              {['ALL', 'Engineering', 'S&T', 'Traction'].map(dept => (
+              {['ALL', 'ENG', 'S&T', 'TRD'].map(dept => (
                 <button
                   key={dept}
                   onClick={() => setDeptFilter(dept)}
+                  disabled={isBDMS && dept !== userDept}
                   className={clsx(
                     'px-2.5 py-1 rounded text-[11px] font-semibold border transition-colors',
                     deptFilter === dept
                       ? 'bg-gray-800 text-white border-gray-800'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300',
+                    (isBDMS && dept !== userDept) && 'opacity-50 cursor-not-allowed'
                   )}
                 >
                   {dept === 'ALL' ? 'All Departments' : dept}
@@ -670,7 +692,12 @@ export default function Plan() {
         {/* ─── BLOCKS TAB ──────────────────────────────────────────────────── */}
         {activeTab === 'blocks' && (
           <div className="space-y-4">
-            <RegionSelector selectedRegion={region} onRegionChange={setRegion} />
+            <RegionSelector 
+              selectedRegion={region} 
+              onRegionChange={setRegion}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
 
             {/* Block KPIs — live data */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

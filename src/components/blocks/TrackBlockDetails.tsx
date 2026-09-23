@@ -94,6 +94,9 @@ export default function TrackBlockDetails({ block, onApprove, onReject, onModify
             <span className="text-gray-500 font-medium">Reason</span>
             <span className="font-semibold">ENGG-TRACK MACHINE WORKING</span>
             
+            <span className="text-gray-500 font-medium">Date</span>
+            <span className="font-semibold">{new Date(block.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+
             <span className="text-gray-500 font-medium">Start</span>
             <span className="font-semibold">{block.startTime}</span>
             

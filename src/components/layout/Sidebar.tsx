@@ -1,25 +1,34 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, CalendarClock,
   Train, AlertTriangle, BarChart3,
-  Wrench, FileText,
+  Wrench, FileText, FileQuestion, LogOut,
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useAuth } from '../../contexts/AuthContext';
 
-const primaryNav = [
-  { path: '/command', label: 'Command', icon: LayoutDashboard, matchPaths: ['/command', '/dashboard', '/overview'] },
-  { path: '/plan', label: 'Plan', icon: CalendarClock, matchPaths: ['/plan', '/blocks', '/priority'] },
-  { path: '/trains', label: 'Trains', icon: Train, matchPaths: ['/trains', '/rerouting'] },
-  { path: '/live', label: 'Live', icon: AlertTriangle, matchPaths: ['/live', '/events', '/reoptimization'], badge: 1 },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3, matchPaths: ['/analytics', '/what-if'] },
-  { path: '/reports', label: 'Reports', icon: FileText, matchPaths: ['/reports'] },
-  { path: '/field', label: 'Field', icon: Wrench, matchPaths: ['/field'] },
-];
+const getPrimaryNav = (role: string) => {
+  const allNav = [
+    { path: '/command', label: 'Command', icon: LayoutDashboard, matchPaths: ['/command', '/dashboard', '/overview'], roles: ['SECTION_CONTROLLER'] },
+    { path: '/plan', label: 'Plan', icon: CalendarClock, matchPaths: ['/plan', '/blocks', '/priority'], roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE'] },
+    { path: '/requests', label: 'Requests', icon: FileQuestion, matchPaths: ['/requests'], roles: ['BDMS_INCHARGE'] },
+    { path: '/trains', label: 'Trains', icon: Train, matchPaths: ['/trains', '/rerouting'], roles: ['SECTION_CONTROLLER'] },
+    { path: '/live', label: 'Live', icon: AlertTriangle, matchPaths: ['/live', '/events', '/reoptimization'], badge: 1, roles: ['SECTION_CONTROLLER'] },
+    { path: '/analytics', label: 'Analytics', icon: BarChart3, matchPaths: ['/analytics', '/what-if'], roles: ['SECTION_CONTROLLER'] },
+    { path: '/reports', label: 'Reports', icon: FileText, matchPaths: ['/reports'], roles: ['SECTION_CONTROLLER'] },
+    { path: '/field', label: 'Field', icon: Wrench, matchPaths: ['/field'], roles: ['FIELD_MANAGER'] },
+  ];
+  return allNav.filter(nav => nav.roles.includes(role));
+};
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  const primaryNav = getPrimaryNav(user?.role || 'SECTION_CONTROLLER');
 
   const [isPinned, setIsPinned] = useState<boolean>(() => {
     try {
@@ -63,6 +72,11 @@ export default function Sidebar() {
       }
       return next;
     });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   useEffect(() => {
@@ -201,33 +215,41 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer Profile Card */}
-      <div className={clsx('border-t border-[#163828]/80 bg-[#081510]/70 transition-all', isExpanded ? 'p-3' : 'p-2')}>
+      <div className={clsx('border-t border-[#163828]/80 bg-[#081510]/70 transition-all flex flex-col', isExpanded ? 'p-3 gap-2' : 'p-2 gap-2')}>
         {!isExpanded ? (
           <div
-            className="flex flex-col items-center cursor-pointer py-1"
-            onClick={togglePinned}
-            title="R. Sharma • Section Controller (CR)"
+            className="flex flex-col items-center py-1"
+            title={`${user?.name} • ${user?.role.replace('_', ' ')}`}
           >
             <div className="relative flex-shrink-0">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1B6B45] to-[#0D9488] flex items-center justify-center text-[11px] font-bold text-white shadow-xs ring-1 ring-emerald-400/30">
-                RS
+                {user?.name?.substring(0, 2).toUpperCase() || 'U'}
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 border-2 border-[#0B1A14] rounded-full" />
             </div>
+            <button onClick={handleLogout} className="mt-4 p-2 text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-lg transition-colors" title="Logout">
+                <LogOut className="w-4 h-4" />
+            </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.08] transition-colors">
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1B6B45] to-[#0D9488] flex items-center justify-center text-[11px] font-bold text-white shadow-xs ring-1 ring-emerald-400/30">
-                RS
+          <>
+            <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white/[0.04] border border-white/[0.07]">
+              <div className="relative flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1B6B45] to-[#0D9488] flex items-center justify-center text-[11px] font-bold text-white shadow-xs ring-1 ring-emerald-400/30">
+                  {user?.name?.substring(0, 2).toUpperCase() || 'U'}
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 border-2 border-[#0B1A14] rounded-full" />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-400 border-2 border-[#0B1A14] rounded-full" />
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-semibold text-white truncate leading-snug">{user?.name || 'User'}</p>
+                <p className="text-[10px] text-emerald-400/85 font-medium truncate leading-tight uppercase">{user?.role?.replace('_', ' ')}</p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-semibold text-white truncate leading-snug">R. Sharma</p>
-              <p className="text-[11px] text-emerald-400/85 font-medium truncate leading-tight">Section Controller</p>
-            </div>
-          </div>
+            <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 py-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-lg border border-transparent hover:border-slate-700 transition-colors">
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out
+            </button>
+          </>
         )}
       </div>
     </aside>

@@ -6,6 +6,7 @@ import { CheckCircle2, ClipboardList, ArrowLeft } from 'lucide-react';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import SecondaryButton from '../components/buttons/SecondaryButton';
 import { blocksApi } from '../api';
+import { useAuth } from '../contexts/AuthContext';
 
 type Department = 'Engineering' | 'S&T' | 'Traction';
 type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
@@ -50,6 +51,7 @@ const initialForm: FormData = {
 
 export default function Requests() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState<FormData>(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -71,6 +73,7 @@ export default function Requests() {
         ...form,
         requestedDuration: Number(form.requestedDuration),
         requiredManpower: Number(form.requiredManpower),
+        actor_id: user?.user_id,
       });
       const reqId = result.id || `REQ-${Date.now().toString(36).toUpperCase()}`;
       setSubmittedId(reqId);

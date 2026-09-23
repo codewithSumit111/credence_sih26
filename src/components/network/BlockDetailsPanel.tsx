@@ -60,6 +60,10 @@ export default function BlockDetailsPanel({ block, onClose, onApprove }: BlockDe
         {/* Window & Duration */}
         <div className="space-y-1">
           <label className="text-[10px] font-bold text-irctc-muted uppercase">Block Window</label>
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="w-4 h-4 text-irctc-blue" />
+            <span className="font-bold text-[13px]">{new Date(block.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          </div>
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-irctc-blue" />
             <div className="flex-1 flex justify-between items-center border bg-gray-50 rounded px-2 py-1.5">

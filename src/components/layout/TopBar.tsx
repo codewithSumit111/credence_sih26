@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, AlertTriangle, Shield, Layers, Info } from 'lucide-react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { Bell, AlertTriangle, Shield, Layers, Info, LogOut } from 'lucide-react';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
+import { useAuth } from '../../contexts/AuthContext';
 
-const navLinks = [
-  { path: '/command', label: 'HOME' },
-  { path: '/plan',    label: 'BLOCKS' },
-  { path: '/trains',  label: 'TRAINS' },
-  { path: '/live',    label: 'ALERTS' },
-  { path: '/assets',  label: 'ASSETS' },
-  { path: '/analytics', label: 'ANALYTICS' },
-  { path: '/reports', label: 'REPORTS' },
-  { path: '/field',   label: 'FIELD' },
+const ALL_NAV_LINKS = [
+  { path: '/command', label: 'HOME', roles: ['SECTION_CONTROLLER'] },
+  { path: '/plan',    label: 'BLOCKS', roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE'] },
+  { path: '/trains',  label: 'TRAINS', roles: ['SECTION_CONTROLLER'] },
+  { path: '/live',    label: 'ALERTS', roles: ['SECTION_CONTROLLER'] },
+  { path: '/assets',  label: 'ASSETS', roles: ['SECTION_CONTROLLER'] },
+  { path: '/analytics', label: 'ANALYTICS', roles: ['SECTION_CONTROLLER'] },
+  { path: '/reports', label: 'REPORTS', roles: ['SECTION_CONTROLLER'] },
+  { path: '/requests', label: 'REQUESTS', roles: ['BDMS_INCHARGE'] },
+  { path: '/field',   label: 'FIELD', roles: ['FIELD_MANAGER'] },
 ];
 
 const MOCK_NOTIFICATIONS = [
@@ -26,6 +28,8 @@ export default function TopBar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
   const notifRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -54,10 +58,17 @@ export default function TopBar() {
     return location.pathname.startsWith(path);
   };
 
+  const navLinks = ALL_NAV_LINKS.filter(link => user && link.roles.includes(user.role));
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <header className="irctc-header" role="navigation" aria-label="Main navigation">
       {/* ── Left: Logo & Branding ── */}
-      <Link to="/command" className="flex items-center gap-2.5 no-underline group flex-shrink-0 mr-4">
+      <Link to="/" className="flex items-center gap-2.5 no-underline group flex-shrink-0 mr-4">
         {/* IR Circular Badge */}
         <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md flex-shrink-0 border-2 border-white/30">
           <span className="text-[10px] font-black text-irctc-navy leading-none">IR</span>
@@ -141,9 +152,24 @@ export default function TopBar() {
         </div>
 
         {/* User Avatar */}
-        <div className="flex items-center gap-2 border-l border-white/20 pl-3 cursor-pointer">
-          <div className="w-9 h-9 rounded-full bg-white text-irctc-navy flex items-center justify-center text-[12px] font-bold shadow-md hover:shadow-lg transition-shadow">
-            RS
+        <div className="flex items-center gap-2 border-l border-white/20 pl-3 cursor-pointer group relative">
+          <div className="w-9 h-9 rounded-full bg-white text-irctc-navy flex items-center justify-center text-[12px] font-bold shadow-md hover:shadow-lg transition-shadow" title={user?.name}>
+            {user?.name?.substring(0, 2).toUpperCase() || 'U'}
+          </div>
+          
+          {/* Logout tooltip/button */}
+          <div className="absolute right-0 top-12 bg-white rounded-lg shadow-xl border border-gray-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+            <div className="px-3 py-2 border-b border-gray-100 mb-2">
+              <p className="text-[12px] font-bold text-gray-900">{user?.name}</p>
+              <p className="text-[10px] text-gray-500">{user?.role.replace('_', ' ')}</p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-3 py-2 text-[12px] font-semibold text-red-600 hover:bg-red-50 rounded transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import type {
   AnalyticsData, ReoptimizationPlan, FieldBlock, BlockRequest, BlockStatus
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // ── Jobs ──────────────────────────────────────────────────────────────────────
 export const jobsApi = {
@@ -81,7 +81,7 @@ export const blocksApi = {
     return res.json();
   },
 
-  async createRequest(req: Partial<BlockRequest>): Promise<BlockRequest> {
+  async createRequest(req: Partial<BlockRequest> & { actor_id?: string }): Promise<BlockRequest> {
     const res = await fetch(`${API_URL}/api/requests`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -265,20 +265,28 @@ export const executionApi = {
       };
     }
   },
-  async updateProgress(blockId: string, progress: number): Promise<FieldBlock> {
+  async updateProgress(blockId: string, progress: number, actor_id?: string): Promise<FieldBlock> {
     await fetch(`${API_URL}/api/field/${blockId}/progress`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ progress, status: progress >= 100 ? 'COMPLETED' : 'IN_PROGRESS' }),
+      body: JSON.stringify({ progress, status: progress >= 100 ? 'COMPLETED' : 'IN_PROGRESS', actor_id }),
     });
     return this.getFieldBlock(blockId);
   },
-  async startBlock(blockId: string): Promise<FieldBlock> {
-    await fetch(`${API_URL}/api/field/${blockId}/start`, { method: 'POST' });
+  async startBlock(blockId: string, actor_id?: string): Promise<FieldBlock> {
+    await fetch(`${API_URL}/api/field/${blockId}/start`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actor_id })
+    });
     return this.getFieldBlock(blockId);
   },
-  async completeBlock(blockId: string): Promise<FieldBlock> {
-    await fetch(`${API_URL}/api/field/${blockId}/complete`, { method: 'POST' });
+  async completeBlock(blockId: string, actor_id?: string): Promise<FieldBlock> {
+    await fetch(`${API_URL}/api/field/${blockId}/complete`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actor_id })
+    });
     return this.getFieldBlock(blockId);
   },
   async reportIssue(blockId: string, issueType: string, notes?: string): Promise<void> {

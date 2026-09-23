@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { OptimizedBlock } from '../../types';
-import { Maximize, ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { Maximize, ZoomIn, ZoomOut } from 'lucide-react';
 
 type Point = { x: number; y: number };
 
@@ -22,29 +22,25 @@ const REGION_TRACKS: Record<string, TrackDef[]> = {
   'Central Railway': [
     {
       id: 'TR-01',
-      name: 'Line No. 1',
+      name: 'Track 1 — UP',
       direction: 'UP',
-      sections: [
-        { name: 'CSMT', position: 0 },
-        { name: 'DR', position: 20 },
-        { name: 'TNA', position: 50 },
-        { name: 'KYN', position: 75 },
-        { name: 'KJT', position: 100 }
-      ],
-      points: [{ x: 150, y: 150 }, { x: 850, y: 150 }]
+      sections: [{ name: 'CSMT', position: 0 }, { name: 'DR', position: 30 }, { name: 'TNA', position: 60 }, { name: 'KYN', position: 100 }],
+      points: [{ x: 100, y: 150 }, { x: 400, y: 150 }, { x: 700, y: 150 }, { x: 1000, y: 150 }]
     },
     {
       id: 'TR-02',
-      name: 'Line No. 2',
+      name: 'Track 2 — DN',
       direction: 'DN',
-      sections: [
-        { name: 'CSMT', position: 0 },
-        { name: 'DR', position: 20 },
-        { name: 'TNA', position: 50 },
-        { name: 'KYN', position: 75 },
-        { name: 'KJT', position: 100 }
-      ],
-      points: [{ x: 150, y: 250 }, { x: 850, y: 250 }]
+      sections: [{ name: 'CSMT', position: 0 }, { name: 'DR', position: 30 }, { name: 'TNA', position: 60 }, { name: 'KYN', position: 100 }],
+      points: [{ x: 100, y: 220 }, { x: 400, y: 220 }, { x: 700, y: 220 }, { x: 1000, y: 220 }]
+    },
+    {
+      id: 'TR-03',
+      name: 'Branch — UP',
+      direction: 'UP',
+      sections: [{ name: 'DIV', position: 20 }, { name: 'BSR', position: 80 }],
+      // Smooth branch turnout geometry
+      points: [{ x: 400, y: 150 }, { x: 550, y: 150 }, { x: 700, y: 50 }, { x: 1000, y: 50 }]
     }
   ],
   'Western Railway': [
@@ -52,14 +48,8 @@ const REGION_TRACKS: Record<string, TrackDef[]> = {
       id: 'TR-01',
       name: 'Local Line',
       direction: 'UP',
-      sections: [
-        { name: 'CCG', position: 0 },
-        { name: 'DDR', position: 30 },
-        { name: 'ADH', position: 60 },
-        { name: 'BVI', position: 85 },
-        { name: 'VR', position: 100 }
-      ],
-      points: [{ x: 150, y: 200 }, { x: 450, y: 200 }, { x: 650, y: 350 }, { x: 850, y: 350 }]
+      sections: [{ name: 'CCG', position: 0 }, { name: 'DDR', position: 30 }, { name: 'ADH', position: 60 }, { name: 'VR', position: 100 }],
+      points: [{ x: 100, y: 200 }, { x: 450, y: 200 }, { x: 650, y: 350 }, { x: 900, y: 350 }]
     }
   ]
 };
@@ -69,13 +59,8 @@ const DEFAULT_TRACKS: TrackDef[] = [
     id: 'TR-00',
     name: 'Main Line',
     direction: 'UP/DN',
-    sections: [
-      { name: 'STN-A', position: 0 },
-      { name: 'STN-B', position: 33 },
-      { name: 'STN-C', position: 66 },
-      { name: 'STN-D', position: 100 }
-    ],
-    points: [{ x: 150, y: 200 }, { x: 850, y: 200 }]
+    sections: [{ name: 'STN-A', position: 0 }, { name: 'STN-B', position: 33 }, { name: 'STN-C', position: 66 }, { name: 'STN-D', position: 100 }],
+    points: [{ x: 100, y: 200 }, { x: 900, y: 200 }]
   }
 ];
 
@@ -95,6 +80,52 @@ export interface BlockItem {
   affectedTrains: number;
   rawBlock: OptimizedBlock;
   type?: string; 
+}
+
+function getSplinePoints(points: Point[], numSegments = 10): Point[] {
+  if (points.length < 2) return points;
+  if (points.length === 2) {
+    const pts = [];
+    for (let i = 0; i <= numSegments; i++) {
+      pts.push({
+        x: points[0].x + (points[1].x - points[0].x) * (i / numSegments),
+        y: points[0].y + (points[1].y - points[0].y) * (i / numSegments)
+      });
+    }
+    return pts;
+  }
+
+  const pts = [points[0], ...points, points[points.length - 1]];
+  const result: Point[] = [];
+
+  for (let i = 1; i < pts.length - 2; i++) {
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2];
+
+    const limit = i === pts.length - 3 ? numSegments + 1 : numSegments;
+    for (let t = 0; t < limit; t++) {
+      const t1 = t / numSegments;
+      const t2 = t1 * t1;
+      const t3 = t2 * t1;
+
+      const x = 0.5 * (
+        (2 * p1.x) +
+        (-p0.x + p2.x) * t1 +
+        (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
+        (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3
+      );
+      const y = 0.5 * (
+        (2 * p1.y) +
+        (-p0.y + p2.y) * t1 +
+        (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
+        (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3
+      );
+      result.push({ x, y });
+    }
+  }
+  return result;
 }
 
 function getTrackSegments(points: Point[]) {
@@ -126,6 +157,35 @@ function getPointAtPercentage(points: Point[], pct: number): Point {
     }
   }
   return points[points.length - 1];
+}
+
+function getParallelPaths(points: Point[], offset: number) {
+  const leftPoints: Point[] = [];
+  const rightPoints: Point[] = [];
+  for (let i = 0; i < points.length; i++) {
+    let dx = 0, dy = 0;
+    if (i === 0) {
+      dx = points[1].x - points[0].x;
+      dy = points[1].y - points[0].y;
+    } else if (i === points.length - 1) {
+      dx = points[i].x - points[i - 1].x;
+      dy = points[i].y - points[i - 1].y;
+    } else {
+      dx = points[i + 1].x - points[i - 1].x;
+      dy = points[i + 1].y - points[i - 1].y;
+    }
+    const len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) {
+      leftPoints.push(points[i]);
+      rightPoints.push(points[i]);
+      continue;
+    }
+    const nx = -dy / len;
+    const ny = dx / len;
+    leftPoints.push({ x: points[i].x + nx * offset, y: points[i].y + ny * offset });
+    rightPoints.push({ x: points[i].x - nx * offset, y: points[i].y - ny * offset });
+  }
+  return { leftPoints, rightPoints };
 }
 
 interface RailwayTrackViewProps {
@@ -205,8 +265,6 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
   const [draggingTrack, setDraggingTrack] = useState<string | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Determine if we clicked on an interactive SVG element (like a track or block)
-    // If not, we pan the canvas.
     const target = e.target as SVGElement;
     if (target.classList.contains('draggable-track') || target.classList.contains('draggable-point') || target.classList.contains('block-hitbox')) {
       return;
@@ -217,8 +275,6 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
   };
   
   const handlePointerMove = (e: React.PointerEvent) => {
-    updateTooltip(e);
-
     const svg = svgRef.current;
     if (!svg) return;
 
@@ -274,12 +330,11 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
     (e.target as Element).setPointerCapture?.(e.pointerId);
   };
 
-  // Tooltip
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [hoveredBlock, setHoveredBlock] = useState<BlockItem | null>(null);
 
   const updateTooltip = (e: React.PointerEvent) => {
-    if (tooltipRef.current && hoveredBlock) {
+    if (tooltipRef.current) {
       tooltipRef.current.style.left = `${e.clientX + 15}px`;
       tooltipRef.current.style.top = `${e.clientY + 15}px`;
     }
@@ -306,8 +361,7 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col">
-      {/* Header & Tools */}
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col relative">
       <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/80">
         <div>
           <h3 className="text-[14px] font-bold text-irctc-navy uppercase tracking-wider">{region} — Engineering Schematic</h3>
@@ -320,8 +374,10 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
         </div>
       </div>
       
-      {/* Interactive SVG Canvas */}
-      <div className="relative w-full h-[500px] bg-white cursor-grab active:cursor-grabbing overflow-hidden">
+      <div 
+        className="relative w-full h-[500px] bg-white cursor-grab active:cursor-grabbing overflow-hidden"
+        onPointerMove={updateTooltip}
+      >
         <svg 
           ref={svgRef}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`}
@@ -332,12 +388,10 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
           onPointerLeave={handlePointerUp}
         >
           <defs>
-            {/* Standard Block Hatch */}
             <pattern id="block-hatch" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
               <rect width="10" height="10" fill="#ffffff" />
               <line x1="0" y1="0" x2="0" y2="10" stroke="#111827" strokeWidth="2.5" />
             </pattern>
-            {/* Muted Block Hatch for Completed */}
             <pattern id="block-hatch-muted" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
               <rect width="10" height="10" fill="#f9fafb" />
               <line x1="0" y1="0" x2="0" y2="10" stroke="#9ca3af" strokeWidth="2" />
@@ -345,16 +399,22 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
           </defs>
 
           {activeTracks.map(track => {
-            const pts = tracksState[track.id] || track.points;
-            if (pts.length < 2) return null;
-            const d = `M ${pts.map(p => `${p.x},${p.y}`).join(' L ')}`;
-            const { totalLength } = getTrackSegments(pts);
+            const rawPts = tracksState[track.id] || track.points;
+            if (rawPts.length < 2) return null;
+            
+            const spline = getSplinePoints(rawPts);
+            const { totalLength } = getTrackSegments(spline);
+            const dMain = `M ${spline.map(p => `${p.x},${p.y}`).join(' L ')}`;
+            
+            const { leftPoints, rightPoints } = getParallelPaths(spline, 5);
+            const dLeft = `M ${leftPoints.map(p => `${p.x},${p.y}`).join(' L ')}`;
+            const dRight = `M ${rightPoints.map(p => `${p.x},${p.y}`).join(' L ')}`;
             
             return (
-              <g key={track.id}>
-                {/* 1. Track Hitbox for dragging */}
+              <g key={track.id} className="group">
+                {/* Track Hitbox */}
                 <path
-                  d={d}
+                  d={dMain}
                   stroke="transparent"
                   strokeWidth="40"
                   fill="none"
@@ -362,50 +422,50 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
                   onPointerDown={(e) => handleTrackDown(e, track.id)}
                 />
 
-                {/* 2. Railway Track Render */}
-                {/* Sleepers */}
-                <path d={d} stroke="#a3a3a3" strokeWidth="16" strokeDasharray="3 7" fill="none" pointerEvents="none" strokeLinecap="butt" />
-                {/* Outer Rails background (white) */}
-                <path d={d} stroke="white" strokeWidth="10" fill="none" pointerEvents="none" strokeLinejoin="round" />
-                {/* Rails (black) */}
-                <path d={d} stroke="#111827" strokeWidth="12" fill="none" pointerEvents="none" strokeLinejoin="round" />
-                {/* Inner center (white) to split the thick black rail into two rails */}
-                <path d={d} stroke="white" strokeWidth="8" fill="none" pointerEvents="none" strokeLinejoin="round" />
+                {/* Professional Railway Rendering */}
+                {/* 1. Sleepers */}
+                <path d={dMain} stroke="#a3a3a3" strokeWidth="18" strokeDasharray="3 7" fill="none" pointerEvents="none" strokeLinecap="butt" />
+                {/* 2. Left Rail */}
+                <path d={dLeft} stroke="#1f2937" strokeWidth="2" fill="none" pointerEvents="none" strokeLinejoin="round" />
+                {/* 3. Right Rail */}
+                <path d={dRight} stroke="#1f2937" strokeWidth="2" fill="none" pointerEvents="none" strokeLinejoin="round" />
 
-                {/* 3. Track Label (positioned at first point slightly offset) */}
-                <text x={pts[0].x} y={pts[0].y - 20} className="text-[12px] font-bold fill-gray-700 pointer-events-none" style={{ fontFamily: 'sans-serif' }}>
-                  {track.name} — {track.direction}
+                {/* Track Label */}
+                <text x={spline[0].x} y={spline[0].y - 20} className="text-[11px] font-bold fill-gray-600 pointer-events-none" style={{ fontFamily: 'sans-serif' }}>
+                  {track.name}
                 </text>
 
-                {/* 4. Stations */}
+                {/* Stations */}
                 {track.sections.map(sec => {
-                  const pt = getPointAtPercentage(pts, sec.position);
+                  const pt = getPointAtPercentage(spline, sec.position);
                   return (
                     <g key={sec.name} transform={`translate(${pt.x}, ${pt.y})`}>
-                      <circle cx="0" cy="0" r="4" fill="#3b82f6" stroke="white" strokeWidth="2" className="pointer-events-none" />
-                      <text x="0" y="20" textAnchor="middle" className="text-[10px] font-bold fill-gray-500 pointer-events-none" style={{ fontFamily: 'sans-serif' }}>
+                      <circle cx="0" cy="0" r="3.5" fill="white" stroke="#1f2937" strokeWidth="2" className="pointer-events-none" />
+                      <text x="0" y="-10" textAnchor="middle" className="text-[10px] font-bold fill-gray-800 pointer-events-none" style={{ fontFamily: 'sans-serif' }}>
                         {sec.name}
                       </text>
                     </g>
                   );
                 })}
 
-                {/* 5. Control Points (visible circles for reshaping) */}
-                {pts.map((p, idx) => (
-                  <circle
-                    key={idx}
-                    cx={p.x}
-                    cy={p.y}
-                    r="8"
-                    fill="white"
-                    stroke="#d1d5db"
-                    strokeWidth="2"
-                    className="draggable-point cursor-crosshair hover:stroke-blue-500 hover:fill-blue-50 transition-colors"
-                    onPointerDown={(e) => handlePointDown(e, track.id, idx)}
-                  />
-                ))}
+                {/* Control Points (visible on track hover) */}
+                <g className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  {rawPts.map((p, idx) => (
+                    <circle
+                      key={idx}
+                      cx={p.x}
+                      cy={p.y}
+                      r="6"
+                      fill="white"
+                      stroke="#3b82f6"
+                      strokeWidth="2"
+                      className="draggable-point cursor-crosshair hover:fill-blue-50"
+                      onPointerDown={(e) => handlePointDown(e, track.id, idx)}
+                    />
+                  ))}
+                </g>
 
-                {/* 6. Blocks */}
+                {/* Blocks */}
                 {displayBlocks.map(block => {
                   const { startPct, lenPct } = getBlockMetrics(block);
                   const startDist = (startPct / 100) * totalLength;
@@ -414,15 +474,14 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
                   const hatchUrl = block.status === 'COMPLETED' || block.status === 'DEFERRED' ? 'url(#block-hatch-muted)' : 'url(#block-hatch)';
                   const isSelected = selectedId === block.id;
 
-                  // Label Position (Center of the block)
                   const centerPct = startPct + (lenPct / 2);
-                  const labelPt = getPointAtPercentage(pts, centerPct);
+                  const labelPt = getPointAtPercentage(spline, centerPct);
 
                   return (
                     <g key={block.id}>
                       {/* Block Hitbox */}
                       <path
-                        d={d}
+                        d={dMain}
                         stroke="transparent"
                         strokeWidth="30"
                         fill="none"
@@ -434,38 +493,36 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
                         onPointerDown={(e) => { e.stopPropagation(); onSelect(block.id); }}
                       />
                       
-                      {/* Outer Border */}
+                      {/* Block Outer Border */}
                       <path
-                        d={d}
+                        d={dMain}
                         stroke={isSelected ? '#3b82f6' : border.stroke}
-                        strokeWidth={isSelected ? "20" : "16"}
-                        strokeDasharray={isSelected ? `${blockLen} 999999` : `${blockLen} 999999`} // dash parameter used below for status
+                        strokeWidth={isSelected ? "20" : "18"}
+                        strokeDasharray={isSelected ? `${blockLen} 999999` : `${blockLen} 999999`}
                         strokeDashoffset={-startDist}
                         fill="none"
                         pointerEvents="none"
                         className={border.classes}
-                        strokeLinejoin="round"
                         strokeLinecap="butt"
                         style={border.dash !== 'none' && !isSelected ? { strokeDasharray: `${border.dash}, ${blockLen} 999999` } : {}}
                       />
                       
-                      {/* Inner Hatch */}
+                      {/* Block Inner Hatch */}
                       <path
-                        d={d}
+                        d={dMain}
                         stroke={hatchUrl}
-                        strokeWidth="12"
+                        strokeWidth="14"
                         strokeDasharray={`${blockLen} 999999`}
                         strokeDashoffset={-startDist}
                         fill="none"
                         pointerEvents="none"
-                        strokeLinejoin="round"
                         strokeLinecap="butt"
                       />
 
-                      {/* Small Label on Track (ID) */}
+                      {/* Small Label on Track */}
                       <g transform={`translate(${labelPt.x}, ${labelPt.y - 25})`} className="pointer-events-none">
-                        <rect x="-35" y="-10" width="70" height="14" fill="white" rx="2" stroke="#e5e7eb" />
-                        <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="text-[8px] font-bold fill-gray-800" style={{ fontFamily: 'sans-serif' }}>
+                        <rect x="-30" y="-8" width="60" height="16" fill="white" rx="2" stroke="#d1d5db" />
+                        <text x="0" y="0" textAnchor="middle" dominantBaseline="middle" className="text-[9px] font-bold fill-gray-800" style={{ fontFamily: 'sans-serif' }}>
                           {block.id}
                         </text>
                       </g>
@@ -477,7 +534,6 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
           })}
         </svg>
 
-        {/* Hover Tooltip (HTML overlay tracking mouse) */}
         <div 
           ref={tooltipRef}
           className={clsx(
@@ -505,7 +561,6 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
         </div>
       </div>
 
-      {/* Legend Footer */}
       <div className="px-5 py-3 bg-gray-50 flex items-center justify-between border-t border-gray-100">
         <div className="flex gap-6">
           <div className="flex items-center gap-2">

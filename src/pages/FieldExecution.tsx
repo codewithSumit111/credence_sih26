@@ -8,6 +8,7 @@ import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import LoadingState from '../components/common/LoadingState';
 import { executionApi } from '../api';
 import type { FieldBlock } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 import {
   CheckCircle2, Clock, Users, Wrench, AlertTriangle, Home,
   Calendar, AlertOctagon, Square, CheckSquare,
@@ -22,6 +23,7 @@ interface TaskCheck {
 }
 
 export default function FieldExecution() {
+  const { user } = useAuth();
   const [block, setBlock] = useState<FieldBlock | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -78,7 +80,7 @@ export default function FieldExecution() {
   const handleUpdateProgress = async (newProgress: number) => {
     if (!block) return;
     try {
-      const updated = await executionApi.updateProgress(block.blockId, newProgress);
+      const updated = await executionApi.updateProgress(block.blockId, newProgress, user?.user_id);
       setBlock(updated);
       toast.success(`Progress Updated: ${newProgress}%`, {
         description: 'Transmitted to Section Controller console.',
@@ -92,7 +94,7 @@ export default function FieldExecution() {
     if (!block) return;
     setActionLoading(true);
     try {
-      const completed = await executionApi.completeBlock(block.blockId);
+      const completed = await executionApi.completeBlock(block.blockId, user?.user_id);
       setBlock(completed);
       setShowCompleteModal(false);
       toast.success('Possession Block Marked Complete!', {

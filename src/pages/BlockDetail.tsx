@@ -171,8 +171,10 @@ export default function BlockDetail() {
                 <span className="font-bold text-gray-900">{block.track}</span>
               </div>
               <div>
-                <span className="text-gray-400 block mb-0.5">Scheduled Window</span>
-                <span className="font-bold text-gray-900">{block.startTime} – {block.endTime}</span>
+                <span className="text-gray-400 block mb-0.5">Scheduled Date & Window</span>
+                <span className="font-bold text-gray-900">
+                  {new Date(block.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • {block.startTime} – {block.endTime}
+                </span>
               </div>
               <div>
                 <span className="text-gray-400 block mb-0.5">Possession Duration</span>
