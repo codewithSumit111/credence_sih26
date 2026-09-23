@@ -35,31 +35,34 @@ export default function Modal({ open, onClose, title, children, size = 'md', foo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
         onClick={onClose}
         aria-hidden="true"
       />
+      {/* Panel */}
       <div className={clsx(
-        'relative bg-white rounded-lg shadow-xl w-full max-h-[90vh] flex flex-col',
+        'relative bg-white rounded-xl shadow-irctc-xl w-full max-h-[90vh] flex flex-col',
+        'border border-irctc-border',
         sizeClass
       )}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
-          <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-irctc-border flex-shrink-0">
+          <h2 className="irctc-section-title">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-irctc-muted hover:text-irctc-text ml-4"
             aria-label="Close"
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4" />
           </button>
         </div>
         {/* Body */}
-        <div className="p-5 overflow-y-auto flex-1">{children}</div>
+        <div className="p-6 overflow-y-auto flex-1 irctc-body">{children}</div>
         {/* Footer */}
         {footer && (
-          <div className="px-5 py-4 border-t border-gray-100 flex justify-end gap-2 flex-shrink-0">
+          <div className="px-6 py-4 border-t border-irctc-border flex justify-end gap-3 flex-shrink-0 bg-gray-50/50 rounded-b-xl">
             {footer}
           </div>
         )}

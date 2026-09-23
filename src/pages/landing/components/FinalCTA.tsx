@@ -23,7 +23,7 @@ export default function FinalCTA() {
         position: 'absolute', top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 600, height: 400, borderRadius: '50%',
-        background: 'radial-gradient(ellipse, rgba(27,107,69,0.06) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse, rgba(8,43,113,0.06) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 

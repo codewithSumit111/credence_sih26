@@ -16,13 +16,13 @@ const features = [
     icon: <CalendarClock size={22} />,
     title: 'Optimized Scheduling',
     desc: 'CP-SAT builds the best block plan based on constraints and priorities.',
-    color: '#1B6B45',
+    color: '#082b71',
   },
   {
     icon: <Zap size={22} />,
     title: 'Real-time Availability',
     desc: 'Redis enables fast corridor checks and near real-time replanning.',
-    color: '#0D9488',
+    color: '#f88100',
   },
   {
     icon: <Database size={22} />,
@@ -46,13 +46,13 @@ const features = [
     icon: <BrainCircuit size={22} />,
     title: 'Explainable AI',
     desc: 'SHAP provides clear, human-readable explanations for every recommendation.',
-    color: '#1B6B45',
+    color: '#082b71',
   },
   {
     icon: <Link2 size={22} />,
     title: 'Integrated End-to-End',
     desc: 'One system. No hand-offs. Just faster, smarter decisions.',
-    color: '#0D9488',
+    color: '#f88100',
   },
 ];
 

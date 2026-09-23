@@ -151,15 +151,15 @@ export default function FieldExecution() {
             </div>
             <StatusBadge status={block.status === 'COMPLETED' ? 'COMPLETED' : 'ACTIVE'} />
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-600 pt-1 border-t border-gray-100">
+          <div className="flex items-center gap-2 text-xs text-irctc-muted pt-1 border-t border-gray-100">
             <Clock className="w-3.5 h-3.5 text-green-500" />
             <span>{block.startTime} – {block.endTime}</span>
-            <span className="ml-auto font-semibold text-blue-900">{block.progress}% complete</span>
+            <span className="ml-auto font-semibold text-irctc-navy">{block.progress}% complete</span>
           </div>
           {/* Mini progress */}
           <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
             <div
-              className="bg-emerald-900 h-full rounded-full transition-all duration-700 ease-out"
+              className="bg-irctc-blue h-full rounded-full transition-all duration-700 ease-out"
               style={{ width: `${block.progress}%` }}
             />
           </div>
@@ -171,11 +171,11 @@ export default function FieldExecution() {
         <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-gray-600 font-medium">Tasks Completed</span>
-            <span className="font-bold text-blue-900">{completedCount}/{totalCount}</span>
+            <span className="font-bold text-irctc-navy">{completedCount}/{totalCount}</span>
           </div>
           <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
             <div
-              className="bg-green-600 h-full rounded-full transition-all duration-500"
+              className="bg-irctc-orange h-full rounded-full transition-all duration-500"
               style={{ width: totalCount > 0 ? `${(completedCount / totalCount) * 100}%` : '0%' }}
             />
           </div>
@@ -297,12 +297,12 @@ export default function FieldExecution() {
       <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-2">
         <div className="flex justify-between items-center text-xs font-bold">
           <span className="text-gray-500 uppercase tracking-wider">PROGRESS</span>
-          <span className="text-blue-900 font-mono text-sm">{block.progress}%</span>
+          <span className="text-irctc-navy font-mono text-sm">{block.progress}%</span>
         </div>
 
         <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
           <div
-            className="bg-emerald-900 h-full rounded-full transition-all duration-700 ease-out"
+            className="bg-irctc-blue h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${block.progress}%` }}
           />
         </div>
@@ -327,7 +327,7 @@ export default function FieldExecution() {
         {block.status !== 'COMPLETED' && (
           <button
             onClick={() => setShowCompleteModal(true)}
-            className="w-full mt-3 bg-emerald-900 hover:bg-emerald-950 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm"
+            className="irctc-btn irctc-btn-primary w-full mt-3 py-2.5 justify-center shadow-sm"
           >
             MARK WORK COMPLETE
           </button>
@@ -386,11 +386,11 @@ export default function FieldExecution() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-between max-w-md mx-auto shadow-2xl border-x border-gray-300">
       {/* Mobile Top Header */}
-      <div className="bg-[#0A3D80] text-white p-4 sticky top-0 z-20 shadow">
+      <div className="bg-irctc-navy text-white p-4 sticky top-0 z-20 shadow">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-sm font-bold tracking-wider">RAILWAY FIELD OPS</h1>
-            <p className="text-[11px] text-emerald-200">Engineering & S&T • {block.track}</p>
+            <p className="text-[11px] text-gray-300">Engineering & S&T • {block.track}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] bg-green-600 text-white font-bold px-2 py-0.5 rounded-full">
@@ -416,14 +416,14 @@ export default function FieldExecution() {
       <div className="bg-white border-t border-gray-200 py-2.5 px-6 flex items-center justify-around text-xs sticky bottom-0 z-20">
         <button
           onClick={() => setActiveTab('home')}
-          className={clsx('flex flex-col items-center gap-1', activeTab === 'home' ? 'text-blue-900 font-bold' : 'text-gray-400')}
+          className={clsx('flex flex-col items-center gap-1', activeTab === 'home' ? 'text-irctc-navy font-bold' : 'text-gray-400')}
         >
           <Home className="w-4 h-4" />
           <span>Home</span>
         </button>
         <button
           onClick={() => setActiveTab('block')}
-          className={clsx('flex flex-col items-center gap-1', activeTab === 'block' ? 'text-blue-900 font-bold' : 'text-gray-400')}
+          className={clsx('flex flex-col items-center gap-1', activeTab === 'block' ? 'text-irctc-navy font-bold' : 'text-gray-400')}
         >
           <Calendar className="w-4 h-4" />
           <span>Block</span>
@@ -432,7 +432,7 @@ export default function FieldExecution() {
           onClick={() => setActiveTab('report')}
           className={clsx(
             'flex flex-col items-center gap-1 relative',
-            activeTab === 'report' ? 'text-blue-900 font-bold' : 'text-gray-400',
+            activeTab === 'report' ? 'text-irctc-navy font-bold' : 'text-gray-400',
           )}
         >
           <AlertOctagon className="w-4 h-4" />

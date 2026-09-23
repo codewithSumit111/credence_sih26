@@ -266,29 +266,40 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="p-5 max-w-[1600px] mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Analytics</h1>
-          <p className="text-[12px] text-gray-500 mt-0.5">Division Overview · August 2026 · Performance Telemetry</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleWhatIf}
-            className={clsx(
-              'flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-lg border transition-colors',
-              showWhatIf
-                ? 'bg-amber-100 border-amber-300 text-amber-800'
-                : 'bg-white border-gray-200 text-gray-600 hover:border-amber-300 hover:text-amber-700'
-            )}
-          >
-            <AlertOctagon className="w-3.5 h-3.5" />
-            What-If Simulator
-            {showWhatIf && <X className="w-3 h-3" />}
-          </button>
+    <div className="irctc-page">
+      {/* Header — IRCTC style */}
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="irctc-page-title">Analytics & Performance</h1>
+            <p className="text-[14px] text-irctc-muted mt-0.5">Division Overview · August 2026 · Performance Telemetry</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleWhatIf}
+              className={clsx(
+                'irctc-btn text-[13px]',
+                showWhatIf
+                  ? 'bg-amber-100 border border-amber-300 text-amber-800'
+                  : 'irctc-btn-outline'
+              )}
+            >
+              <AlertOctagon className="w-4 h-4" />
+              What-If Simulator
+              {showWhatIf && <X className="w-3.5 h-3.5" />}
+            </button>
+            <SecondaryButton
+              onClick={() => handleExport('PDF')}
+              icon={<Download className="w-4 h-4" />}
+              size="md"
+            >
+              Export
+            </SecondaryButton>
+          </div>
         </div>
       </div>
+
+      <div className="max-w-[1600px] mx-auto px-7 py-6 space-y-6">
 
       {/* What-If Panel (inline) */}
       {showWhatIf && <WhatIfPanel onClose={() => setSearchParams({})} />}
@@ -303,10 +314,10 @@ export default function Analytics() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Block Hours by Department */}
-        <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Block Hours by Department (Requested vs Used)</h3>
-            <span className="text-xs text-gray-400">Aug 2026</span>
+        <div className="irctc-card">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="irctc-card-title">Block Hours by Department (Requested vs Used)</h3>
+            <span className="text-[12px] text-irctc-muted">Aug 2026</span>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -392,7 +403,8 @@ export default function Analytics() {
         </div>
       </div>
 
-      <p className="text-[10px] text-center text-gray-400">Prototype Simulation · Data refreshed at session start</p>
+      <p className="text-[12px] text-center text-irctc-muted">Prototype Simulation · Data refreshed at session start</p>
+    </div>
     </div>
   );
 }

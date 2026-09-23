@@ -21,7 +21,7 @@ export default function ContextStrip() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{
             width: 32, height: 32, borderRadius: '50%',
-            background: '#1B6B45', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#082b71', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />

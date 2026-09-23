@@ -54,9 +54,9 @@ export default function Navbar() {
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
           <div style={{
             width: 36, height: 36, borderRadius: 9,
-            background: 'linear-gradient(135deg, #1B6B45 0%, #0D9488 100%)',
+            background: 'linear-gradient(135deg, #0a3d80 0%, #082b71 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(27,107,69,0.25)',
+            boxShadow: '0 2px 8px rgba(8,43,113,0.25)',
           }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -65,11 +65,11 @@ export default function Navbar() {
             </svg>
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '0.9375rem', color: '#122A1F', letterSpacing: '-0.01em', lineHeight: 1 }}>
-              KAVACH
+            <div style={{ fontWeight: 800, fontSize: '0.9375rem', color: scrolled ? '#082b71' : '#ffffff', letterSpacing: '-0.01em', lineHeight: 1, transition: 'color 0.3s' }}>
+              AI BLOCK PLANNING
             </div>
-            <div style={{ fontSize: '0.62rem', color: '#1B6B45', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.2, marginTop: 1 }}>
-              Central Railway
+            <div style={{ fontSize: '0.62rem', color: scrolled ? '#f88100' : 'rgba(255,255,255,0.9)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.2, marginTop: 1, transition: 'color 0.3s' }}>
+              IRCTC Prototype
             </div>
           </div>
         </a>
@@ -82,7 +82,7 @@ export default function Navbar() {
               href={link.href}
               onClick={(e) => handleNav(e, link.href)}
               style={{
-                color: '#2D4A3E',
+                color: scrolled ? '#374151' : 'rgba(255,255,255,0.9)',
                 textDecoration: 'none',
                 fontSize: '0.875rem',
                 fontWeight: 500,
@@ -91,11 +91,11 @@ export default function Navbar() {
                 transition: 'color 0.15s, background 0.15s',
               }}
               onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.color = '#1B6B45';
-                (e.target as HTMLElement).style.background = '#F0FBF5';
+                (e.target as HTMLElement).style.color = '#f88100';
+                (e.target as HTMLElement).style.background = scrolled ? '#fff7ed' : 'rgba(255,255,255,0.1)';
               }}
               onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.color = '#2D4A3E';
+                (e.target as HTMLElement).style.color = scrolled ? '#374151' : 'rgba(255,255,255,0.9)';
                 (e.target as HTMLElement).style.background = 'transparent';
               }}
             >
@@ -121,7 +121,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="mobile-menu-btn"
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: '0.375rem', color: '#2D4A3E', borderRadius: 6 }}
+            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: '0.375rem', color: scrolled ? '#082b71' : '#fff', borderRadius: 6 }}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}

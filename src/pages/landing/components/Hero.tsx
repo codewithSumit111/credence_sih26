@@ -47,7 +47,7 @@ export default function Hero() {
       {/* Dark gradient overlay */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(135deg, rgba(15,42,31,0.92) 0%, rgba(18,42,31,0.85) 40%, rgba(27,59,45,0.65) 100%)',
+        background: 'linear-gradient(135deg, rgba(8,43,113,0.92) 0%, rgba(10,61,128,0.85) 40%, rgba(15,42,100,0.65) 100%)',
       }} />
 
       {/* Subtle grid texture */}
@@ -74,15 +74,15 @@ export default function Hero() {
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
               padding: '0.35rem 0.95rem', borderRadius: 9999,
-              background: 'rgba(27,107,69,0.25)', border: '1px solid rgba(27,107,69,0.4)',
-              fontSize: '0.72rem', fontWeight: 700, color: '#A7F3D0', letterSpacing: '0.06em',
+              background: 'rgba(248,129,0,0.25)', border: '1px solid rgba(248,129,0,0.4)',
+              fontSize: '0.72rem', fontWeight: 700, color: '#f88100', letterSpacing: '0.06em',
             }}>
               <span style={{
-                width: 7, height: 7, borderRadius: '50%', background: '#4ADE80',
-                boxShadow: '0 0 8px rgba(74,222,128,0.5)',
+                width: 7, height: 7, borderRadius: '50%', background: '#f88100',
+                boxShadow: '0 0 8px rgba(248,129,0,0.5)',
                 animation: 'pulse-node 2s ease-in-out infinite',
               }} />
-              CENTRAL RAILWAY • NAGPUR DIVISION
+              IRCTC AI BLOCK PLANNING
             </span>
           </motion.div>
 
@@ -101,7 +101,7 @@ export default function Hero() {
             Smarter Planning<br/>
             for a Stronger<br/>
             <span style={{
-              background: 'linear-gradient(135deg, #4ADE80 0%, #2DD4BF 100%)',
+              background: 'linear-gradient(135deg, #f88100 0%, #fbbf24 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
             }}>Rail Network</span>
@@ -135,9 +135,9 @@ export default function Hero() {
               whileTap={{ scale: 0.98 }}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                padding: '0.9rem 2rem', background: '#1B6B45', color: '#fff',
+                padding: '0.9rem 2rem', background: '#f88100', color: '#fff',
                 fontWeight: 600, fontSize: '0.9375rem', borderRadius: 10, border: 'none',
-                cursor: 'pointer', boxShadow: '0 4px 16px rgba(27,107,69,0.35)',
+                cursor: 'pointer', boxShadow: '0 4px 16px rgba(248,129,0,0.35)',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -184,7 +184,7 @@ export default function Hero() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <div style={{
                 width: 28, height: 28, borderRadius: 7,
-                background: 'linear-gradient(135deg, #1B6B45, #0D9488)',
+                background: 'linear-gradient(135deg, #0a3d80, #082b71)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
@@ -193,14 +193,14 @@ export default function Hero() {
                 </svg>
               </div>
               <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }}>
-                KAVACH
+                IRCTC
               </span>
               <div style={{ flex: 1 }} />
               {['Dashboard', 'Block Planning', 'Corridor Map'].map((tab, i) => (
                 <span key={tab} style={{
-                  fontSize: '0.55rem', fontWeight: 600, color: i === 0 ? '#4ADE80' : 'rgba(255,255,255,0.4)',
+                  fontSize: '0.55rem', fontWeight: 600, color: i === 0 ? '#f88100' : 'rgba(255,255,255,0.4)',
                   padding: '0.25rem 0.5rem', borderRadius: 5,
-                  background: i === 0 ? 'rgba(74,222,128,0.12)' : 'transparent',
+                  background: i === 0 ? 'rgba(248,129,0,0.12)' : 'transparent',
                 }}>
                   {tab}
                 </span>
@@ -218,7 +218,7 @@ export default function Hero() {
               {/* Mini Gantt bars */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 {[
-                  { name: 'Delhi – Mumbai', w: '70%', color: '#4ADE80' },
+                  { name: 'Delhi – Mumbai', w: '70%', color: '#f88100' },
                   { name: 'Pune – Lonavala', w: '45%', color: '#FBBF24' },
                   { name: 'Mumbai – Chennai', w: '60%', color: '#2DD4BF' },
                   { name: 'Howrah – Patna', w: '35%', color: '#F87171' },
@@ -252,7 +252,7 @@ export default function Hero() {
                 </div>
                 <svg viewBox="0 0 120 90" style={{ width: '100%', height: 'auto' }}>
                   {/* Simplified India rail routes */}
-                  <path d="M60,10 L40,35 L30,70" stroke="#4ADE80" strokeWidth="1.5" fill="none" opacity="0.6" />
+                  <path d="M60,10 L40,35 L30,70" stroke="#f88100" strokeWidth="1.5" fill="none" opacity="0.6" />
                   <path d="M60,10 L85,40 L90,70" stroke="#2DD4BF" strokeWidth="1.5" fill="none" opacity="0.6" />
                   <path d="M40,35 L85,40" stroke="#FBBF24" strokeWidth="1.5" fill="none" opacity="0.5" strokeDasharray="3 2" />
                   <path d="M30,70 L70,80" stroke="#F87171" strokeWidth="1.5" fill="none" opacity="0.4" />
@@ -265,8 +265,8 @@ export default function Hero() {
                     { cx: 90, cy: 70, label: 'Chennai' },
                   ].map((city) => (
                     <g key={city.label}>
-                      <circle cx={city.cx} cy={city.cy} r="3" fill="#4ADE80" opacity="0.8" />
-                      <circle cx={city.cx} cy={city.cy} r="5" fill="none" stroke="#4ADE80" strokeWidth="0.5" opacity="0.3" />
+                      <circle cx={city.cx} cy={city.cy} r="3" fill="#f88100" opacity="0.8" />
+                      <circle cx={city.cx} cy={city.cy} r="5" fill="none" stroke="#f88100" strokeWidth="0.5" opacity="0.3" />
                     </g>
                   ))}
                 </svg>
@@ -283,7 +283,7 @@ export default function Hero() {
                 <svg viewBox="0 0 80 80" style={{ width: 64, height: 64, margin: '0 auto' }}>
                   <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
                   <motion.circle
-                    cx="40" cy="40" r="32" fill="none" stroke="#4ADE80" strokeWidth="6"
+                    cx="40" cy="40" r="32" fill="none" stroke="#f88100" strokeWidth="6"
                     strokeLinecap="round"
                     strokeDasharray={`${0.78 * 2 * Math.PI * 32} ${2 * Math.PI * 32}`}
                     initial={{ strokeDashoffset: 2 * Math.PI * 32 }}
@@ -325,7 +325,7 @@ export default function Hero() {
               transition={{ delay: 0.6 + i * 0.1 }}
               style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}
             >
-              <div style={{ color: '#4ADE80' }}>{item.icon}</div>
+              <div style={{ color: '#f88100' }}>{item.icon}</div>
               <div>
                 <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{item.t1}</div>
                 <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)' }}>{item.t2}</div>

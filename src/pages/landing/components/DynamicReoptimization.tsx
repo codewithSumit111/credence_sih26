@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const steps = [
-  { label: 'CURRENT PLAN', icon: '📋', desc: 'Optimized block schedule in place', color: '#1B6B45' },
+  { label: 'CURRENT PLAN', icon: '📋', desc: 'Optimized block schedule in place', color: '#082b71' },
   { label: 'NEW DEFECT', icon: '⚠', desc: 'Urgent defect detected on track section', color: '#D97706' },
   { label: 'TRAIN DELAY', icon: '🚆', desc: 'Inbound freight delay alters corridor window', color: '#EF4444' },
   { label: 'RESOURCE CONFLICT', icon: '⚡', desc: 'Engineering crew overlap identified', color: '#D97706' },

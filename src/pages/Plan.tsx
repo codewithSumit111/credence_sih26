@@ -64,10 +64,10 @@ const STATUS_COLORS: Record<string, string> = {
 // ─── Gantt Component (simplified, focused) ────────────────────────────────────
 function BlockGantt({ blocks, selectedId, onSelect }: { blocks: BlockItem[]; selectedId: string; onSelect: (id: string) => void }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Block Timeline — Today</h3>
-        <span className="text-[10px] text-gray-400">Click a block to open detail</span>
+    <div className="irctc-card overflow-hidden p-0">
+      <div className="px-5 py-3 border-b border-irctc-border flex items-center justify-between bg-gray-50/50">
+        <h3 className="irctc-card-title">Block Timeline — Today</h3>
+        <span className="text-[12px] text-irctc-muted">Click a block to open detail</span>
       </div>
       {/* Time axis */}
       <div className="relative px-4 pt-2 pb-1 border-b border-gray-100">
@@ -553,48 +553,43 @@ export default function Plan() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
-      {/* Page header */}
-      <div className="bg-white border-b border-gray-200 px-5 py-4">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-3">
+    <div className="irctc-page">
+      {/* Page header — IRCTC style */}
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Plan</h1>
-            <p className="text-[12px] text-gray-500 mt-0.5">Maintenance scheduling · Block planning · CP-SAT optimization</p>
+            <h1 className="irctc-page-title">Block Planning</h1>
+            <p className="text-[14px] text-irctc-muted mt-0.5">Maintenance scheduling · Block planning · CP-SAT optimization</p>
           </div>
-          {/* Tab switcher */}
-          <div className="flex bg-gray-100 rounded-lg p-1 gap-1">
-            {(['maintenance', 'blocks'] as const).map(tab => (
+          {/* Tab switcher — IRCTC style */}
+          <div className="irctc-tabs gap-0">
+            {(['maintenance', 'blocks', 'requests'] as const).map(tab => (
               <button
                 key={tab}
-                onClick={() => setTab(tab)}
-                className={clsx(
-                  'px-4 py-1.5 rounded-md text-[12px] font-semibold transition-all capitalize',
-                  activeTab === tab
-                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                    : 'text-gray-500 hover:text-gray-700'
-                )}
+                onClick={() => setTab(tab as 'maintenance' | 'blocks')}
+                className={clsx('irctc-tab capitalize', activeTab === tab && 'active')}
               >
-                {tab === 'maintenance' ? 'Maintenance' : 'Blocks & Gantt'}
+                {tab === 'maintenance' ? 'Maintenance' : tab === 'blocks' ? 'Blocks & Gantt' : 'Requests'}
               </button>
             ))}
           </div>
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {activeTab === 'blocks' && (
               <button
                 onClick={handleRunOptimizer}
                 disabled={optimizing}
-                className="flex items-center gap-1.5 text-[12px] font-semibold border border-gray-300 bg-white hover:border-blue-500 hover:text-blue-700 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+                className="irctc-btn irctc-btn-outline text-[13px]"
               >
-                  {optimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" /> : <Settings className="w-3.5 h-3.5" />}
-                  {optimizing ? 'Running...' : 'Run CP-SAT'}
+                  {optimizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
+                  {optimizing ? 'Running CP-SAT...' : 'Run CP-SAT'}
                 </button>
             )}
             <button
               onClick={() => navigate('/requests')}
-              className="flex items-center gap-1.5 text-[12px] font-bold bg-[#0A3D80] hover:bg-blue-900 text-white px-3 py-1.5 rounded-lg transition-colors"
+              className="irctc-btn irctc-btn-primary text-[13px]"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               New Request
             </button>
           </div>
@@ -603,8 +598,8 @@ export default function Plan() {
 
       {/* Optimizer progress */}
       {optimizing && (
-        <div className="bg-blue-50 border-b border-blue-200 px-5 py-2.5">
-          <div className="max-w-[1600px] mx-auto flex items-center gap-6">
+        <div className="bg-blue-50 border-b border-irctc-border px-7 py-3">
+          <div className="max-w-[1600px] mx-auto flex items-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
               <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wide">CP-SAT Solver Active</span>
@@ -622,7 +617,7 @@ export default function Plan() {
         </div>
       )}
 
-      <div className="max-w-[1600px] mx-auto p-5">
+      <div className="max-w-[1600px] mx-auto px-7 py-6">
         {/* ─── MAINTENANCE TAB ─────────────────────────────────────────────── */}
         {activeTab === 'maintenance' && (
           <div>
@@ -634,14 +629,14 @@ export default function Plan() {
                 { label: 'Scheduled', value: String(jobs.filter(j => j.status === 'SCHEDULED').length), sub: 'In active plan', icon: Calendar, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
                 { label: 'Completed', value: String(jobs.filter(j => j.status === 'COMPLETED').length), sub: 'All time', icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
               ].map(kpi => (
-                <div key={kpi.label} className={clsx('border rounded-lg p-3.5', kpi.bg)}>
+                <div key={kpi.label} className={clsx('irctc-card-sm', kpi.bg)}>
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{kpi.label}</p>
-                      <p className={clsx('text-2xl font-bold', kpi.color)}>{kpi.value}</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
+                      <p className="irctc-label mb-2">{kpi.label}</p>
+                      <p className={clsx('text-[26px] font-bold leading-none', kpi.color)}>{kpi.value}</p>
+                      <p className="text-[12px] text-irctc-muted mt-1.5">{kpi.sub}</p>
                     </div>
-                    <kpi.icon className={clsx('w-4 h-4 flex-shrink-0', kpi.color)} />
+                    <kpi.icon className={clsx('w-5 h-5 flex-shrink-0', kpi.color)} />
                   </div>
                 </div>
               ))}

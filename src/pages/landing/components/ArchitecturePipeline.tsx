@@ -4,7 +4,7 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const steps = [
   {
-    id: '01', title: 'Data Integration', color: '#1B6B45',
+    id: '01', title: 'Data Integration', color: '#082b71',
     description: 'Unified ingestion from maintenance and operational systems.',
     tags: ['TMS', 'SMMS', 'TDMS', 'BDMS', 'COA', 'Timetable', 'Goods Forecast'],
   },
@@ -29,7 +29,7 @@ const steps = [
     tags: ['Time-Dep. A*', 'Delay', 'Rerouting', 'Waiting Time'],
   },
   {
-    id: '06', title: 'Decision', color: '#0D9488',
+    id: '06', title: 'Decision', color: '#f88100',
     description: 'Explainable, multi-department optimized block recommendation.',
     tags: ['Optimized', 'Explainable', 'Multi-dept.', 'Block Plan'],
   },

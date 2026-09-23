@@ -15,7 +15,7 @@ const steps = [
     icon: <CalendarClock size={24} />,
     title: 'Plan',
     desc: 'Generate optimized block schedules with CP-SAT and ALNS, respecting all hard constraints.',
-    color: '#1B6B45',
+    color: '#082b71',
     detail: 'Multi-dept consolidation',
   },
   {
@@ -29,7 +29,7 @@ const steps = [
     icon: <Radio size={24} />,
     title: 'Operate',
     desc: 'Monitor, re-plan, and keep trains on track with rolling-horizon dynamic re-optimization.',
-    color: '#0D9488',
+    color: '#f88100',
     detail: 'Real-time adaptation',
   },
 ];
@@ -63,7 +63,7 @@ export default function PipelineFlow() {
             <span className="text-gradient-blue">In One Flow</span>
           </h2>
           <p className="section-subheading" style={{ maxWidth: 560, margin: '0 auto' }}>
-            KAVACH brings together risk analysis, optimization, and real-time operations
+            IRCTC brings together risk analysis, optimization, and real-time operations
             in a single, seamless pipeline.
           </p>
         </motion.div>
@@ -80,7 +80,7 @@ export default function PipelineFlow() {
             transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
             style={{
               position: 'absolute', top: 52, left: '12%', right: '12%', height: 2,
-              background: 'linear-gradient(90deg, #D97706, #1B6B45, #7C3AED, #0D9488)',
+              background: 'linear-gradient(90deg, #D97706, #082b71, #7C3AED, #f88100)',
               transformOrigin: 'left center', zIndex: 0, opacity: 0.25,
               borderRadius: 1,
             }}
@@ -93,8 +93,8 @@ export default function PipelineFlow() {
               transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
               style={{
                 position: 'absolute', top: 48, width: 10, height: 10,
-                borderRadius: '50%', background: '#1B6B45',
-                boxShadow: '0 0 12px rgba(27,107,69,0.5), 0 0 24px rgba(27,107,69,0.25)',
+                borderRadius: '50%', background: '#082b71',
+                boxShadow: '0 0 12px rgba(8,43,113,0.5), 0 0 24px rgba(8,43,113,0.25)',
                 zIndex: 1,
               }}
             />
@@ -116,9 +116,9 @@ export default function PipelineFlow() {
                 animate={isVisible ? {
                   scale: [1, 1.06, 1],
                   boxShadow: [
-                    `0 0 0 rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#1B6B45' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0)`,
-                    `0 0 20px rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#1B6B45' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0.25)`,
-                    `0 0 0 rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#1B6B45' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0)`,
+                    `0 0 0 rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#082b71' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0)`,
+                    `0 0 20px rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#082b71' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0.25)`,
+                    `0 0 0 rgba(${step.color === '#D97706' ? '217,119,6' : step.color === '#082b71' ? '27,107,69' : step.color === '#7C3AED' ? '124,58,237' : '13,148,136'},0)`,
                   ],
                 } : {}}
                 transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.3 }}

@@ -4,11 +4,11 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const metrics = [
   { label: 'Asset Availability', direction: 'up', color: '#059669', desc: 'More assets made available through coordinated multi-department block planning.' },
-  { label: 'Block Utilisation', direction: 'up', color: '#1B6B45', desc: 'Higher proportion of each block window utilized through job consolidation.' },
+  { label: 'Block Utilisation', direction: 'up', color: '#082b71', desc: 'Higher proportion of each block window utilized through job consolidation.' },
   { label: 'Train Disruption', direction: 'down', color: '#EF4444', desc: 'Reduced train impact by optimizing block windows around traffic patterns.' },
   { label: 'Multi-Dept. Coordination', direction: 'up', color: '#7C3AED', desc: 'Engineering, S&T, and TRD maintenance consolidated into compatible blocks.' },
   { label: 'Unplanned Downtime', direction: 'down', color: '#D4A843', desc: 'Risk-driven prioritization reduces reactive emergency interventions.' },
-  { label: 'Planning Explainability', direction: 'up', color: '#0D9488', desc: 'Every recommendation is traceable, auditable, and human-verifiable.' },
+  { label: 'Planning Explainability', direction: 'up', color: '#f88100', desc: 'Every recommendation is traceable, auditable, and human-verifiable.' },
 ];
 
 export default function ImpactMetrics() {

@@ -317,35 +317,35 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
-      {/* Page Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="irctc-page">
+      {/* Page Header — IRCTC style */}
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
         <div className="max-w-[1500px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Reports & Documentation Center</h1>
-              <span className="text-[11px] font-bold text-blue-800 bg-blue-100 border border-emerald-300 px-2 py-0.5 rounded-full">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="irctc-page-title">Reports & Documentation</h1>
+              <span className="irctc-badge bg-blue-50 text-irctc-blue border-blue-200">
                 Division Central
               </span>
             </div>
-            <p className="text-[12px] text-gray-500">
+            <p className="text-[14px] text-irctc-muted">
               Generate official railway block plans, punctuality audits, disruption logs, and telemetry dossiers
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-[11px] font-bold text-gray-700">Nagpur Division (CR)</p>
-              <p className="text-[10px] text-gray-400">NGP–BSL Corridor · 27 Aug 2026</p>
+              <p className="text-[13px] font-bold text-irctc-navy">Nagpur Division (CR)</p>
+              <p className="text-[12px] text-irctc-muted">NGP–BSL Corridor · 27 Aug 2026</p>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-irctc-blue">
               <FileText className="w-5 h-5" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1500px] mx-auto px-7 py-6 space-y-6">
 
         {/* ── SECTION 1: Standard Operational Reports (Click to Get) ────────── */}
         <div>

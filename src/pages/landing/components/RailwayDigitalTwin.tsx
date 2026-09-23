@@ -28,14 +28,14 @@ export default function RailwayDigitalTwin() {
     const tracks = [
       { y: 0.28, color: 'rgba(29,78,216,0.18)', label: 'UP LINE' },
       { y: 0.45, color: 'rgba(13,148,136,0.15)', label: 'DOWN LINE' },
-      { y: 0.62, color: 'rgba(27,107,69,0.12)', label: 'GOODS' },
+      { y: 0.62, color: 'rgba(8,43,113,0.12)', label: 'GOODS' },
     ];
 
     // Node definitions
     const nodes = [
-      { xf: 0.18, yf: 0.28, type: 'signal', label: 'SIGNAL', color: '#1B6B45' },
+      { xf: 0.18, yf: 0.28, type: 'signal', label: 'SIGNAL', color: '#082b71' },
       { xf: 0.42, yf: 0.28, type: 'ohe',    label: 'OHE',    color: '#D97706' },
-      { xf: 0.70, yf: 0.28, type: 'signal', label: 'SIGNAL', color: '#1B6B45' },
+      { xf: 0.70, yf: 0.28, type: 'signal', label: 'SIGNAL', color: '#082b71' },
       { xf: 0.25, yf: 0.45, type: 'st',     label: 'S&T',    color: '#7C3AED' },
       { xf: 0.55, yf: 0.45, type: 'maint',  label: '',       color: '#059669' },
       { xf: 0.78, yf: 0.45, type: 'st',     label: 'S&T',    color: '#7C3AED' },
@@ -43,14 +43,14 @@ export default function RailwayDigitalTwin() {
       { xf: 0.40, yf: 0.62, type: 'eng',    label: '',       color: '#059669' },
       { xf: 0.65, yf: 0.62, type: 'eng',    label: 'TRACK',  color: '#059669' },
       // AI core
-      { xf: 0.80, yf: 0.42, type: 'ai',     label: 'AI',     color: '#0D9488' },
+      { xf: 0.80, yf: 0.42, type: 'ai',     label: 'AI',     color: '#f88100' },
     ];
 
     // Trains
     const trains = [
-      { track: 0, x: -0.08, len: 0.14, speed: 0.00028, color: '#1B6B45' },
-      { track: 1, x: 0.4,   len: 0.10, speed: 0.00020, color: '#0D9488' },
-      { track: 2, x: 0.65,  len: 0.12, speed: 0.00024, color: '#1B6B45' },
+      { track: 0, x: -0.08, len: 0.14, speed: 0.00028, color: '#082b71' },
+      { track: 1, x: 0.4,   len: 0.10, speed: 0.00020, color: '#f88100' },
+      { track: 2, x: 0.65,  len: 0.12, speed: 0.00024, color: '#082b71' },
     ];
 
     // Block window

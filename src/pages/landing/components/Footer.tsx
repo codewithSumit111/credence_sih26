@@ -31,9 +31,9 @@ export default function Footer() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.875rem' }}>
               <div style={{
                 width: 32, height: 32, borderRadius: 8,
-                background: 'linear-gradient(135deg, #1B6B45, #0D9488)',
+                background: 'linear-gradient(135deg, #082b71, #f88100)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(27,107,69,0.25)',
+                boxShadow: '0 2px 8px rgba(8,43,113,0.25)',
               }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2">
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -42,8 +42,8 @@ export default function Footer() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '0.875rem', color: '#122A1F' }}>KAVACH</div>
-                <div style={{ fontSize: '0.6rem', color: '#5A7A6C', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Central Railway</div>
+                <div style={{ fontWeight: 800, fontSize: '0.875rem', color: '#122A1F' }}>IRCTC</div>
+                <div style={{ fontSize: '0.6rem', color: '#5A7A6C', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Block Planning</div>
               </div>
             </div>
             <p style={{ fontSize: '0.8rem', color: '#5A7A6C', lineHeight: 1.7, maxWidth: 220 }}>
@@ -57,7 +57,7 @@ export default function Footer() {
             {navLinks.map((link) => (
               <a key={link.href} href={link.href} onClick={(e) => handleNav(e, link.href)}
                 style={{ display: 'block', fontSize: '0.875rem', color: '#5A7A6C', textDecoration: 'none', marginBottom: '0.5rem', transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#1B6B45'}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#082b71'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#5A7A6C'}>
                 {link.label}
               </a>
@@ -73,14 +73,14 @@ export default function Footer() {
             ].map((item) => (
               <a key={item.label} href={item.href} onClick={(e) => handleNav(e, item.href)}
                 style={{ display: 'block', fontSize: '0.875rem', color: '#5A7A6C', textDecoration: 'none', marginBottom: '0.5rem', transition: 'color 0.15s' }}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#1B6B45'}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#082b71'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#5A7A6C'}>
                 {item.label}
               </a>
             ))}
             <a href="#" onClick={(e) => { e.preventDefault(); openPrototype(); }}
               style={{ display: 'block', fontSize: '0.875rem', color: '#5A7A6C', textDecoration: 'none', marginBottom: '0.5rem', transition: 'color 0.15s', cursor: 'pointer' }}
-              onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#1B6B45'}
+              onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#082b71'}
               onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#5A7A6C'}>
               Prototype
             </a>
@@ -93,8 +93,8 @@ export default function Footer() {
               {['CP-SAT', 'GNN', 'ALNS', 'XGBoost', 'Time-Dep. A*', 'Python'].map((tech) => (
                 <span key={tech} style={{
                   padding: '0.2rem 0.55rem', borderRadius: 4, fontSize: '0.65rem', fontWeight: 600,
-                  background: '#F0FBF5', color: '#1B6B45',
-                  border: '1px solid rgba(27,107,69,0.18)', fontFamily: 'JetBrains Mono',
+                  background: '#F0FBF5', color: '#082b71',
+                  border: '1px solid rgba(8,43,113,0.18)', fontFamily: 'JetBrains Mono',
                 }}>{tech}</span>
               ))}
             </div>
@@ -108,7 +108,7 @@ export default function Footer() {
             This system is a research prototype developed for SIH 2025. All block recommendations require authorized railway authority validation and approval before execution.
           </p>
           <div style={{ fontSize: '0.75rem', color: '#94A3B8', textAlign: 'right', flexShrink: 0 }}>
-            <div>Central Railway · Nagpur Division</div>
+            <div>Block Planning · Nagpur Division</div>
             <div style={{ marginTop: 2 }}>Integrated Railway Maintenance Intelligence</div>
           </div>
         </div>

@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const papers = [
-  { title: 'Integrated Train Scheduling and Maintenance Optimization', year: '2022', method: 'Mixed-Integer Programming + Rolling Horizon', relevance: 'Multi-dept. block planning framework', color: '#1B6B45' },
+  { title: 'Integrated Train Scheduling and Maintenance Optimization', year: '2022', method: 'Mixed-Integer Programming + Rolling Horizon', relevance: 'Multi-dept. block planning framework', color: '#082b71' },
   { title: 'Dynamic Maintenance Scheduling under Operational Uncertainty', year: '2021', method: 'Stochastic Programming, ALNS', relevance: 'Dynamic re-optimization approach', color: '#7C3AED' },
   { title: 'Predictive Maintenance in Railway Infrastructure', year: '2023', method: 'XGBoost, LSTM, Survival Models', relevance: 'Risk & priority scoring engine', color: '#059669' },
   { title: 'GNN-Based Railway Network Maintenance Scheduling', year: '2023', method: 'Graph Neural Networks, RL', relevance: 'GNN-guided ALNS search', color: '#D4A843' },
-  { title: 'ALNS for Railway Maintenance Window Optimization', year: '2020', method: 'Adaptive Large Neighbourhood Search', relevance: 'Core ALNS optimization layer', color: '#0D9488' },
-  { title: 'AI Applications in Indian Railways Maintenance', year: '2022', method: 'Predictive Analytics, Digital Twin', relevance: 'Indian Railways operational context', color: '#1B6B45' },
+  { title: 'ALNS for Railway Maintenance Window Optimization', year: '2020', method: 'Adaptive Large Neighbourhood Search', relevance: 'Core ALNS optimization layer', color: '#f88100' },
+  { title: 'AI Applications in Indian Railways Maintenance', year: '2022', method: 'Predictive Analytics, Digital Twin', relevance: 'Indian Railways operational context', color: '#082b71' },
 ];
 
 export default function ResearchSection() {

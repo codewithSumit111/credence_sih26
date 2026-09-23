@@ -291,24 +291,24 @@ export default function Trains() {
   if (loading) return <LoadingState message="Loading train operations data..." />;
 
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
-      {/* Page header */}
-      <div className="bg-white border-b border-gray-200 px-5 py-4">
-        <div className="max-w-[1500px] mx-auto flex items-center justify-between flex-wrap gap-3">
+    <div className="irctc-page">
+      {/* Page header — IRCTC style */}
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
+        <div className="max-w-[1500px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Trains</h1>
-            <p className="text-[12px] text-gray-500 mt-0.5">Operations, impact analysis, and rerouting decisions</p>
+            <h1 className="irctc-page-title">Train Operations</h1>
+            <p className="text-[14px] text-irctc-muted mt-0.5">Operations, impact analysis, and rerouting decisions</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1.5 rounded-lg">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-[12px] font-semibold text-irctc-blue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-irctc-blue animate-pulse" />
               Time-Dependent A* Active
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1500px] mx-auto p-5 space-y-4">
+      <div className="max-w-[1500px] mx-auto px-7 py-6 space-y-5">
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -317,16 +317,16 @@ export default function Trains() {
             { label: 'Delayed', value: delayedCount.toString(), sub: 'Requires attention', color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
             { label: 'Rerouted', value: reroutedCount.toString(), sub: 'Alternate routes active', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' },
           ].map(kpi => (
-            <div key={kpi.label} className={clsx('border rounded-lg p-3.5', kpi.bg)}>
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">{kpi.label}</p>
-              <p className={clsx('text-2xl font-bold', kpi.color)}>{kpi.value}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{kpi.sub}</p>
+            <div key={kpi.label} className={clsx('irctc-card-sm', kpi.bg)}>
+              <p className="irctc-label mb-2">{kpi.label}</p>
+              <p className={clsx('text-[26px] font-bold leading-none', kpi.color)}>{kpi.value}</p>
+              <p className="text-[12px] text-irctc-muted mt-1.5">{kpi.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Filter bar */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3 flex flex-wrap items-center gap-3">
+        <div className="irctc-card flex flex-wrap items-center gap-3 p-4">
           <FilterBar
             onSearch={q => setSearchQuery(q)}
             searchPlaceholder="Search train number or name..."
@@ -343,10 +343,10 @@ export default function Trains() {
                   key={f.value}
                   onClick={() => setStatusFilter(f.value)}
                   className={clsx(
-                    'px-2.5 py-1 rounded text-[11px] font-semibold border transition-colors',
+                    'px-3 py-1.5 rounded-full text-[12px] font-semibold border transition-colors',
                     statusFilter === f.value
-                      ? 'bg-gray-800 text-white border-gray-800'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                      ? 'bg-irctc-blue text-white border-irctc-blue'
+                      : 'bg-white text-irctc-muted border-irctc-border hover:border-irctc-blue hover:text-irctc-blue'
                   )}
                 >
                   {f.label}

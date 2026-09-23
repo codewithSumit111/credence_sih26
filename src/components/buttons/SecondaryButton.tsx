@@ -5,22 +5,32 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   size?: 'sm' | 'md' | 'lg';
   icon?: ReactNode;
+  variant?: 'outline' | 'ghost' | 'blue';
 }
 
-export default function SecondaryButton({ children, size = 'md', icon, className, ...rest }: Props) {
+export default function SecondaryButton({
+  children, size = 'md', icon, className, variant = 'outline', ...rest
+}: Props) {
   const sizeClass = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-5 py-2.5 text-sm',
+    sm: 'px-3.5 py-1.5 text-[12px]',
+    md: 'px-5 py-2.5 text-[13px]',
+    lg: 'px-6 py-3 text-[14px]',
   }[size];
+
+  const variantClass = {
+    outline: 'irctc-btn-outline',
+    ghost:   'irctc-btn-ghost',
+    blue:    'irctc-btn-blue',
+  }[variant];
 
   return (
     <button
       {...rest}
       className={clsx(
-        'inline-flex items-center gap-2 font-semibold rounded border border-gray-300 bg-white text-gray-700',
-        'hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+        'irctc-btn',
+        variantClass,
         sizeClass,
+        'disabled:opacity-50 disabled:cursor-not-allowed',
         className
       )}
     >

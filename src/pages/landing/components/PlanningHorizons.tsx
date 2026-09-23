@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
 const horizons = [
-  { label: '52-WEEK STRATEGIC', period: 'Annual', color: '#1B6B45', tag: 'Strategic', desc: 'Long-range maintenance strategy aligned with infrastructure overhaul plans.' },
+  { label: '52-WEEK STRATEGIC', period: 'Annual', color: '#082b71', tag: 'Strategic', desc: 'Long-range maintenance strategy aligned with infrastructure overhaul plans.' },
   { label: 'MONTHLY', period: '30-day rolling', color: '#D4A843', tag: 'Tactical', desc: 'Monthly planning with demand forecasts and resource allocation optimization.' },
-  { label: 'WEEKLY', period: '7-day rolling', color: '#0D9488', tag: 'Operational', desc: 'Weekly block scheduling refined against current train movements and defect status.' },
+  { label: 'WEEKLY', period: '7-day rolling', color: '#f88100', tag: 'Operational', desc: 'Weekly block scheduling refined against current train movements and defect status.' },
   { label: 'EXECUTABLE BLOCK PLAN', period: 'Authorized output', color: '#059669', tag: 'Executable', desc: 'Final multi-department block plan ready for railway authority validation and approval.' },
 ];
 
@@ -36,7 +36,7 @@ export default function PlanningHorizons() {
             </p>
             <div style={{
               padding: '1.25rem', borderRadius: 12,
-              background: '#EDF5F0', border: '1px solid rgba(27,107,69,0.18)',
+              background: '#EDF5F0', border: '1px solid rgba(8,43,113,0.18)',
             }}>
               <p style={{ fontSize: '0.8125rem', color: '#2D4A3E', lineHeight: 1.7 }}>
                 <strong>Positioned as:</strong> An optimization and decision intelligence layer

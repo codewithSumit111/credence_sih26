@@ -29,15 +29,14 @@ export default function DataTable<T extends object>({
 }: Props<T>) {
   return (
     <div className={clsx('overflow-x-auto', className)}>
-      <table className="w-full border-collapse">
+      <table className="irctc-table">
         <thead className={stickyHeader ? 'sticky top-0 z-10' : ''}>
-          <tr className="border-b border-gray-200 bg-gray-50">
+          <tr>
             {columns.map(col => (
               <th
                 key={col.key}
                 className={clsx(
-                  'text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap border-b border-gray-200',
-                  compact ? 'px-3 py-2' : 'px-4 py-2.5',
+                  compact ? 'px-3 py-2.5' : 'px-4 py-3',
                   col.align === 'right' && 'text-right',
                   col.align === 'center' && 'text-center',
                   col.className,
@@ -52,7 +51,10 @@ export default function DataTable<T extends object>({
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="text-center py-12 text-sm text-gray-400">
+              <td
+                colSpan={columns.length}
+                className="text-center py-14 text-[14px] text-irctc-muted"
+              >
                 {emptyMessage ?? 'No data available'}
               </td>
             </tr>
@@ -65,19 +67,16 @@ export default function DataTable<T extends object>({
                   key={id}
                   onClick={() => onRowClick?.(row)}
                   className={clsx(
-                    'border-b border-gray-100 transition-colors',
                     onRowClick && 'cursor-pointer',
-                    isSelected
-                      ? 'bg-blue-50 hover:bg-blue-50'
-                      : onRowClick ? 'hover:bg-gray-50' : ''
+                    isSelected ? 'irctc-table tbody tr.selected bg-[#EEF4FB]' : ''
                   )}
+                  style={isSelected ? { background: '#EEF4FB' } : undefined}
                 >
                   {columns.map(col => (
                     <td
                       key={col.key}
                       className={clsx(
-                        'text-sm text-gray-800',
-                        compact ? 'px-3 py-2' : 'px-4 py-2.5',
+                        compact ? 'px-3 py-2.5' : 'px-4 py-3',
                         col.align === 'right' && 'text-right',
                         col.align === 'center' && 'text-center',
                         col.className,

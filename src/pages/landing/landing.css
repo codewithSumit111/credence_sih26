@@ -1,6 +1,6 @@
 /* ============================================================
-   KAVACH Landing Page — Light Mode Design System
-   Central Railway Automatic Block Planning
+   IRCTC Landing Page — Light Mode Design System
+   Block Planning Automatic Block Planning
    Scoped to .landing-page wrapper to avoid conflicts with main app
    ============================================================ */
 
@@ -12,19 +12,19 @@
   --lp-text-secondary: #344054;
   --lp-text-muted: #667085;
   --lp-text-faint: #98A2B3;
-  --lp-accent-blue: #1B6B45;
+  --lp-accent-blue: #082b71;
   --lp-accent-blue-mid: #145536;
   --lp-accent-blue-light: #228B58;
   --lp-accent-blue-pale: #ECFDF5;
   --lp-accent-blue-dim: rgba(27, 107, 69, 0.08);
   --lp-accent-blue-glow: rgba(27, 107, 69, 0.16);
-  --lp-accent-sky: #0D9488;
+  --lp-accent-sky: #f88100;
   --lp-accent-sky-pale: #F0FDF4;
   --lp-accent-sky-dim: rgba(13, 148, 136, 0.1);
   --lp-accent-amber: #D97706;
   --lp-accent-amber-pale: #FFFBEB;
   --lp-accent-amber-dim: rgba(217, 119, 6, 0.08);
-  --lp-accent-green: #1B6B45;
+  --lp-accent-green: #082b71;
   --lp-accent-green-pale: #ECFDF5;
   --lp-accent-green-dim: rgba(27, 107, 69, 0.08);
   --lp-border-light: #F2F4F7;
@@ -54,19 +54,19 @@
   --text-secondary: #344054;
   --text-muted: #667085;
   --text-faint: #98A2B3;
-  --accent-blue: #1B6B45;
+  --accent-blue: #082b71;
   --accent-blue-mid: #145536;
   --accent-blue-light: #228B58;
   --accent-blue-pale: #ECFDF5;
   --accent-blue-dim: rgba(27, 107, 69, 0.08);
   --accent-blue-glow: rgba(27, 107, 69, 0.16);
-  --accent-sky: #0D9488;
+  --accent-sky: #f88100;
   --accent-sky-pale: #F0FDF4;
   --accent-sky-dim: rgba(13, 148, 136, 0.1);
   --accent-amber: #D97706;
   --accent-amber-pale: #FFFBEB;
   --accent-amber-dim: rgba(217, 119, 6, 0.08);
-  --accent-green: #1B6B45;
+  --accent-green: #082b71;
   --accent-green-pale: #ECFDF5;
   --accent-green-dim: rgba(27, 107, 69, 0.08);
   --border-light: #F2F4F7;
@@ -133,7 +133,7 @@
 
 .text-gradient-blue,
 .text-gradient-green {
-  background: linear-gradient(135deg, #1B6B45 0%, #0D9488 100%);
+  background: linear-gradient(135deg, #082b71 0%, #f88100 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -169,7 +169,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, #1B6B45 0%, #135F3A 100%);
+  background: linear-gradient(135deg, #f88100 0%, #fbbf24 100%);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.9375rem;
@@ -179,13 +179,13 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(27, 107, 69, 0.28);
+  box-shadow: 0 4px 16px rgba(248, 129, 0, 0.28);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #145536 0%, #0E472A 100%);
+  background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(27, 107, 69, 0.38);
+  box-shadow: 0 8px 24px rgba(248, 129, 0, 0.38);
 }
 
 .btn-primary:active { transform: translateY(0); }

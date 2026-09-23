@@ -3,11 +3,11 @@ import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { Shield, Eye, Lock, CheckCircle2, UserCheck } from 'lucide-react';
 
 const trustChain = [
-  { label: 'AI Recommendation', icon: <Eye size={18} />, desc: 'Explainable, multi-department optimized block proposal', color: '#1B6B45' },
+  { label: 'AI Recommendation', icon: <Eye size={18} />, desc: 'Explainable, multi-department optimized block proposal', color: '#082b71' },
   { label: 'Dept. Validation', icon: <UserCheck size={18} />, desc: 'Department heads review maintenance jobs and resource assignments', color: '#7C3AED' },
   { label: 'Safety Verification', icon: <Shield size={18} />, desc: 'Hard constraint checks — safety, timetable, corridor availability', color: '#D4A843' },
   { label: 'Authorized Approval', icon: <Lock size={18} />, desc: 'Competent railway authority grants or modifies the block', color: '#059669' },
-  { label: 'Execution', icon: <CheckCircle2 size={18} />, desc: 'Block executed under authorized supervision', color: '#0D9488' },
+  { label: 'Execution', icon: <CheckCircle2 size={18} />, desc: 'Block executed under authorized supervision', color: '#f88100' },
 ];
 
 const principles = [
@@ -115,9 +115,9 @@ export default function SafetySection() {
                 >
                   <div style={{
                     width: 34, height: 34, borderRadius: 8,
-                    background: '#F0FBF5', border: '1px solid rgba(27,107,69,0.18)',
+                    background: '#F0FBF5', border: '1px solid rgba(8,43,113,0.18)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#1B6B45', flexShrink: 0,
+                    color: '#082b71', flexShrink: 0,
                   }}>
                     {p.icon}
                   </div>

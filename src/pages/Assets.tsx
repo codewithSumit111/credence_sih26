@@ -64,55 +64,55 @@ export default function Assets() {
   }
 
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="irctc-page">
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Asset Monitoring</h1>
-            <p className="text-[12px] text-gray-500 mt-0.5">Real-time health, defects, and maintenance requirements</p>
+            <h1 className="irctc-page-title">Asset Monitoring</h1>
+            <p className="text-[14px] text-irctc-muted mt-0.5">Real-time health, defects, and maintenance requirements</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 uppercase tracking-wide">
+            <span className="text-[12px] font-bold bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 rounded-full flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> Asset Telemetry Live
             </span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1400px] mx-auto px-7 py-6 space-y-6">
         
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((kpi, idx) => (
-            <div key={idx} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-              <div className={clsx('w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0', kpi.bg)}>
+            <div key={idx} className="irctc-card flex items-center gap-4 hover:shadow-irctc-md transition-shadow">
+              <div className={clsx('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', kpi.bg)}>
                  <kpi.icon className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">{kpi.label}</p>
-                <p className={clsx('text-2xl font-black mt-0.5', kpi.color)}>{kpi.value}</p>
-                <p className="text-[10px] text-gray-400 font-medium mt-1">{kpi.sub}</p>
+                <p className="irctc-label mb-1">{kpi.label}</p>
+                <p className={clsx('text-[28px] font-bold leading-none', kpi.color)}>{kpi.value}</p>
+                <p className="text-[12px] text-irctc-muted mt-1">{kpi.sub}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Asset Table */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-wide">Monitored Assets</h3>
-              <span className="text-[11px] text-gray-500">{assets.length} assets tracking</span>
+        <div className="irctc-card overflow-hidden p-0">
+           <div className="px-5 py-4 border-b border-irctc-border flex items-center justify-between">
+              <h3 className="irctc-card-title">Monitored Assets</h3>
+              <span className="text-[12px] text-irctc-muted">{assets.length} assets tracking</span>
            </div>
            
-           <table className="w-full text-left text-[12px]">
+           <table className="irctc-table">
               <thead>
-                 <tr className="bg-gray-50 border-b border-gray-100 text-gray-500">
-                    <th className="py-3 px-5 font-bold">ASSET ID</th>
-                    <th className="py-3 px-5 font-bold">TYPE & CORRIDOR</th>
-                    <th className="py-3 px-5 font-bold">CRITICALITY</th>
-                    <th className="py-3 px-5 font-bold">DEFECTS</th>
-                    <th className="py-3 px-5 font-bold">STATUS</th>
-                    <th className="py-3 px-5 font-bold text-right">MAINTENANCE</th>
+                 <tr>
+                    <th>ASSET ID</th>
+                    <th>TYPE & CORRIDOR</th>
+                    <th>CRITICALITY</th>
+                    <th>DEFECTS</th>
+                    <th>STATUS</th>
+                    <th className="text-right">MAINTENANCE</th>
                  </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">

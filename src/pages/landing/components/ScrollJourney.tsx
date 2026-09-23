@@ -147,7 +147,7 @@ export default function ScrollJourney() {
 
         {/* Phase Indicator (Left Sticky) */}
         <div style={{ position: 'absolute', left: '2rem', top: '50%', transform: 'translateY(-50%)', zIndex: 50 }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#1B6B45', letterSpacing: '0.1em', marginBottom: 12 }}>
+          <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#082b71', letterSpacing: '0.1em', marginBottom: 12 }}>
             PIPELINE STAGE
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', transition: '0.3s' }}>
@@ -183,16 +183,16 @@ export default function ScrollJourney() {
             {/* Railway Track Background */}
             <div style={{
               position: 'absolute', inset: '10% 0',
-              background: 'rgba(27,107,69,0.04)',
+              background: 'rgba(8,43,113,0.04)',
               transform: 'rotateX(60deg) rotateZ(-45deg)',
-              border: '2px solid rgba(27,107,69,0.15)',
+              border: '2px solid rgba(8,43,113,0.15)',
               borderRadius: 16,
             }}>
               {/* Animated Train (Stage 1-6) */}
               <motion.div
                 style={{
                   position: 'absolute', top: '35%', left: 0,
-                  width: 100, height: 16, background: '#1B6B45', borderRadius: 8,
+                  width: 100, height: 16, background: '#082b71', borderRadius: 8,
                   opacity: activePhase >= 7 ? 0 : 1, // Hides when stage 7 takes over train animation
                 }}
                 animate={{ left: ['-10%', '110%'] }}
@@ -207,20 +207,20 @@ export default function ScrollJourney() {
                 transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
                 style={{
                   width: 100, height: 100, borderRadius: '50%',
-                  background: 'conic-gradient(from 0deg, rgba(27,107,69,0.15), rgba(13,148,136,0.35), rgba(27,107,69,0.15))',
+                  background: 'conic-gradient(from 0deg, rgba(8,43,113,0.15), rgba(13,148,136,0.35), rgba(8,43,113,0.15))',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
                 <div style={{
                   width: 60, height: 60, borderRadius: 12,
-                  background: 'linear-gradient(135deg, #1B6B45, #0D9488)',
-                  boxShadow: '0 8px 24px rgba(27,107,69,0.35)',
+                  background: 'linear-gradient(135deg, #082b71, #f88100)',
+                  boxShadow: '0 8px 24px rgba(8,43,113,0.35)',
                 }} />
               </motion.div>
               
               {/* Stage 3 text over AI */}
               <motion.div style={{ position: 'absolute', top: -40, left: -60, width: 220, textAlign: 'center', opacity: aiGlow }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1B6B45', letterSpacing: '0.1em' }}>MULTIPLE INPUTS</div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#082b71', letterSpacing: '0.1em' }}>MULTIPLE INPUTS</div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A' }}>ONE INTELLIGENT PLAN</div>
               </motion.div>
             </div>
@@ -280,12 +280,12 @@ export default function ScrollJourney() {
                 <div key={b.id} style={{
                   flex: 1, padding: '0.5rem', borderRadius: 6,
                   background: b.status === 'optimal' ? '#ECFDF5' : '#F8FAFC',
-                  border: b.status === 'optimal' ? '2px solid #1B6B45' : '1px solid #E2E8F0',
+                  border: b.status === 'optimal' ? '2px solid #082b71' : '1px solid #E2E8F0',
                   opacity: b.status === 'optimal' ? 1 : 0.4,
                   textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: b.status === 'optimal' ? '#1B6B45' : '#64748B' }}>BLOCK {b.id}</div>
-                  {b.status === 'optimal' && <div style={{ fontSize: '0.6rem', color: '#1B6B45', marginTop: 4 }}>01:30-03:15</div>}
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: b.status === 'optimal' ? '#082b71' : '#64748B' }}>BLOCK {b.id}</div>
+                  {b.status === 'optimal' && <div style={{ fontSize: '0.6rem', color: '#082b71', marginTop: 4 }}>01:30-03:15</div>}
                 </div>
               ))}
             </motion.div>
@@ -321,7 +321,7 @@ export default function ScrollJourney() {
             {activePhase >= 6 && activePhase < 8 && (
               <div style={{
                 position: 'absolute', top: '50%', left: 0, right: 0, height: 60,
-                borderTop: '2px solid rgba(27,107,69,0.3)', borderBottom: '2px solid rgba(27,107,69,0.3)',
+                borderTop: '2px solid rgba(8,43,113,0.3)', borderBottom: '2px solid rgba(8,43,113,0.3)',
                 zIndex: 35,
               }}>
                 {/* Proposed Block */}
@@ -371,14 +371,14 @@ export default function ScrollJourney() {
             <motion.div style={{
               position: 'absolute', right: '5%', top: '20%',
               background: '#FFFFFF', padding: '1.5rem', borderRadius: 16,
-              border: '2px solid #1B6B45', boxShadow: '0 8px 32px rgba(27,107,69,0.18)',
+              border: '2px solid #082b71', boxShadow: '0 8px 32px rgba(8,43,113,0.18)',
               width: 300, zIndex: 40,
               y: explainY, opacity: explainOp,
               display: activePhase >= 7 && activePhase < 9 ? 'block' : 'none',
             }}>
               <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.1em' }}>RECOMMENDED BLOCK</div>
               <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>PUNE — LONAVALA</div>
-              <div style={{ fontSize: '0.875rem', color: '#1B6B45', fontFamily: 'JetBrains Mono', marginBottom: 16 }}>01:30 — 03:15</div>
+              <div style={{ fontSize: '0.875rem', color: '#082b71', fontFamily: 'JetBrains Mono', marginBottom: 16 }}>01:30 — 03:15</div>
               
               <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#94A3B8', letterSpacing: '0.1em', marginBottom: 8 }}>WHY THIS BLOCK?</div>
               {[
@@ -411,9 +411,9 @@ export default function ScrollJourney() {
                 <div style={{ padding: '0.75rem 1rem', background: '#FEF2F2', color: '#EF4444', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700 }}>CONSTRAINT CHANGE</div>
                 <ArrowRight size={16} />
                 <motion.div
-                  animate={{ scale: [1, 1.05, 1], boxShadow: ['0 0 0 rgba(27,107,69,0)', '0 0 20px rgba(27,107,69,0.3)', '0 0 0 rgba(27,107,69,0)'] }}
+                  animate={{ scale: [1, 1.05, 1], boxShadow: ['0 0 0 rgba(8,43,113,0)', '0 0 20px rgba(8,43,113,0.3)', '0 0 0 rgba(8,43,113,0)'] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
-                  style={{ padding: '0.75rem 1rem', background: '#1B6B45', color: '#fff', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700 }}
+                  style={{ padding: '0.75rem 1rem', background: '#082b71', color: '#fff', borderRadius: 8, fontSize: '0.75rem', fontWeight: 700 }}
                 >
                   AI RE-OPTIMIZATION
                 </motion.div>

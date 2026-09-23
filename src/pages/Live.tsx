@@ -175,19 +175,19 @@ export default function Live() {
   const currentWorkflowStep = plan?.status === 'APPROVED' ? 5 : recoveryStep;
 
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-5 py-4">
-        <div className="max-w-[1400px] mx-auto flex items-start justify-between flex-wrap gap-3">
+    <div className="irctc-page">
+      {/* ── Page Header (IRCTC style — matches 4.png layout) ── */}
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
+        <div className="max-w-[1400px] mx-auto flex items-start justify-between flex-wrap gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-0.5">
-              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">Live Recovery</h1>
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                Monitoring Active
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="irctc-page-title">Alerts and Updates</h1>
+              <div className="flex items-center gap-1.5 text-[12px] font-semibold text-irctc-blue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-irctc-blue animate-pulse" />
+                Live Monitoring
               </div>
             </div>
-            <p className="text-[12px] text-gray-500">Event detection → ALNS re-optimization → A* rerouting → human approval</p>
+            <p className="text-[14px] text-irctc-muted">Event detection → ALNS re-optimization → A* rerouting → human approval</p>
           </div>
           <div className="overflow-x-auto">
             <WorkflowIndicator currentStep={currentWorkflowStep} />
@@ -195,42 +195,103 @@ export default function Live() {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto p-5 space-y-5">
+      <div className="max-w-[1400px] mx-auto px-7 py-6 space-y-6">
 
-        {/* Event list */}
-        <div>
-          <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
-            Active Events
-          </h3>
-          <div className="space-y-2">
+        {/* Event list — IRCTC Announcements style (4.png) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left: Announcements */}
+          <div className="irctc-card">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="irctc-section-title">Announcements</h2>
+              <div className="flex gap-1">
+                <button className="w-8 h-8 rounded-full border border-irctc-border text-irctc-muted flex items-center justify-center hover:bg-gray-50 text-[14px] font-bold">‹</button>
+                <button className="w-8 h-8 rounded-full border border-irctc-border text-irctc-muted flex items-center justify-center hover:bg-gray-50 text-[14px] font-bold">›</button>
+              </div>
+            </div>
             {events.length === 0 && (
-              <div className="p-6 bg-white border border-gray-200 rounded-lg text-center">
-                <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                <p className="text-[12px] font-semibold text-gray-600">No active disruptions</p>
-                <p className="text-[11px] text-gray-400">All corridor operations nominal</p>
+              <div className="py-8 text-center">
+                <CheckCircle2 className="w-7 h-7 text-green-500 mx-auto mb-2" />
+                <p className="text-[14px] font-semibold text-irctc-text">No active disruptions</p>
+                <p className="text-[13px] text-irctc-muted">All corridor operations nominal</p>
               </div>
             )}
-            {events.map(event => (
-              <EventRow
-                key={event.id}
-                event={event}
-                selected={selectedEvent?.id === event.id}
-                onClick={() => { setSelectedEvent(event); setRecoveryStep(0); setPlan(null); }}
-              />
-            ))}
+            <div className="space-y-0">
+              {events.map(event => (
+                <div
+                  key={event.id}
+                  onClick={() => { setSelectedEvent(event); setRecoveryStep(0); setPlan(null); }}
+                  className={clsx(
+                    'flex items-start gap-3 py-4 border-b border-irctc-border-light last:border-0 cursor-pointer hover:bg-blue-50/40 transition-colors -mx-5 px-5',
+                    selectedEvent?.id === event.id && 'bg-blue-50'
+                  )}
+                >
+                  <span className={clsx(
+                    'w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5',
+                    event.severity === 'CRITICAL' ? 'bg-red-600' :
+                    event.severity === 'HIGH' ? 'bg-irctc-orange' :
+                    event.severity === 'MEDIUM' ? 'bg-amber-500' : 'bg-gray-400'
+                  )} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-semibold text-irctc-text leading-snug">{event.title}</p>
+                    <p className="text-[12px] text-irctc-muted mt-0.5">{event.location} · {event.description}</p>
+                    <p className="text-[11px] text-irctc-muted mt-0.5 font-mono">
+                      {new Date(event.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                  <StatusBadge status={event.status} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Operational Advisories */}
+          <div className="irctc-card">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-irctc-blue flex items-center justify-center">
+                  <AlertOctagon className="w-5 h-5" />
+                </div>
+                <h2 className="irctc-section-title">Operational Advisories</h2>
+              </div>
+              <button className="text-irctc-muted hover:text-irctc-text">
+                <ChevronUp className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3 max-h-72 overflow-y-auto">
+              {[{
+                text: 'Review all active blocks before authorizing new maintenance windows on TR-02.',
+                level: 'note',
+              }, {
+                text: 'Train conflict detection active — 2 trains flagged for potential delay on NGP–AK section.',
+                level: 'warning',
+              }, {
+                text: 'Block overrun threshold exceeded on TR-04. Notify Engineering department.',
+                level: 'critical',
+              }].map((adv, i) => (
+                <div
+                  key={i}
+                  className={clsx(
+                    'p-4 rounded-xl border text-[13px] leading-relaxed',
+                    adv.level === 'critical' ? 'bg-red-50/60 border-red-100' :
+                    adv.level === 'warning' ? 'bg-amber-50/60 border-amber-100' :
+                    'bg-blue-50/40 border-blue-100'
+                  )}
+                >
+                  {adv.text}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Selected event detail — full recovery workspace */}
         {selectedEvent && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left: Impact + Recovery workflow */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-7 space-y-5">
               {/* Impact */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
-                  Impact Assessment
-                </h3>
+              <div className="irctc-card">
+                <h3 className="irctc-card-title mb-5">Impact Assessment</h3>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   {[
                     { label: 'Trains Affected', value: selectedEvent.systemImpact.trainsAffected, color: 'text-red-700', bg: 'bg-red-50 border-red-100' },
@@ -238,22 +299,22 @@ export default function Live() {
                     { label: 'Route Recalcs', value: selectedEvent.systemImpact.routeRecalculations, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-100' },
                     { label: 'Safety Violations', value: selectedEvent.systemImpact.safetyViolations, color: 'text-green-700', bg: 'bg-green-50 border-green-100' },
                   ].map(item => (
-                    <div key={item.label} className={clsx('border rounded-lg p-3 flex items-center justify-between', item.bg)}>
-                      <span className="text-[11px] font-semibold text-gray-700">{item.label}</span>
-                      <span className={clsx('font-bold text-[16px]', item.color)}>{item.value}</span>
+                    <div key={item.label} className={clsx('border rounded-xl p-4 flex items-center justify-between', item.bg)}>
+                      <span className="text-[13px] font-semibold text-irctc-text">{item.label}</span>
+                      <span className={clsx('font-bold text-[20px]', item.color)}>{item.value}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Affected trains list */}
-                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Affected Trains</h4>
-                <div className="space-y-1.5">
+                <h4 className="irctc-label mb-3 mt-4">Affected Trains</h4>
+                <div className="space-y-2">
                   {selectedEvent.affectedTrains.map((tNum, idx) => {
                     const isFirst = idx === 0;
                     return (
-                      <div key={tNum} className="flex items-center justify-between p-2.5 bg-gray-50 border border-gray-200 rounded text-[11px]">
-                        <span className="font-mono font-bold text-gray-800">{tNum}</span>
-                        <span className={clsx('font-medium', isFirst ? 'text-amber-700' : 'text-gray-600')}>
+                      <div key={tNum} className="flex items-center justify-between p-3 bg-gray-50 border border-irctc-border rounded-lg">
+                        <span className="font-mono font-bold text-irctc-navy text-[14px]">{tNum}</span>
+                        <span className={clsx('text-[13px] font-medium', isFirst ? 'text-amber-700' : 'text-irctc-muted')}>
                           {isFirst ? 'Reroute via alternate path recommended' : 'Wait strategy recommended'}
                         </span>
                         <StatusBadge status={isFirst ? 'DELAYED' : 'ON_TIME'} />
@@ -261,19 +322,19 @@ export default function Live() {
                     );
                   })}
                   {selectedEvent.affectedBlocks.length > 0 && (
-                    <div className="flex items-center justify-between p-2.5 bg-amber-50 border border-amber-200 rounded text-[11px]">
-                      <span className="text-amber-800 font-semibold">Affected Blocks</span>
-                      <span className="font-mono text-amber-700">{selectedEvent.affectedBlocks.join(', ')}</span>
+                    <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                      <span className="text-[13px] font-semibold text-amber-800">Affected Blocks</span>
+                      <span className="font-mono text-[13px] text-amber-700">{selectedEvent.affectedBlocks.join(', ')}</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Recovery Engine */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Recovery Engine</h3>
-                  <span className="text-[10px] font-mono text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">
+              <div className="irctc-card">
+                <div className="flex items-center justify-between mb-5">
+                  <h3 className="irctc-card-title">Recovery Engine</h3>
+                  <span className="text-[12px] font-mono text-irctc-blue bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full font-bold">
                     ALNS + TD-A*
                   </span>
                 </div>
@@ -343,10 +404,10 @@ export default function Live() {
                   <button
                     onClick={handleRunRecovery}
                     disabled={recovering}
-                    className="w-full flex items-center justify-center gap-2 bg-emerald-900 hover:bg-emerald-950 text-white font-bold py-3 rounded-lg text-[13px] transition-colors"
+                    className="irctc-btn irctc-btn-blue w-full justify-center py-3 text-[14px] font-bold"
                   >
                     {recovering ? <RefreshCw className="w-4 h-4 animate-spin" /> : <AlertOctagon className="w-4 h-4" />}
-                    LAUNCH ALNS + A* RECOVERY ENGINE
+                    Launch ALNS + A* Recovery Engine
                   </button>
                 )}
 
@@ -363,10 +424,10 @@ export default function Live() {
             </div>
 
             {/* Right: Timeline + Recovery Plan */}
-            <div className="lg:col-span-5 space-y-4">
+            <div className="lg:col-span-5 space-y-5">
               {/* Timeline */}
-              <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">
+              <div className="irctc-card">
+                <h3 className="irctc-card-title mb-5">
                   Disruption Timeline
                 </h3>
                 <div className="relative space-y-3.5">
@@ -418,13 +479,13 @@ export default function Live() {
 
               {/* Recovery Plan — appears after ALNS runs */}
               {plan && (
-                <div className="bg-white border-2 border-emerald-400 rounded-lg p-5">
-                  <div className="flex items-center justify-between mb-4">
+                <div className="irctc-card border-irctc-blue border-2">
+                  <div className="flex items-center justify-between mb-5">
                     <div>
-                      <h3 className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">New Operating Plan</h3>
-                      <p className="text-[10px] text-gray-400 mt-0.5">Generated by ALNS + Time-Dependent A*</p>
+                      <h3 className="irctc-card-title text-irctc-navy">New Operating Plan</h3>
+                      <p className="text-[12px] text-irctc-muted mt-0.5">Generated by ALNS + Time-Dependent A*</p>
                     </div>
-                    <span className="text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded uppercase">
+                    <span className="irctc-badge bg-amber-50 text-amber-700 border-amber-200">
                       Awaiting Approval
                     </span>
                   </div>
@@ -497,16 +558,16 @@ export default function Live() {
                   </div>
 
                   {plan.status !== 'APPROVED' ? (
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <button
                         onClick={handleReject}
-                        className="flex-1 text-[12px] font-semibold border border-red-200 text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors"
+                        className="irctc-btn irctc-btn-outline flex-1 justify-center py-2.5 text-red-700 border-red-200 hover:bg-red-50"
                       >
                         Reject
                       </button>
                       <button
                         onClick={() => setShowApproveDialog(true)}
-                        className="flex-1 text-[12px] font-bold bg-[#E85D04] hover:bg-[#D05303] text-white py-2.5 rounded-lg transition-colors"
+                        className="irctc-btn irctc-btn-primary flex-1 justify-center py-2.5"
                       >
                         ✓ Approve Plan
                       </button>

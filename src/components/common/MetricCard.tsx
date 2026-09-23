@@ -9,39 +9,66 @@ interface Props {
   trendValue?: string;
   highlight?: boolean;
   danger?: boolean;
+  warning?: boolean;
   icon?: ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-export default function MetricCard({ label, value, sub, trend, trendValue, highlight, danger, icon, className }: Props) {
+export default function MetricCard({
+  label, value, sub, trend, trendValue,
+  highlight, danger, warning, icon, className, onClick
+}: Props) {
   return (
-    <div className={clsx(
-      'bg-white border border-gray-200 rounded p-4',
-      highlight && 'border-l-4 border-l-blue-600',
-      danger && 'border-l-4 border-l-red-500',
-      className
-    )}>
-      <div className="flex items-start justify-between">
-        <div className="min-w-0">
-          <p className="text-[11px] text-gray-500 font-semibold uppercase tracking-wide mb-1 leading-tight">{label}</p>
-          <p className={clsx(
-            'text-2xl font-bold leading-none',
-            highlight ? 'text-blue-700' : danger ? 'text-red-600' : 'text-gray-900'
-          )}>
-            {value}
-          </p>
-          {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
-        </div>
-        {icon && <div className="text-gray-300 flex-shrink-0 ml-2">{icon}</div>}
-      </div>
-      {trendValue && (
+    <div
+      className={clsx(
+        'irctc-card flex items-start gap-4 transition-shadow',
+        onClick && 'cursor-pointer hover:shadow-irctc-md',
+        className
+      )}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
+      {/* Icon area */}
+      {icon && (
         <div className={clsx(
-          'mt-2 flex items-center gap-1 text-xs font-medium',
-          trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-500'
+          'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0',
+          highlight ? 'bg-blue-50 text-irctc-blue'
+          : danger   ? 'bg-red-50 text-red-600'
+          : warning  ? 'bg-orange-50 text-irctc-orange'
+          : 'bg-gray-50 text-gray-500'
         )}>
-          {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendValue}
+          {icon}
         </div>
       )}
+
+      {/* Content */}
+      <div className="min-w-0 flex-1">
+        <p className="irctc-label mb-1.5 truncate">{label}</p>
+        <p className={clsx(
+          'text-[28px] font-bold leading-none',
+          highlight ? 'text-irctc-blue'
+          : danger   ? 'text-red-600'
+          : warning  ? 'text-irctc-orange'
+          : 'text-irctc-navy'
+        )}>
+          {value}
+        </p>
+        {sub && (
+          <p className="text-[12px] text-irctc-muted mt-1.5 leading-snug">{sub}</p>
+        )}
+        {trendValue && (
+          <div className={clsx(
+            'mt-2 flex items-center gap-1 text-[12px] font-semibold',
+            trend === 'up'   ? 'text-green-600'
+            : trend === 'down' ? 'text-red-600'
+            : 'text-irctc-muted'
+          )}>
+            {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendValue}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -24,7 +24,7 @@ function MiniBarChart() {
             <span style={{ fontSize: '0.55rem', fontWeight: 700, color: '#122A1F', marginBottom: 2 }}>{b.value}%</span>
             <div style={{
               width: '100%', height: (b.value / max) * 55,
-              background: '#1B6B45', borderRadius: '3px 3px 0 0', opacity: 0.75,
+              background: '#082b71', borderRadius: '3px 3px 0 0', opacity: 0.75,
               minHeight: 4,
             }} />
             <span style={{ fontSize: '0.5rem', color: '#5A7A6C', marginTop: 3, fontWeight: 600 }}>{b.label}</span>
@@ -39,7 +39,7 @@ function MiniBarChart() {
 function DonutChart() {
   const total = 744;
   const segments = [
-    { label: 'On Time', value: 684, color: '#1B6B45' },
+    { label: 'On Time', value: 684, color: '#082b71' },
     { label: 'Delayed', value: 48, color: '#D97706' },
     { label: 'Cancelled', value: 12, color: '#EF4444' },
   ];
@@ -104,7 +104,7 @@ function MiniCorridorMap() {
     { from: 'Kolkata', to: 'Chennai', status: 'conflict' },
   ];
   const statusColors: Record<string, string> = {
-    available: '#1B6B45',
+    available: '#082b71',
     planned: '#D97706',
     maintenance: '#EF4444',
     conflict: '#7C3AED',
@@ -134,7 +134,7 @@ function MiniCorridorMap() {
           {/* Cities */}
           {cities.map((c) => (
             <g key={c.name}>
-              <circle cx={c.x} cy={c.y} r="4" fill="#1B6B45" stroke="#fff" strokeWidth="1.5" />
+              <circle cx={c.x} cy={c.y} r="4" fill="#082b71" stroke="#fff" strokeWidth="1.5" />
               <text x={c.x} y={c.y + 10} textAnchor="middle" fill="#5A7A6C" fontSize="4.5" fontWeight="600">
                 {c.name}
               </text>
@@ -162,7 +162,7 @@ function MiniCorridorMap() {
       {/* Legend */}
       <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
         {[
-          { label: 'Available', color: '#1B6B45' },
+          { label: 'Available', color: '#082b71' },
           { label: 'Planned', color: '#D97706' },
           { label: 'Maintenance', color: '#EF4444' },
           { label: 'Conflict', color: '#7C3AED' },
@@ -188,7 +188,7 @@ function ConflictsList() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
         <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#122A1F' }}>Upcoming Conflicts</div>
-        <span style={{ fontSize: '0.55rem', color: '#1B6B45', fontWeight: 600, cursor: 'pointer' }}>View All →</span>
+        <span style={{ fontSize: '0.55rem', color: '#082b71', fontWeight: 600, cursor: 'pointer' }}>View All →</span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {conflicts.map((c) => (
@@ -245,7 +245,7 @@ function SparklineChart() {
           {[
             { label: 'High', color: '#EF4444' },
             { label: 'Medium', color: '#D97706' },
-            { label: 'Low', color: '#1B6B45' },
+            { label: 'Low', color: '#082b71' },
           ].map((l) => (
             <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: l.color }} />
@@ -263,7 +263,7 @@ function SparklineChart() {
         {/* Lines */}
         <path d={toPath('high')} fill="none" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
         <path d={toPath('med')} fill="none" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" />
-        <path d={toPath('low')} fill="none" stroke="#1B6B45" strokeWidth="1.5" strokeLinecap="round" />
+        <path d={toPath('low')} fill="none" stroke="#082b71" strokeWidth="1.5" strokeLinecap="round" />
         {/* X labels */}
         {days.map((d, i) => (
           <text key={d} x={px + (i / (days.length - 1)) * chartW} y={h - 1}
