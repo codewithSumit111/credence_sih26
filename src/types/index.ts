@@ -116,6 +116,12 @@ export interface OptimizedBlock {
   approvedAt?: string;
   assetBenefit: 'High' | 'Medium' | 'Low';
   operationalImpact: 'High' | 'Medium' | 'Low';
+  advantages?: string[];
+  tradeoffs?: string[];
+  constraintStatus?: { hard: string[]; soft: string[] };
+  scoreBreakdown?: { label: string; value: number; weight: number }[];
+  score?: number;
+  utilization?: number;
 }
 
 export interface AffectedTrain {
@@ -132,11 +138,17 @@ export interface BlockResources {
 }
 
 export interface BlockAlternative {
+  id?: string;
   label: string;
   startTime: string;
   endTime: string;
   delay: number;
   recommended: boolean;
+  advantages?: string[];
+  tradeoffs?: string[];
+  score?: number;
+  utilization?: number;
+  reasoning?: string[];
 }
 
 // ============================================================
@@ -235,6 +247,27 @@ export interface AuditEntry {
   type: 'SYSTEM' | 'USER';
 }
 
+export interface DecisionHistoryEntry {
+  decisionId: string;
+  planId: string;
+  timestamp: string;
+  action: string;
+  modifiedFields?: { field: string; previousValue: string; newValue: string }[];
+  userRole: string;
+  status: string;
+}
+
+export interface SimulationEvent {
+  simulationId: string;
+  eventType: EventType;
+  timestamp: string;
+  trackId: string;
+  assetId?: string;
+  severity: EventSeverity;
+  estimatedDuration: number;
+  status: 'PENDING' | 'INJECTED' | 'RECOVERED';
+}
+
 // ============================================================
 // ANALYTICS
 // ============================================================
@@ -252,6 +285,20 @@ export interface AnalyticsData {
   blockUtilizationTrend: TrendPoint[];
   disruptions: DisruptionRecord[];
   maintenanceCompletion: number;
+  
+  baselineBlockHours?: number;
+  optimizedBlockHours?: number;
+  baselineDelay?: number;
+  optimizedDelay?: number;
+  baselineMaintenanceCompleted?: number;
+  optimizedMaintenanceCompleted?: number;
+  baselineBundled?: number;
+  optimizedBundled?: number;
+  baselineResourceUtil?: number;
+  optimizedResourceUtil?: number;
+  planningTimeManual?: number; // minutes
+  planningTimeOptimized?: number; // seconds
+  decisionLatency?: number; // seconds
 }
 
 export interface DeptBlockHours {
