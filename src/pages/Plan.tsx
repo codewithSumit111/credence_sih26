@@ -8,12 +8,15 @@ import {
   Check, Lock, ChevronUp
 } from 'lucide-react';
 import Drawer from '../components/common/Drawer';
-import ExplainabilityPanel from '../components/blocks/ExplainabilityPanel';
+import DecisionRecommendationPanel from '../components/blocks/DecisionRecommendationPanel';
+import DecisionHistory from '../components/blocks/DecisionHistory';
 import StatusBadge from '../components/common/StatusBadge';
 import PriorityBadge from '../components/common/PriorityBadge';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
 import { priorityApi, blocksApi, approvalsApi } from '../api';
-import type { MaintenanceJob, BlockRequest } from '../types';
+import type { MaintenanceJob, BlockRequest, OptimizedBlock } from '../types';
+import { mockDecisionHistory } from '../data/mockData';
+
 
 // ─── Block data ───────────────────────────────────────────────────────────────
 interface BlockItem {
@@ -30,6 +33,7 @@ interface BlockItem {
   priority: 'HIGH' | 'MEDIUM' | 'LOW';
   status: 'AI-OPTIMIZED' | 'PROPOSED' | 'APPROVED' | 'PROVISIONAL' | 'DEMANDED';
   affectedTrains: number;
+  rawBlock: OptimizedBlock;
 }
 
 // No hardcoded blocks — all data comes from /api/blocks
@@ -146,149 +150,47 @@ function BlockGantt({ blocks, selectedId, onSelect }: { blocks: BlockItem[]; sel
 }
 
 // ─── Block Detail Drawer content ──────────────────────────────────────────────
-function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: BlockItem; onApprove: () => void; onReject: () => void; onModify: () => void }) {
-  const [showOptDetails, setShowOptDetails] = useState(false);
+function BlockDetailContent({ block, onApprove, onReject, onModify }: { block: BlockItem; onApprove: (altId?: string) => void; onReject: () => void; onModify: () => void }) {
+  const fullBlock = block.rawBlock;
+  const alternatives = fullBlock.alternatives || [];
+  const [selectedAltId, setSelectedAltId] = useState<string | undefined>(alternatives.find(a => a.recommended)?.id);
 
-  const blockJobs = ((block as any).jobDetails?.length > 0)
-    ? (block as any).jobDetails
-    : ((block as any).jobIds || []).map((jid: string) => ({ id: jid, maintenanceType: 'Maintenance Job', department: 'Engineering', asset: jid, requiredManpower: 5, machinery: 'Standard', priorityScore: 'N/A', notes: '', estimatedDuration: 90, dueDate: 'N/A' }));
-
-  const reasons = (block as any).whyThisSlot || [
-    'Compatible maintenance — same track section',
-    'Timing compatible with train schedule gaps',
-    'Safety buffer requirements satisfied',
-    'No resource conflict detected',
-    `${block.affectedTrains > 0 ? block.affectedTrains + ' train(s) affected — rerouting options available' : 'No train conflicts detected'}`,
-  ];
-
-  const canApprove = block.status === 'AI-OPTIMIZED' || block.status === 'PROPOSED';
+  const activeAlternative = alternatives.find(a => a.id === selectedAltId);
+  const history = mockDecisionHistory.filter(h => h.planId === fullBlock.id).length > 0 
+    ? mockDecisionHistory.filter(h => h.planId === fullBlock.id)
+    : mockDecisionHistory; // fallback to show demo data
 
   return (
-    <div className="space-y-4 text-[12px]">
-      {/* Header info */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-mono font-bold text-[16px] text-gray-900">{block.id}</h2>
-            <StatusBadge status={block.status} size="md" />
-          </div>
-          <p className="text-gray-500">{block.track} · {block.section}</p>
-          <p className="font-mono font-semibold text-gray-700 mt-0.5">{block.startTime} - {block.endTime} · {block.duration} min</p>
-        </div>
-      </div>
-
-      {/* Status */}
-      <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg text-amber-900 text-[11px] font-medium">
-        Status: {block.status === 'APPROVED' ? 'Approved and committed to the schedule.' : 'Awaiting human approval before this possession can be activated.'}
-      </div>
-
-      {/* Jobs */}
-      <div>
-        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Jobs Included ({blockJobs.length})</h4>
-        <div className="space-y-2">
-          {blockJobs.map((job: any, i: number) => (
-            <div key={i} className="p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <span className={clsx('w-2 h-2 rounded-full', DEPT_COLORS[job.department?.slice(0, 3) || 'Eng'] || 'bg-gray-400')} />
-                <span className="font-bold text-gray-800">{job.maintenanceType}</span>
-                <span className="font-mono text-gray-500 ml-auto bg-gray-100 px-1.5 py-0.5 rounded text-[10px]">{job.id}</span>
-              </div>
-              <p className="text-gray-500 text-[10px] ml-4 mb-2">{job.department} · Asset: {job.asset}</p>
-              
-              <div className="grid grid-cols-2 gap-2 bg-white border border-gray-100 rounded p-2 ml-4">
-                <div className="border-r border-gray-100 pr-2">
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1">Requested</p>
-                  <p className="text-[10px] text-gray-600">Due: {job.dueDate || job.preferredDate || 'Flexible'}</p>
-                  <p className="text-[10px] text-gray-600">Dur: {job.estimatedDuration || job.requestedDuration || block.duration} min</p>
-                </div>
-                <div className="pl-2">
-                  <p className="text-[9px] font-bold text-blue-600 uppercase tracking-wider mb-1">Approved</p>
-                  <p className="text-[10px] text-gray-600">Win: {block.startTime}-{block.endTime}</p>
-                  <p className="text-[10px] text-gray-600">Dur: {block.duration} min</p>
-                </div>
-              </div>
-            </div>
+    <div className="space-y-6">
+      {/* Plan Alternatives Tabs */}
+      {alternatives.length > 0 && (
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          {alternatives.map(alt => (
+            <button
+              key={alt.id}
+              onClick={() => setSelectedAltId(alt.id)}
+              className={clsx(
+                "flex-1 py-2 text-[11px] font-bold rounded-md transition-colors",
+                selectedAltId === alt.id ? "bg-white text-blue-700 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              )}
+            >
+              {alt.label} {alt.recommended && '⭐'}
+            </button>
           ))}
-        </div>
-      </div>
-
-      {/* Resources */}
-      <div>
-        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Resources</h4>
-        <div className="flex gap-3">
-          <div className="flex-1 p-2.5 bg-gray-50 border border-gray-200 rounded text-center">
-            <Users className="w-3.5 h-3.5 mx-auto text-gray-400 mb-1" />
-            <p className="font-bold text-gray-800">11</p>
-            <p className="text-[10px] text-gray-400">Workers</p>
-          </div>
-          <div className="flex-1 p-2.5 bg-gray-50 border border-gray-200 rounded text-center">
-            <Settings className="w-3.5 h-3.5 mx-auto text-gray-400 mb-1" />
-            <p className="font-bold text-gray-800">2</p>
-            <p className="text-[10px] text-gray-400">Machines</p>
-          </div>
-          <div className="flex-1 p-2.5 bg-gray-50 border border-gray-200 rounded text-center">
-            <Clock className="w-3.5 h-3.5 mx-auto text-gray-400 mb-1" />
-            <p className="font-bold text-gray-800">+6 min</p>
-            <p className="text-[10px] text-gray-400">Est. delay</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Why this block */}
-      <div>
-        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Why This Block?</h4>
-        <div className="space-y-1.5">
-          {reasons.map((r: string, i: number) => (
-            <div key={i} className="flex items-center gap-2 text-gray-600">
-              <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
-              {r}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Optimization Details (expandable) */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
-        <button
-          onClick={() => setShowOptDetails(!showOptDetails)}
-          className="w-full flex items-center justify-between p-3 bg-gray-50 text-[11px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          <span>Optimization Details (CP-SAT)</span>
-          {showOptDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
-        {showOptDetails && (
-          <div className="p-3 space-y-1.5 text-[11px] text-gray-600">
-            <p className="font-semibold text-gray-700 mb-1.5">Hard Constraints Satisfied:</p>
-            {['Track availability verified', 'Safety buffer applied (5 min)', 'Resource availability confirmed', 'No maintenance dependency violations', 'Train conflict minimized'].map((c, i) => (
-              <div key={i} className="flex items-center gap-2"><Check className="w-3 h-3 text-green-500" />{c}</div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Actions */}
-      {canApprove && (
-        <div className="flex gap-2 pt-2">
-          <button
-            onClick={onModify}
-            className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2.5 rounded-lg transition-colors"
-          >
-            Modify
-          </button>
-          <button
-            onClick={onReject}
-            className="flex-1 text-[12px] font-semibold border border-red-200 text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors"
-          >
-            Reject
-          </button>
-          <button
-            onClick={onApprove}
-            className="flex-2 text-[12px] font-bold bg-[#E85D04] hover:bg-blue-900 text-white py-2.5 px-4 rounded-lg transition-colors"
-          >
-            ✓ Approve Block
-          </button>
         </div>
       )}
+
+      {/* Decision Recommendation Panel */}
+      <DecisionRecommendationPanel
+        block={fullBlock}
+        alternative={activeAlternative}
+        onApprove={() => onApprove(selectedAltId)}
+        onModify={onModify}
+        onReject={onReject}
+      />
+
+      {/* Decision History log */}
+      <DecisionHistory history={history} />
     </div>
   );
 }
@@ -425,6 +327,7 @@ const mapApiBlockToBlockItem = (b: any): BlockItem => ({
   priority: (b.priorityScore > 0.5 ? 'HIGH' : b.priorityScore > 0.3 ? 'MEDIUM' : 'LOW'),
   status: b.status || 'AI-OPTIMIZED',
   affectedTrains: b.trainImpact ? (b.trainImpact > 0 ? 1 : 0) : (b.affectedTrains?.length || 0),
+  rawBlock: b as OptimizedBlock,
 });
 
 export default function Plan() {
@@ -909,7 +812,11 @@ export default function Plan() {
         {selectedBlock && (
           <BlockDetailContent
             block={selectedBlock}
-            onApprove={() => setShowApproveDialog(true)}
+            onApprove={(altId) => {
+              // Optionally log the selected plan alternative
+              console.log(`Approving with alternative ${altId}`);
+              setShowApproveDialog(true);
+            }}
             onReject={() => handleRejectBlock(selectedBlock)}
             onModify={() => handleModifyBlock(selectedBlock)}
           />

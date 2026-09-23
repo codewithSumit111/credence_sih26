@@ -10,6 +10,7 @@ import StatusBadge from '../components/common/StatusBadge';
 import LoadingState from '../components/common/LoadingState';
 import { eventsApi, reoptimizationApi } from '../api';
 import type { LiveEvent, ReoptimizationPlan } from '../types';
+import DisruptionSimulator from '../components/live/DisruptionSimulator';
 
 // ─── Recovery workflow step indicator ─────────────────────────────────────────
 const WORKFLOW_STEPS = ['EVENT', 'IMPACT', 'ALNS', 'A*', 'NEW PLAN', 'APPROVE'] as const;
@@ -144,6 +145,16 @@ export default function Live() {
     setRecovering(false);
   };
 
+  const handleInjectEvent = (newEvent: LiveEvent) => {
+    setEvents([newEvent, ...events]);
+    setSelectedEvent(newEvent);
+    setRecoveryStep(0);
+    setPlan(null);
+    toast.warning('Disruption Injected', {
+      description: `${newEvent.title} has been simulated on ${newEvent.location}.`
+    });
+  };
+
   const handleApprove = async () => {
     if (!plan) return;
     setActionLoading(true);
@@ -244,9 +255,12 @@ export default function Live() {
             </div>
           </div>
 
-          {/* Right: Operational Advisories */}
-          <div className="irctc-card">
-            <div className="flex items-center justify-between mb-5">
+          {/* Right: Operational Advisories & Simulator */}
+          <div className="space-y-6">
+            <DisruptionSimulator onInject={handleInjectEvent} />
+            
+            <div className="irctc-card">
+              <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-blue-50 text-irctc-blue flex items-center justify-center">
                   <AlertOctagon className="w-5 h-5" />
@@ -281,6 +295,7 @@ export default function Live() {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </div>
 

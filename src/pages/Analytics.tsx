@@ -311,6 +311,68 @@ export default function Analytics() {
         <MetricCard label="JOBS COMPLETED" value="126" trend="up" trendValue="87.3% closure rate" icon={<CheckCircle className="w-5 h-5" />} />
       </div>
 
+      {/* Baseline vs Optimized Comparison */}
+      <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+            Algorithm Performance: Baseline vs Optimized
+          </h3>
+          <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            CP-SAT Optimization
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-[12px] text-left">
+            <thead>
+              <tr className="border-b border-gray-200 text-gray-400">
+                <th className="py-2.5 font-semibold">Metric</th>
+                <th className="py-2.5 font-semibold">Baseline (Manual)</th>
+                <th className="py-2.5 font-semibold font-bold text-blue-900">Optimized (AI)</th>
+                <th className="py-2.5 font-semibold text-right">Improvement</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Total Block Hours</td>
+                <td className="py-3 text-gray-700">{data.baselineBlockHours} hrs</td>
+                <td className="py-3 font-bold text-blue-900">{data.optimizedBlockHours} hrs</td>
+                <td className="py-3 text-right text-green-700 font-bold">-{(data.baselineBlockHours! - data.optimizedBlockHours!) / data.baselineBlockHours! * 100 | 0}%</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Total Train Delay</td>
+                <td className="py-3 text-gray-700">{data.baselineDelay} min</td>
+                <td className="py-3 font-bold text-blue-900">{data.optimizedDelay} min</td>
+                <td className="py-3 text-right text-green-700 font-bold">-{(data.baselineDelay! - data.optimizedDelay!) / data.baselineDelay! * 100 | 0}%</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Jobs Completed</td>
+                <td className="py-3 text-gray-700">{data.baselineMaintenanceCompleted}</td>
+                <td className="py-3 font-bold text-blue-900">{data.optimizedMaintenanceCompleted}</td>
+                <td className="py-3 text-right text-green-700 font-bold">+{(data.optimizedMaintenanceCompleted! - data.baselineMaintenanceCompleted!) / data.baselineMaintenanceCompleted! * 100 | 0}%</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Bundled Jobs</td>
+                <td className="py-3 text-gray-700">{data.baselineBundled}</td>
+                <td className="py-3 font-bold text-blue-900">{data.optimizedBundled}</td>
+                <td className="py-3 text-right text-green-700 font-bold">+{(data.optimizedBundled! - data.baselineBundled!) / data.baselineBundled! * 100 | 0}%</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Resource Utilization</td>
+                <td className="py-3 text-gray-700">{data.baselineResourceUtil}%</td>
+                <td className="py-3 font-bold text-blue-900">{data.optimizedResourceUtil}%</td>
+                <td className="py-3 text-right text-green-700 font-bold">+{data.optimizedResourceUtil! - data.baselineResourceUtil!}%</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="py-3 font-semibold text-gray-900">Planning Time</td>
+                <td className="py-3 text-gray-700">{data.planningTimeManual} min</td>
+                <td className="py-3 font-bold text-blue-900">{data.planningTimeOptimized} sec</td>
+                <td className="py-3 text-right text-green-700 font-bold">99% faster</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Block Hours by Department */}

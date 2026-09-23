@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Bell, AlertTriangle, Shield, Layers, Info } from 'lucide-react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { clsx } from 'clsx';
 
@@ -14,9 +14,28 @@ const navLinks = [
   { path: '/field',   label: 'FIELD' },
 ];
 
+const MOCK_NOTIFICATIONS = [
+  { id: 1, type: 'CRITICAL', title: 'Track Failure Detected', detail: 'TR-02 near km 112. Immediate attention required.', time: 'Just now', link: '/live', icon: AlertTriangle, color: 'text-red-600 bg-red-50' },
+  { id: 2, type: 'ACTION REQUIRED', title: 'Block BR-00231 Optimized', detail: 'Pending controller approval for tomorrow\'s possession.', time: '12m ago', link: '/plan?view=blocks', icon: Layers, color: 'text-amber-600 bg-amber-50' },
+  { id: 3, type: 'SYSTEM', title: 'TMS Sync Completed', detail: 'Live train positions updated successfully.', time: '25m ago', link: '/command', icon: Info, color: 'text-blue-600 bg-blue-50' },
+  { id: 4, type: 'WARNING', title: 'Train 12003 Delayed', detail: 'Projected +18 min delay due to maintenance block.', time: '1h ago', link: '/trains', icon: Shield, color: 'text-orange-600 bg-orange-50' },
+];
+
 export default function TopBar() {
   const [time, setTime] = useState(new Date());
+  const [showNotifications, setShowNotifications] = useState(false);
   const location = useLocation();
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -75,15 +94,45 @@ export default function TopBar() {
       {/* ── Right: Tools ── */}
       <div className="flex items-center gap-3 flex-shrink-0">
         {/* Alerts Bell */}
-        <Link
-          to="/live"
-          className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
-          title="Alerts"
-          aria-label="View alerts"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-irctc-orange rounded-full border-2 border-irctc-blue" />
-        </Link>
+        <div className="relative" ref={notifRef}>
+          <button
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="relative p-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
+            title="Alerts"
+            aria-label="View alerts"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-irctc-orange rounded-full border-2 border-irctc-blue" />
+          </button>
+
+          {showNotifications && (
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+              <div className="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+                <p className="text-[11px] font-bold text-gray-600 uppercase tracking-wider">Notifications</p>
+                <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">4 New</span>
+              </div>
+              <div className="divide-y divide-gray-50 max-h-[300px] overflow-y-auto">
+                {MOCK_NOTIFICATIONS.map(notif => (
+                  <Link
+                    key={notif.id}
+                    to={notif.link}
+                    onClick={() => setShowNotifications(false)}
+                    className="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className={clsx('w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0', notif.color)}>
+                      <notif.icon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[12px] font-bold text-gray-900 leading-tight">{notif.title}</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{notif.detail}</p>
+                      <p className="text-[9px] text-gray-400 mt-1">{notif.time} · <span className="font-semibold">{notif.type}</span></p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Date / Time */}
         <div className="hidden sm:flex flex-col items-end leading-tight text-right text-blue-200 border-l border-white/20 pl-3 whitespace-nowrap">
