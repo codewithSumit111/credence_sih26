@@ -13,6 +13,13 @@ const REPORT_TYPES = [
   { id: 'disruption', label: 'Disruption Recovery Report' },
   { id: 'performance', label: 'Management Performance Report' },
   { id: 'corridor', label: 'Section / Corridor Report' },
+  // BDMS Report Types
+  { id: 'traffic_block_status', label: 'Traffic Block Status' },
+  { id: 'rolling_block_program', label: 'Rolling Block Program' },
+  { id: 'integrated_blocks', label: 'Integrated Blocks - No Associated Block Demanded' },
+  { id: 'approved_not_granted', label: 'Approved but Not Granted' },
+  { id: 'extended_blocks', label: 'Extended Blocks' },
+  { id: 'spilled_over_burst_blocks', label: 'Spilled Over/Burst Blocks' },
 ];
 
 export default function ReportGeneratorModal() {

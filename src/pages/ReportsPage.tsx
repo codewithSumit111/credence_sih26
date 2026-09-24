@@ -183,6 +183,61 @@ const REPORT_PRESETS = [
     icon: TrendingUp,
     color: 'purple',
     defaultFormat: 'excel'
+  },
+  // BDMS Report Types
+  {
+    id: 'traffic_block_status',
+    title: 'Traffic Block Status',
+    desc: 'Show the status of traffic blocks including start/end times and duration.',
+    category: 'Operational Field Report',
+    icon: FileText,
+    color: 'emerald',
+    defaultFormat: 'pdf'
+  },
+  {
+    id: 'rolling_block_program',
+    title: 'Rolling Block Program',
+    desc: 'Rolling block period, start/end dates, department, and status.',
+    category: 'Operational Field Report',
+    icon: Calendar,
+    color: 'blue',
+    defaultFormat: 'pdf'
+  },
+  {
+    id: 'integrated_blocks',
+    title: 'Integrated Blocks - No Associated Block Demanded',
+    desc: 'Integrated block details, associated block status, and start/end times.',
+    category: 'Operational Field Report',
+    icon: Radio,
+    color: 'amber',
+    defaultFormat: 'pdf'
+  },
+  {
+    id: 'approved_not_granted',
+    title: 'Approved but Not Granted',
+    desc: 'Blocks approved but not granted, including reason and requested date.',
+    category: 'Operational Field Report',
+    icon: CheckCircle2,
+    color: 'purple',
+    defaultFormat: 'excel'
+  },
+  {
+    id: 'extended_blocks',
+    title: 'Extended Blocks',
+    desc: 'Original and extended start/end times, extension duration, and reason.',
+    category: 'Operational Field Report',
+    icon: Clock,
+    color: 'emerald',
+    defaultFormat: 'excel'
+  },
+  {
+    id: 'spilled_over_burst_blocks',
+    title: 'Spilled Over/Burst Blocks',
+    desc: 'Planned vs actual end, spill-over duration, and reason.',
+    category: 'Operational Field Report',
+    icon: AlertTriangle,
+    color: 'amber',
+    defaultFormat: 'excel'
   }
 ];
 
@@ -191,10 +246,27 @@ export default function ReportsPage() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Custom Generator State
+  const [selectedOperationalReport, setSelectedOperationalReport] = useState(REPORT_PRESETS[0].id);
   const [selectedPreset, setSelectedPreset] = useState('daily_block');
   const [corridorScope, setCorridorScope] = useState('NGP-BSL');
   const [dateRange, setDateRange] = useState('today');
+  
+  // BDMS Custom Report Filters
+  const [railway, setRailway] = useState('Central Railway');
+  const [division, setDivision] = useState('Nagpur');
+  const [demandFromDate, setDemandFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [subSection, setSubSection] = useState('');
+  const [blockSectionLeft, setBlockSectionLeft] = useState('');
+  const [blockSectionRight, setBlockSectionRight] = useState('');
+  const [station, setStation] = useState('');
+  const [demandedBy, setDemandedBy] = useState('');
+  const [rollingBlock, setRollingBlock] = useState('');
+  const [reasonCode, setReasonCode] = useState('');
+  const [status, setStatus] = useState('Demanded');
+  const [shadowBlock, setShadowBlock] = useState('No');
+  const [organization, setOrganization] = useState('Engineering');
+  
   const [exportFormat, setExportFormat] = useState<'pdf' | 'excel' | 'csv'>('pdf');
   const [includeExplanations, setIncludeExplanations] = useState(true);
   const [includeDelays, setIncludeDelays] = useState(true);
@@ -347,66 +419,78 @@ export default function ReportsPage() {
 
       <div className="max-w-[1500px] mx-auto px-7 py-6 space-y-6">
 
-        {/* ── SECTION 1: Standard Operational Reports (Click to Get) ────────── */}
+        {/* ── SECTION 1: Operational Field Reports & Standards ────────── */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-[13px] font-bold text-gray-800 uppercase tracking-wider">
-                Instant Operational Reports
+                Operational Field Reports
               </h2>
               <p className="text-[11px] text-gray-500">One-click exports calibrated for DRM, Section Controllers, and Safety Officers</p>
             </div>
             <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md">
-              4 Core Templates Ready
+              {REPORT_PRESETS.length} Templates Ready
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {REPORT_PRESETS.map(preset => {
-              const Icon = preset.icon;
+          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm max-w-2xl">
+            {(() => {
+              const activePreset = REPORT_PRESETS.find(p => p.id === selectedOperationalReport) || REPORT_PRESETS[0];
+              const Icon = activePreset.icon;
               return (
-                <div
-                  key={preset.id}
-                  className="bg-white border border-gray-200 hover:border-emerald-300 rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
-                >
+                <div className="flex flex-col gap-5">
                   <div>
-                    <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
-                        {preset.category}
-                      </span>
-                      <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-blue-50 text-gray-600 group-hover:text-blue-700 flex items-center justify-center transition-colors">
-                        <Icon className="w-4 h-4" />
-                      </div>
-                    </div>
-                    <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-blue-800 transition-colors mb-1.5">
-                      {preset.title}
-                    </h3>
-                    <p className="text-[11.5px] text-gray-500 leading-relaxed line-clamp-3 mb-4">
-                      {preset.desc}
-                    </p>
+                    <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-2">
+                      Select Report Template
+                    </label>
+                    <select
+                      value={selectedOperationalReport}
+                      onChange={e => setSelectedOperationalReport(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[13px] font-medium text-gray-900 outline-none"
+                    >
+                      {REPORT_PRESETS.map(preset => (
+                        <option key={preset.id} value={preset.id}>
+                          {preset.title}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 flex items-center gap-2">
+                  <div className="bg-gray-50 border border-gray-100 rounded-lg p-4 flex gap-4 items-start">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex flex-shrink-0 items-center justify-center">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100/50 px-2 py-0.5 rounded mb-1.5 inline-block">
+                        {activePreset.category}
+                      </span>
+                      <p className="text-[12px] text-gray-600 leading-relaxed mt-1">
+                        {activePreset.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center gap-3">
                     <button
-                      onClick={() => handleQuickDownload(preset.id, 'pdf')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-[#E85D04] hover:bg-[#D05303] text-white text-[11px] font-bold py-2 rounded-lg transition-colors shadow-xs"
+                      onClick={() => handleQuickDownload(activePreset.id, 'pdf')}
+                      className="flex-1 flex items-center justify-center gap-2 bg-[#E85D04] hover:bg-[#D05303] text-white text-[12px] font-bold py-2.5 rounded-lg transition-colors shadow-sm"
                       title="Download PDF"
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      PDF
+                      <Download className="w-4 h-4" />
+                      Download PDF
                     </button>
                     <button
-                      onClick={() => handleQuickDownload(preset.id, 'excel')}
-                      className="flex-1 flex items-center justify-center gap-1.5 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-800 border border-gray-200 hover:border-emerald-300 text-[11px] font-bold py-2 rounded-lg transition-colors"
+                      onClick={() => handleQuickDownload(activePreset.id, 'excel')}
+                      className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-800 border border-gray-200 hover:border-blue-300 text-[12px] font-bold py-2.5 rounded-lg transition-colors"
                       title="Download Excel Spreadsheet"
                     >
-                      <FileSpreadsheet className="w-3.5 h-3.5" />
-                      Excel
+                      <FileSpreadsheet className="w-4 h-4" />
+                      Download Excel
                     </button>
                   </div>
                 </div>
               );
-            })}
+            })()}
           </div>
         </div>
 
@@ -427,78 +511,193 @@ export default function ReportsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* 1. Report Template */}
-            <div>
-              <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-2">
-                1. Report Template
-              </label>
-              <select
-                value={selectedPreset}
-                onChange={e => setSelectedPreset(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
-              >
-                <option value="daily_block">Daily Integrated Block Plan</option>
-                <option value="train_impact">Train Impact & Rerouting Audit</option>
-                <option value="disruption">Disruption & Recovery Incident Log</option>
-                <option value="corridor">Corridor Asset Availability Dossier</option>
-              </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            {/* Left Column */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Report Type</label>
+                <select value={selectedPreset} onChange={e => setSelectedPreset(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  {REPORT_PRESETS.map(preset => (
+                    <option key={preset.id} value={preset.id}>{preset.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Railway</label>
+                <select value={railway} onChange={e => setRailway(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="Central Railway">Central Railway</option>
+                  <option value="Western Railway">Western Railway</option>
+                  <option value="Northern Railway">Northern Railway</option>
+                  <option value="Southern Railway">Southern Railway</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Date / Window</label>
+                  <select value={dateRange} onChange={e => setDateRange(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                    <option value="today">Today</option>
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="mtd">Month-to-Date</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Demand From Date</label>
+                  <input type="date" value={demandFromDate} onChange={e => setDemandFromDate(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Corridor Scope</label>
+                <select value={corridorScope} onChange={e => setCorridorScope(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="NGP-BSL">NGP–BSL Main Line</option>
+                  <option value="WR-BD">Wardha–Badnera</option>
+                  <option value="NGP-YARD">Nagpur Junction Yard</option>
+                  <option value="ALL-DIV">All Nagpur Division</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Sub Section</label>
+                <select value={subSection} onChange={e => setSubSection(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="">-- Select --</option>
+                  <option value="NGP-WR">NGP-WR</option>
+                  <option value="WR-BD">WR-BD</option>
+                  <option value="AK-BD">AK-BD</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Block Section</label>
+                <select value={blockSectionLeft} onChange={e => setBlockSectionLeft(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="">-- Select --</option>
+                  <option value="BS-1">Block Section 1</option>
+                  <option value="BS-2">Block Section 2</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Demanded By</label>
+                <select value={demandedBy} onChange={e => setDemandedBy(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="">-- Select --</option>
+                  <option value="SSE/PWay">SSE/PWay</option>
+                  <option value="SSE/Sig">SSE/Sig</option>
+                  <option value="SSE/TRD">SSE/TRD</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Rolling Block (Period)</label>
+                  <select value={rollingBlock} onChange={e => setRollingBlock(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                    <option value="">-- Select --</option>
+                    <option value="Week 1">Week 1</option>
+                    <option value="Week 2">Week 2</option>
+                    <option value="Month 1">Month 1</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Reason Code</label>
+                  <select value={reasonCode} onChange={e => setReasonCode(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                    <option value="">-- Select --</option>
+                    <option value="RC01">RC01 - Track Maintenance</option>
+                    <option value="RC02">RC02 - OHE Repair</option>
+                    <option value="RC03">RC03 - Signal Failure</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            {/* 2. Corridor Scope */}
-            <div>
-              <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-2">
-                2. Target Corridor Scope
-              </label>
-              <select
-                value={corridorScope}
-                onChange={e => setCorridorScope(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
-              >
-                <option value="NGP-BSL">NGP–BSL Main Line (All 8 Tracks)</option>
-                <option value="WR-BD">Wardha–Badnera Section</option>
-                <option value="NGP-YARD">Nagpur Junction Yard Area</option>
-                <option value="ALL-DIV">All Nagpur Division Corridors</option>
-              </select>
-            </div>
+            {/* Right Column */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Division</label>
+                <select value={division} onChange={e => setDivision(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="CSTM">CSTM</option>
+                  <option value="KYN">KYN</option>
+                  <option value="BSL">BSL</option>
+                  <option value="PUNE">PUNE</option>
+                  <option value="Nagpur">Nagpur</option>
+                </select>
+              </div>
 
-            {/* 3. Date / Window */}
-            <div>
-              <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-2">
-                3. Date / Time Window
-              </label>
-              <select
-                value={dateRange}
-                onChange={e => setDateRange(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden"
-              >
-                <option value="today">Today (27 Aug 2026 - Operational)</option>
-                <option value="24h">Last 24 Hours</option>
-                <option value="7d">Last 7 Days (Consolidated)</option>
-                <option value="mtd">Month-to-Date (August 2026)</option>
-              </select>
-            </div>
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">To Date</label>
+                <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden" />
+              </div>
 
-            {/* 4. Format Selection */}
-            <div>
-              <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-2">
-                4. Output Format
-              </label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(['pdf', 'excel', 'csv'] as const).map(fmt => (
-                  <button
-                    key={fmt}
-                    onClick={() => setExportFormat(fmt)}
-                    className={clsx(
-                      'py-2 text-[11px] font-bold rounded-lg border transition-all text-center uppercase',
-                      exportFormat === fmt
-                        ? 'bg-blue-700 text-white border-emerald-700 shadow-xs'
-                        : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                    )}
-                  >
-                    {fmt}
-                  </button>
-                ))}
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Block Section / Station</label>
+                <select value={blockSectionRight} onChange={e => setBlockSectionRight(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="">-- Select --</option>
+                  <option value="NGP">NGP - Nagpur</option>
+                  <option value="WR">WR - Wardha</option>
+                  <option value="BD">BD - Badnera</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Station</label>
+                <select value={station} onChange={e => setStation(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="">-- Select --</option>
+                  <option value="NGP">Nagpur (NGP)</option>
+                  <option value="WR">Wardha (WR)</option>
+                  <option value="BD">Badnera (BD)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Status</label>
+                <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="Demanded">Demanded</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Granted">Granted</option>
+                  <option value="Imposed">Imposed</option>
+                  <option value="Extended">Extended</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Deferred">Deferred</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Shadow / Associated Block</label>
+                <select value={shadowBlock} onChange={e => setShadowBlock(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Organization</label>
+                <select value={organization} onChange={e => setOrganization(e.target.value)} className="w-full bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-lg px-3 py-2 text-[12px] font-medium text-gray-800 outline-hidden">
+                  <option value="Engineering">Engineering</option>
+                  <option value="S&T">S&T</option>
+                  <option value="TRD">TRD</option>
+                  <option value="Operating">Operating</option>
+                  <option value="Electrical">Electrical</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-600 uppercase tracking-wider mb-1.5">Output Format</label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {(['pdf', 'excel', 'csv'] as const).map(fmt => (
+                    <button
+                      key={fmt}
+                      onClick={() => setExportFormat(fmt)}
+                      className={clsx(
+                        'py-2 text-[11px] font-bold rounded-lg border transition-all text-center uppercase',
+                        exportFormat === fmt
+                          ? 'bg-blue-700 text-white border-emerald-700 shadow-xs'
+                          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                      )}
+                    >
+                      {fmt}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
