@@ -1,7 +1,9 @@
 import type {
   MaintenanceJob, OptimizedBlock, Train, LiveEvent, ApprovalItem,
-  AnalyticsData, ReoptimizationPlan, FieldBlock, BlockRequest, BlockStatus
+  AnalyticsData, ReoptimizationPlan, FieldBlock, BlockRequest, BlockStatus,
+  EnrichedTrain
 } from '../types';
+
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -121,30 +123,72 @@ export const blocksApi = {
 
 // ── Trains ────────────────────────────────────────────────────────────────────
 export const trainsApi = {
-  async getTrain(id: string): Promise<Train | undefined> {
-    const trains = await this.getTrains();
-    return trains.find(t => t.number === id || t.id === id);
-  },
-  async getTrains(): Promise<Train[]> {
+  async getTrains(): Promise<EnrichedTrain[]> {
     try {
       const res = await fetch(`${API_URL}/api/trains`);
       if (!res.ok) throw new Error('API failed');
       return await res.json();
     } catch (e) {
-      console.warn("Using mock fallback for trains:", e);
+      console.warn('Using mock fallback for trains:', e);
       return [];
     }
   },
-  async computeRoute(_trainNumber: string, _blockId: string): Promise<Train['proposedRoute']> {
+  async getTrain(number: string): Promise<EnrichedTrain | undefined> {
+    try {
+      const res = await fetch(`${API_URL}/api/trains/${number}`);
+      if (!res.ok) throw new Error('API failed');
+      return await res.json();
+    } catch (e) {
+      const trains = await this.getTrains();
+      return trains.find(t => t.trainNumber === number);
+    }
+  },
+  async approveReroute(
+    trainNumber: string,
+    approvedBy: string,
+    actorId?: string,
+    notes?: string
+  ): Promise<{ success: boolean; approvedAt: string; approvedRoute: any[] }> {
+    const res = await fetch(`${API_URL}/api/trains/${trainNumber}/reroute/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ approvedBy, actor_id: actorId, notes }),
+    });
+    if (!res.ok) throw new Error('Failed to approve reroute');
+    return res.json();
+  },
+  async rejectReroute(
+    trainNumber: string,
+    rejectedBy: string,
+    reason?: string,
+    actorId?: string
+  ): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_URL}/api/trains/${trainNumber}/reroute/reject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rejectedBy, reason, actor_id: actorId }),
+    });
+    if (!res.ok) throw new Error('Failed to reject reroute');
+    return res.json();
+  },
+  async getRerouteHistory(trainNumber: string): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_URL}/api/trains/${trainNumber}/reroute-history`);
+      if (!res.ok) return [];
+      return res.json();
+    } catch {
+      return [];
+    }
+  },
+  // Legacy compat
+  async acceptReroute(trainNumber: string): Promise<any> {
+    return this.approveReroute(trainNumber, 'Section Controller');
+  },
+  async computeRoute(_trainNumber: string, _blockId: string) {
     return undefined;
   },
-  async acceptReroute(trainNumber: string): Promise<Train> {
-    const trains = await this.getTrains();
-    const train = trains.find(t => t.number === trainNumber);
-    if (!train) throw new Error('Train not found');
-    return { ...train, reroutingStatus: 'ACCEPTED' };
-  },
 };
+
 
 // ── Events ────────────────────────────────────────────────────────────────────
 export const eventsApi = {
@@ -165,7 +209,7 @@ export const eventsApi = {
   async triggerReoptimize(eventId: string): Promise<ReoptimizationPlan> {
     // Simulate reoptimization using current train data
     const trains = await trainsApi.getTrains();
-    const delayedTrains = trains.filter(t => t.delay > 0);
+    const delayedTrains = trains.filter(t => t.delayMinutes > 0);
     return {
       id: `RP-${Date.now().toString(36).toUpperCase()}`,
       triggeredBy: 'ALNS+TDA*',
@@ -182,9 +226,9 @@ export const eventsApi = {
         'Remaining schedule shifted downstream by minimum required margin',
       ],
       impact: {
-        additionalDelay: delayedTrains.reduce((sum, t) => sum + Math.min(t.delay, 30), 0),
+        additionalDelay: delayedTrains.reduce((sum, t) => sum + Math.min(t.delayMinutes, 30), 0),
         blocksChanged: 1,
-        trainsRerouted: delayedTrains.filter(t => t.reroutingEligible).length,
+        trainsRerouted: delayedTrains.filter(t => t.proposedRoute !== null || t.approvedRoute !== null).length,
         safetyViolations: 0,
         maintenanceDelayed: 0,
       },
@@ -325,9 +369,9 @@ export const overviewApi = {
         priorityQueue: jobs.slice(0, 7),
         recommendedBlock: pendingBlocks.length ? pendingBlocks[0] : undefined,
         allBlocks: blocks,
-        allTrains: trains,
+        allTrains: trains as any,
         overdueJobs: jobs.filter(j => j.overdueDays > 0),
-        delayedTrains: trains.filter(t => t.currentStatus === 'DELAYED'),
+        delayedTrains: trains.filter(t => t.delayMinutes > 0) as any,
       };
     } catch (e) {
       console.warn("Using mock fallback for dashboard data:", e);

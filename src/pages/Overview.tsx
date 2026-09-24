@@ -27,7 +27,7 @@ interface DashboardData {
   priorityQueue: MaintenanceJob[];
   recommendedBlock?: OptimizedBlock;
   allBlocks: OptimizedBlock[];
-  allTrains: Train[];
+  allTrains: any[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────

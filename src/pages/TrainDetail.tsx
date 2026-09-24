@@ -12,7 +12,7 @@ import { ArrowLeft, GitBranch, Clock, MapPin, AlertTriangle, ArrowRight } from '
 export default function TrainDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [train, setTrain] = useState<Train | null>(null);
+  const [train, setTrain] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function TrainDetail() {
         <div>
           <p className="text-xs font-semibold text-gray-700 mb-1.5">Original Timetabled Route</p>
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded text-xs flex-wrap">
-            {train.originalRoute.map((seg, i) => (
+            {(train.originalRoute || []).map((seg: any, i: number) => (
               <span key={i} className="flex items-center gap-1.5">
                 <span className="font-semibold text-gray-800">{seg.from}</span>
                 <ArrowRight className="w-3 h-3 text-gray-400" />
@@ -111,7 +111,7 @@ export default function TrainDetail() {
           <div>
             <p className="text-xs font-semibold text-blue-800 mb-1.5">A* Proposed Feasible Route</p>
             <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded text-xs flex-wrap">
-              {train.proposedRoute.map((seg, i) => (
+              {(train.proposedRoute || []).map((seg: any, i: number) => (
                 <span key={i} className="flex items-center gap-1.5">
                   <span className="font-semibold text-blue-900">{seg.from}</span>
                   <ArrowRight className="w-3 h-3 text-emerald-400" />

@@ -27,9 +27,9 @@ interface DashboardData {
   priorityQueue: MaintenanceJob[];
   recommendedBlock?: OptimizedBlock;
   allBlocks: OptimizedBlock[];
-  allTrains: Train[];
+  allTrains: any[];
   overdueJobs: MaintenanceJob[];
-  delayedTrains: Train[];
+  delayedTrains: any[];
 }
 
 export default function Command() {
@@ -92,7 +92,7 @@ export default function Command() {
     ...(data?.delayedTrains && data.delayedTrains.length > 0 ? [{
       level: 'amber' as const,
       title: `${data.delayedTrains.length} train(s) delayed`,
-      detail: data.delayedTrains.slice(0, 3).map(t => t.number).join(' · ') + ' · Affected by maintenance blocks',
+      detail: data.delayedTrains.slice(0, 3).map((t: any) => t.trainNumber || t.number || '').join(' · ') + ' · Affected by maintenance blocks',
       action: () => navigate('/trains'),
       actionLabel: 'View Trains',
     }] : []),

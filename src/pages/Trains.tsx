@@ -11,7 +11,7 @@ import { ArrowRight, GitBranch, Train as TrainIcon } from 'lucide-react';
 
 export default function Trains() {
   const navigate = useNavigate();
-  const [trains, setTrains] = useState<Train[]>([]);
+  const [trains, setTrains] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -30,8 +30,8 @@ export default function Trains() {
     loadTrains();
   }, []);
 
-  const filteredTrains = trains.filter(t => {
-    if (statusFilter !== 'ALL' && t.currentStatus !== statusFilter) return false;
+  const filteredTrains = trains.filter((t: any) => {
+    if (statusFilter !== 'ALL' && (t.currentStatus || t.status) !== statusFilter) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (

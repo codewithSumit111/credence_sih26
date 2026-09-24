@@ -152,8 +152,113 @@ export interface BlockAlternative {
 }
 
 // ============================================================
-// TRAIN
+// TRAIN — Enriched human-readable model
 // ============================================================
+export type TrainOperationalStatus =
+  | 'NORMAL'
+  | 'DELAYED'
+  | 'DISRUPTED_NOT_REROUTED'
+  | 'REROUTE_SUGGESTED'
+  | 'PENDING_APPROVAL'
+  | 'REROUTE_APPROVED'
+  | 'REROUTED'
+  | 'CANCELLED';
+
+export type TrainRerouteStatus =
+  | 'NOT_REQUIRED'
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'COMPLETED';
+
+export interface StationStop {
+  station: string;
+  code: string;
+  lat: number;
+  lng: number;
+}
+
+export interface AlternativeRoute {
+  label: string;
+  route: string;
+  estimatedDelay: number;
+  additionalDistance: number;
+  risk: string;
+  capacity: string;
+  recommended: boolean;
+}
+
+export interface AiRecommendation {
+  recommendedRoute: string;
+  estimatedDelay: number;
+  additionalDistance: number;
+  confidence: number;
+  reasoning: string[];
+  constraints: string[];
+  generatedAt: string;
+  engine: string;
+}
+
+export interface OperationalImpact {
+  additionalDistance: number;
+  additionalTime: number;
+  affectedStations: string[];
+  platformImpact: string;
+}
+
+export interface NotReroutedReason {
+  explanation: string;
+  reasons: string[];
+  outcomeOriginalRoute: { expectedArrival: string; expectedDelay: number };
+  outcomeIfRerouted: { expectedArrival: string; expectedDelay: number };
+}
+
+export interface EnrichedTrain {
+  // Human-readable identity
+  trainNumber: string;
+  trainName: string;
+  trainType: string;
+  sourceStation: string;
+  sourceStationCode: string;
+  destinationStation: string;
+  destinationStationCode: string;
+
+  // Schedule
+  scheduledDate: string;
+  scheduledDeparture: string;
+  scheduledArrival: string;
+
+  // Operational state
+  status: TrainOperationalStatus;
+  rerouteStatus: TrainRerouteStatus;
+  delayMinutes: number;
+  affectedSection: string | null;
+  disruptionReason: string | null;
+  disruptionDescription: string | null;
+
+  // Routes (geographic)
+  originalRoute: StationStop[];
+  proposedRoute: StationStop[] | null;
+  approvedRoute: StationStop[] | null;
+
+  // Approval
+  approvedBy: string | null;
+  approvedAt: string | null;
+
+  // AI recommendation
+  aiRecommendation: AiRecommendation | null;
+  alternatives: AlternativeRoute[];
+
+  // Not-rerouted explanation
+  notReroutedReason?: NotReroutedReason;
+
+  // Impact
+  operationalImpact: OperationalImpact;
+
+  // Timeline
+  timeline?: { time: string; event: string; status?: 'done' | 'active' | 'pending' }[];
+}
+
 export interface Train {
   id?: string;
   number: string;
@@ -172,6 +277,7 @@ export interface Train {
   scheduledOccupation: TimeWindow[];
   reroutingEligible: boolean;
 }
+
 
 export interface RouteSegment {
   from: string;

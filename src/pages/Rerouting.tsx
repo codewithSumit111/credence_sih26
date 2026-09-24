@@ -14,7 +14,7 @@ import { clsx } from 'clsx';
 export default function Rerouting() {
   const navigate = useNavigate();
   const { trainId } = useParams<{ trainId: string }>();
-  const [trains, setTrains] = useState<Train[]>([]);
+  const [trains, setTrains] = useState<any[]>([]);
   const [selectedTrainNumber, setSelectedTrainNumber] = useState<string>(trainId || '12123');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -33,7 +33,7 @@ export default function Rerouting() {
     loadTrains();
   }, []);
 
-  const selectedTrain = trains.find(t => t.number === selectedTrainNumber) || trains[0];
+  const selectedTrain = trains.find((t: any) => t.trainNumber === selectedTrainNumber || t.number === selectedTrainNumber) || trains[0];
 
   const handleAcceptReroute = async () => {
     if (!selectedTrain) return;
