@@ -353,6 +353,12 @@ export default function RailwayTrackView({ region, blocks, selectedId, onSelect 
     if (status === 'IMPOSED' || status === 'APPROVED') return { stroke: '#111827', dash: 'none', classes: '' };
     if (status === 'COMPLETED') return { stroke: '#9ca3af', dash: 'none', classes: '' };
     if (status === 'DEFERRED') return { stroke: '#9ca3af', dash: '4 4', classes: '' };
+    
+    // Recovery states
+    if (status === 'PROTECTED') return { stroke: '#10b981', dash: 'none', classes: '' }; // Green solid
+    if (status === 'UNCHANGED') return { stroke: '#9ca3af', dash: 'none', classes: 'opacity-50' }; // Gray solid muted
+    if (status === 'UPDATED') return { stroke: '#3b82f6', dash: 'none', classes: 'animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]' }; // Blue pulsing
+    
     return { stroke: '#6b7280', dash: '6 4', classes: '' }; // PROPOSED
   };
 

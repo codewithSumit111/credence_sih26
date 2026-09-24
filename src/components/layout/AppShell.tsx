@@ -5,6 +5,7 @@ import TopBar from './TopBar';
 import AppFooter from './AppFooter';
 import ReportGeneratorModal from '../reports/ReportGeneratorModal';
 import OnboardingTour from '../onboarding/OnboardingTour';
+import WorkflowIndicator from './WorkflowIndicator';
 
 export default function AppShell() {
   const location = useLocation();

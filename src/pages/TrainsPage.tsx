@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { format, parseISO } from 'date-fns';
 import {
   Search, SlidersHorizontal, Train as TrainIcon, GitBranch, AlertTriangle,
-  CheckCircle2, Clock, ArrowRight, RefreshCw, Filter, X
+  CheckCircle2, Clock, ArrowRight, RefreshCw, Filter, X, MapPin
 } from 'lucide-react';
 import StatusBadge from '../components/common/StatusBadge';
 import LoadingState from '../components/common/LoadingState';
@@ -24,6 +24,24 @@ function delayLabel(min: number): string {
   return m > 0 ? `+${h}h ${m}m` : `+${h}h`;
 }
 
+// ─── Route options for rerouting (From Remote) ───────────────────────────────
+const routeOptions = [
+  {
+    label: 'WAIT',
+    segments: 'Hold at ST-B until TR-02 possession completes',
+    delay: 45,
+    recommended: false,
+    description: 'Train waits at signal. No additional distance.',
+  },
+  {
+    label: 'REROUTE (Recommended)',
+    segments: 'ST-A → TR-01 → TR-04 (Akola bypass) → ST-C',
+    delay: 12,
+    extraKm: 12,
+    recommended: true,
+    description: 'Routing Engine computed path. Lowest delay option.',
+  },
+];
 // ─── Status colour dot ────────────────────────────────────────────────────────
 const STATUS_DOT: Record<string, string> = {
   NORMAL: 'bg-green-500',
@@ -43,6 +61,185 @@ function KpiCard({ label, value, sub, accent }: { label: string; value: string; 
       <p className="irctc-label mb-2">{label}</p>
       <p className="text-[26px] font-bold leading-none">{value}</p>
       <p className="text-[11px] text-gray-500 mt-1.5">{sub}</p>
+    </div>
+  );
+}
+
+// ─── Legacy Train Detail (From Remote) ─────────────────────────────────────────
+function LegacyTrainDetail({ train, isAffected, onKeepWaiting, onAcceptReroute, loading }: any) {
+  return (
+    <div className="space-y-4 text-[12px]">
+      {/* Train header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono font-bold text-[16px] text-gray-900">{train.number}</span>
+            <StatusBadge status={train.currentStatus} size="md" />
+          </div>
+          <p className="text-gray-600 font-medium">{train.name}</p>
+          <p className="text-gray-500 text-[11px]">{train.type} · {train.currentSection}</p>
+        </div>
+        {train.delay > 0 && (
+          <div className="text-right">
+            <span className="text-[22px] font-bold text-amber-700">+{train.delay}</span>
+            <span className="text-gray-500 ml-1 text-[12px]">min delay</span>
+          </div>
+        )}
+      </div>
+
+      {/* Cause */}
+      {isAffected && (
+        <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
+          <p className="text-[10px] font-bold text-red-600 uppercase tracking-wide mb-1">Cause</p>
+          <p className="text-red-800 font-medium">Track block / maintenance possession on TR-02</p>
+          <p className="text-red-600 text-[10px] mt-0.5">Block: {train.affectedBlockId}</p>
+        </div>
+      )}
+
+      {/* Route display */}
+      {isAffected && (
+        <div>
+          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Original Route</h4>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {train.originalRoute?.map((seg: any, i: number) => (
+              <span key={i} className="flex items-center gap-1">
+                <span className="font-mono text-[11px] font-medium text-gray-700">{seg.from}</span>
+                <ArrowRight className="w-3 h-3 text-gray-300" />
+                <span className="font-mono text-[10px] text-gray-400 bg-gray-100 px-1 rounded">[{seg.track}]</span>
+                {i === train.originalRoute.length - 1 && (
+                  <>
+                    <ArrowRight className="w-3 h-3 text-gray-300" />
+                    <span className="font-mono text-[11px] font-medium text-gray-700">{seg.to}</span>
+                  </>
+                )}
+              </span>
+            ))}
+          </div>
+          {train.affectedBlockId && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-red-600 font-medium">
+              <span className="w-2 h-2 rounded-full bg-red-500" />
+              TR-02 section blocked
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Route Options */}
+      {isAffected && (
+        <div>
+          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+            Options — Routing Engine
+          </h4>
+          <div className="space-y-2">
+            {routeOptions.map(option => (
+              <div
+                key={option.label}
+                className={clsx(
+                  'border rounded-lg p-3',
+                  option.recommended ? 'border-emerald-300 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                )}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className={clsx('text-[11px] font-bold uppercase', option.recommended ? 'text-blue-800' : 'text-gray-600')}>
+                    {option.label}
+                  </span>
+                  {option.recommended && (
+                    <span className="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold">RECOMMENDED</span>
+                  )}
+                </div>
+                <p className="text-[10px] text-gray-600 mb-1.5">{option.segments}</p>
+                <div className="flex items-center gap-3">
+                  <span className={clsx(
+                    'flex items-center gap-1 font-bold text-[12px]',
+                    option.delay > 30 ? 'text-red-600' : option.delay > 15 ? 'text-amber-600' : 'text-green-600'
+                  )}>
+                    <Clock className="w-3 h-3" />
+                    +{option.delay} min
+                  </span>
+                  {option.extraKm && (
+                    <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      +{option.extraKm} km
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-gray-500 mt-1">{option.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Why reroute */}
+      {isAffected && (
+        <div>
+          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Why Reroute?</h4>
+          <div className="space-y-1.5">
+            {[
+              'Blocked section excluded from path',
+              'Current network state considered',
+              'Minimizes total delay vs waiting',
+              'No conflicting train on alternate path',
+            ].map((r, i) => (
+              <div key={i} className="flex items-center gap-2 text-gray-600">
+                <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
+                {r}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className="text-[10px] font-mono bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded">
+              Engine: Routing Engine
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Non-affected train message */}
+      {!isAffected && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+          <CheckCircle2 className="w-5 h-5 text-green-600 mx-auto mb-2" />
+          <p className="text-[12px] font-semibold text-green-800">No action required</p>
+          <p className="text-[11px] text-green-600 mt-0.5">This train has no conflict with active blocks</p>
+        </div>
+      )}
+
+      {/* Actions */}
+      {isAffected && (
+        <div className="flex gap-2 pt-2">
+          <button
+            onClick={onKeepWaiting}
+            className="flex-1 text-[12px] font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 py-2.5 rounded-lg transition-colors"
+          >
+            Keep Waiting
+          </button>
+          <button
+            onClick={onAcceptReroute}
+            disabled={loading}
+            className="flex-1 text-[12px] font-bold bg-[#E85D04] hover:bg-[#D05303] text-white py-2.5 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Processing...' : '✓ Accept Reroute'}
+          </button>
+        </div>
+      )}
+
+      {isAffected && (
+        <p className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2.5 py-1.5 text-center">
+          Human approval required. This action will be logged to the control system.
+        </p>
+      )}
+
+      {/* Schedule info */}
+      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-gray-100">
+        <div className="p-2 bg-gray-50 rounded">
+          <p className="text-[10px] text-gray-400">Scheduled Arr.</p>
+          <p className="font-mono font-semibold text-gray-700">{train.scheduledArrival}</p>
+        </div>
+        <div className="p-2 bg-gray-50 rounded">
+          <p className="text-[10px] text-gray-400">Scheduled Dep.</p>
+          <p className="font-mono font-semibold text-gray-700">{train.scheduledDeparture}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -219,7 +416,7 @@ export default function TrainsPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-[12px] font-semibold text-irctc-blue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-irctc-blue animate-pulse" />
-              Time-Dependent A* Active
+              Routing Engine Active
             </div>
             <button
               onClick={() => loadTrains(true)}

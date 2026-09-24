@@ -39,12 +39,6 @@ export default function Command() {
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Control panel state
-  const [section, setSection] = useState('');
-  const [horizon, setHorizon] = useState('Weekly');
-  const [trainType, setTrainType] = useState('All Trains');
-  const [department, setDepartment] = useState('All Departments');
-
   useEffect(() => {
     overviewApi.getDashboardData().then(d => {
       setData(d);
@@ -74,27 +68,53 @@ export default function Command() {
   };
 
   const overdueJobs = data?.overdueJobs || [];
+  const pendingRequests = data?.priorityQueue.filter(j => j.status === 'PENDING') || [];
+  const activeBlocks = data?.allBlocks.filter(b => b.status === 'AI-OPTIMIZED' || b.status === 'PROPOSED') || [];
+  
   const attentionItems = [
+    // 1. What needs my attention? (High-priority maintenance requirements)
     ...(overdueJobs.slice(0, 1).map(j => ({
       level: 'red' as const,
+      category: 'Needs Attention',
       title: `${j.id} — ${j.maintenanceType} overdue`,
       detail: `${j.track} · ${j.department} · ${j.overdueDays} days overdue · Priority ${j.priorityScore}`,
-      action: () => navigate('/plan?view=maintenance'),
+      action: () => navigate('/requests'),
       actionLabel: 'Review',
     }))),
-    ...(data?.recommendedBlock ? [{
-      level: 'amber' as const,
-      title: `${data.recommendedBlock.id} awaiting approval`,
-      detail: `${data.recommendedBlock.track} · ${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime} · ${data.recommendedBlock.jobIds?.length || 1} job(s) · CP-SAT optimized`,
+    ...(pendingRequests.slice(0, 1).map(j => ({
+      level: 'red' as const,
+      category: 'Needs Attention',
+      title: `${j.id} — Pending Request`,
+      detail: `${j.track} · ${j.department} · High Priority`,
+      action: () => navigate('/requests'),
+      actionLabel: 'Review Request',
+    }))),
+    // 2. What is currently being planned? (Current planning status)
+    ...(activeBlocks.slice(0, 1).map(b => ({
+      level: 'blue' as const,
+      category: 'Currently Planning',
+      title: `${b.id} — Optimization Complete`,
+      detail: `${b.track} · ${b.duration} min window · System optimized`,
       action: () => navigate('/plan?view=blocks'),
-      actionLabel: 'Review Block',
-    }] : []),
+      actionLabel: 'View Plan',
+    }))),
+    // 3. What operational impact exists?
     ...(data?.delayedTrains && data.delayedTrains.length > 0 ? [{
       level: 'amber' as const,
+      category: 'Operational Impact',
       title: `${data.delayedTrains.length} train(s) delayed`,
       detail: data.delayedTrains.slice(0, 3).map((t: any) => t.trainNumber || t.number || '').join(' · ') + ' · Affected by maintenance blocks',
       action: () => navigate('/trains'),
       actionLabel: 'View Trains',
+    }] : []),
+    // 4. What requires my decision?
+    ...(data?.recommendedBlock ? [{
+      level: 'amber' as const,
+      category: 'Requires Decision',
+      title: `${data.recommendedBlock.id} awaiting approval`,
+      detail: `${data.recommendedBlock.track} · ${data.recommendedBlock.startTime}–${data.recommendedBlock.endTime} · ${data.recommendedBlock.jobIds?.length || 1} job(s)`,
+      action: () => navigate('/plan?view=blocks'),
+      actionLabel: 'Review Block',
     }] : []),
   ];
 
@@ -137,33 +157,7 @@ export default function Command() {
     },
   ];
 
-  // Quick action cards
-  const quickActions = [
-    {
-      title: 'View Block Plans',
-      desc: 'Review optimized blocks across corridors and time windows.',
-      path: '/plan?view=blocks',
-      icon: Layers,
-    },
-    {
-      title: 'Train Impact',
-      desc: 'View affected trains and rerouting recommendations.',
-      path: '/trains',
-      icon: AlertTriangle,
-    },
-    {
-      title: 'Live Recovery',
-      desc: 'Monitor disruptions and re-optimization status.',
-      path: '/live',
-      icon: Radio,
-    },
-    {
-      title: 'Reports',
-      desc: 'Generate operational and planning reports.',
-      path: '/reports',
-      icon: FileText,
-    },
-  ];
+
 
   const today = new Date().toLocaleDateString('en-IN', {
     day: '2-digit', month: 'short', year: 'numeric',
@@ -213,118 +207,12 @@ export default function Command() {
         </div>
       </div>
 
-      {/* ══ CONTROL PANEL (overlaps hero) ════════════════════════════════ */}
+      {/* ══ OPERATIONAL SUMMARY (overlaps hero) ════════════════════════════════ */}
       <div className="max-w-[1400px] mx-auto px-8 -mt-6 relative z-10">
-        <div
-          className="bg-white/95 backdrop-blur-sm border border-irctc-border rounded-2xl shadow-irctc-xl p-6"
-        >
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Form fields */}
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="irctc-form-group col-span-2 md:col-span-1">
-                <label className="irctc-input-label">Section</label>
-                <select
-                  className="irctc-select"
-                  value={section}
-                  onChange={e => setSection(e.target.value)}
-                >
-                  <option value="">Select Section</option>
-                  <option>NGP–BSL</option>
-                  <option>BSL–MMR</option>
-                  <option>NGP–AK</option>
-                </select>
-              </div>
-              <div className="irctc-form-group">
-                <label className="irctc-input-label">Date</label>
-                <input
-                  type="text"
-                  className="irctc-input"
-                  defaultValue={today}
-                  readOnly
-                />
-              </div>
-              <div className="irctc-form-group">
-                <label className="irctc-input-label">Time Horizon</label>
-                <select
-                  className="irctc-select"
-                  value={horizon}
-                  onChange={e => setHorizon(e.target.value)}
-                >
-                  <option>Daily</option>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                </select>
-              </div>
-              <div className="irctc-form-group">
-                <label className="irctc-input-label">Train Type</label>
-                <select
-                  className="irctc-select"
-                  value={trainType}
-                  onChange={e => setTrainType(e.target.value)}
-                >
-                  <option>All Trains</option>
-                  <option>Express</option>
-                  <option>Passenger</option>
-                  <option>Goods</option>
-                </select>
-              </div>
-              <div className="irctc-form-group">
-                <label className="irctc-input-label">Department</label>
-                <select
-                  className="irctc-select"
-                  value={department}
-                  onChange={e => setDepartment(e.target.value)}
-                >
-                  <option>All Departments</option>
-                  <option>Engineering</option>
-                  <option>S&T</option>
-                  <option>TRD</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="hidden lg:block w-px bg-irctc-border" />
-
-            {/* CTA */}
-            <div className="flex flex-col gap-3 justify-center lg:w-56">
-              <button
-                onClick={() => navigate('/plan')}
-                className="irctc-btn irctc-btn-primary text-[14px] px-6 py-3 w-full justify-center font-bold text-center"
-              >
-                Generate Block Plan <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Action Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-          {quickActions.map(qa => (
-            <button
-              key={qa.path}
-              onClick={() => navigate(qa.path)}
-              className="irctc-card text-left flex items-start gap-3 hover:shadow-irctc-md hover:border-irctc-blue/30 transition-all group cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-irctc-blue flex items-center justify-center flex-shrink-0 group-hover:bg-irctc-blue group-hover:text-white transition-colors">
-                <qa.icon className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[14px] font-bold text-irctc-navy group-hover:text-irctc-blue transition-colors leading-tight">{qa.title}</p>
-                <p className="text-[12px] text-irctc-muted mt-1 leading-snug line-clamp-2">{qa.desc}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ══ MAIN CONTENT ═════════════════════════════════════════════════ */}
-      <div className="max-w-[1400px] mx-auto px-8 mt-8 pb-12 space-y-6">
-
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((kpi, idx) => (
-            <div key={idx} className="irctc-card flex items-center gap-4 hover:shadow-irctc-md transition-shadow">
+            <div key={idx} className="bg-white/95 backdrop-blur-sm border border-irctc-border rounded-2xl shadow-irctc-xl p-6 flex items-center gap-4 hover:shadow-irctc-md transition-shadow">
               <div className={clsx('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0', kpi.iconBg)}>
                 <kpi.icon className="w-6 h-6" />
               </div>
@@ -336,6 +224,10 @@ export default function Command() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ══ MAIN CONTENT ═════════════════════════════════════════════════ */}
+      <div className="max-w-[1400px] mx-auto px-8 mt-8 pb-12 space-y-6">
 
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -367,20 +259,32 @@ export default function Command() {
                       key={i}
                       className={clsx(
                         'flex items-center justify-between p-4 rounded-xl border',
-                        item.level === 'red'
-                          ? 'bg-red-50 border-red-100'
-                          : 'bg-amber-50 border-amber-100'
+                        item.level === 'red' ? 'bg-red-50 border-red-100' :
+                        item.level === 'amber' ? 'bg-amber-50 border-amber-100' :
+                        'bg-blue-50 border-blue-100'
                       )}
                     >
                       <div className="flex items-start gap-3 min-w-0">
                         <span className={clsx(
-                          'w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1',
-                          item.level === 'red' ? 'bg-red-600' : 'bg-amber-500'
+                          'w-2.5 h-2.5 rounded-full flex-shrink-0 mt-2',
+                          item.level === 'red' ? 'bg-red-600' : 
+                          item.level === 'amber' ? 'bg-amber-500' : 
+                          'bg-blue-500'
                         )} />
                         <div className="min-w-0">
                           <p className={clsx(
+                            'text-[10px] font-bold uppercase tracking-wider mb-0.5',
+                            item.level === 'red' ? 'text-red-700' : 
+                            item.level === 'amber' ? 'text-amber-700' : 
+                            'text-blue-700'
+                          )}>
+                            {item.category}
+                          </p>
+                          <p className={clsx(
                             'text-[14px] font-bold leading-snug',
-                            item.level === 'red' ? 'text-red-900' : 'text-amber-900'
+                            item.level === 'red' ? 'text-red-900' : 
+                            item.level === 'amber' ? 'text-amber-900' : 
+                            'text-blue-900'
                           )}>
                             {item.title}
                           </p>
@@ -391,9 +295,9 @@ export default function Command() {
                         onClick={item.action}
                         className={clsx(
                           'text-[12px] font-bold ml-4 flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border hover:shadow-sm transition-all',
-                          item.level === 'red'
-                            ? 'text-red-700 border-red-200 hover:border-red-300'
-                            : 'text-amber-700 border-amber-200 hover:border-amber-300'
+                          item.level === 'red' ? 'text-red-700 border-red-200 hover:border-red-300' :
+                          item.level === 'amber' ? 'text-amber-700 border-amber-200 hover:border-amber-300' :
+                          'text-blue-700 border-blue-200 hover:border-blue-300'
                         )}
                       >
                         {item.actionLabel}
@@ -413,7 +317,7 @@ export default function Command() {
               <div className="flex items-center justify-between mb-5">
                 <h3 className="irctc-card-title">System Recommendation</h3>
                 <span className="text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full uppercase tracking-wide">
-                  CP-SAT Optimized
+                  System Optimized
                 </span>
               </div>
 
@@ -480,8 +384,8 @@ export default function Command() {
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-4">
               {[
-                { label: 'Open Jobs', value: '12', sub: 'Maintenance queue', path: '/plan?view=maintenance' },
-                { label: 'Recovery Time', value: '18 min', sub: 'Avg this month', path: '/analytics' },
+                { label: 'Open Jobs', value: String(data?.pendingMaintenance || 0), sub: 'Maintenance queue', path: '/requests' },
+                { label: 'Critical Jobs', value: String(data?.criticalJobCount || 0), sub: 'High priority', path: '/requests' },
               ].map(item => (
                 <button
                   key={item.label}

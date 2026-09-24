@@ -19,23 +19,22 @@ export default function TrackBlockDetails({ block, onApprove, onReject, onModify
       case 'PROPOSED': return 'text-amber-700 bg-amber-50 border-amber-200';
       case 'ACTIVE': return 'text-blue-700 bg-blue-50 border-blue-200';
       case 'COMPLETED': return 'text-green-700 bg-green-50 border-green-200';
+      case 'MODIFIED': return 'text-purple-700 bg-purple-50 border-purple-200';
       default: return 'text-gray-700 bg-gray-50 border-gray-200';
     }
   };
 
   const getStatusLabel = (status: string) => {
-    if (status === 'APPROVED') return 'IMPOSED'; // To match screenshot terms
     if (status === 'AI-OPTIMIZED') return 'PROPOSED';
     return status;
   };
 
-  // Safe extract array 
   const depts = Array.isArray(block.departments) ? block.departments : ['ENGG (-)'];
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
       
-      {/* Header Info */}
+      {/* Header */}
       <div className="bg-white p-5 border-b border-gray-200">
         <p className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-1">COA Block ID</p>
         <div className="flex items-center justify-between">
@@ -48,9 +47,9 @@ export default function TrackBlockDetails({ block, onApprove, onReject, onModify
 
       <div className="flex-1 overflow-y-auto p-5 space-y-6 text-[12px] text-gray-800">
         
-        {/* Identification */}
+        {/* BLOCK SUMMARY */}
         <section>
-          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Identification</h3>
+          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Block Summary</h3>
           <div className="grid grid-cols-[120px_1fr] gap-y-2.5">
             <span className="text-gray-500 font-medium">Department</span>
             <div className="flex flex-wrap gap-1">
@@ -61,68 +60,75 @@ export default function TrackBlockDetails({ block, onApprove, onReject, onModify
               ))}
             </div>
             
-            <span className="text-gray-500 font-medium">Division</span>
-            <span className="font-semibold">CSTM (Demo)</span>
-            
-            <span className="text-gray-500 font-medium">Sub Section</span>
+            <span className="text-gray-500 font-medium">Section</span>
             <span className="font-semibold">{block.section}</span>
             
-            <span className="text-gray-500 font-medium">Line</span>
-            <span className="font-semibold">{block.track} / UP</span>
-          </div>
-        </section>
-
-        {/* Location */}
-        <section>
-          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Location</h3>
-          <div className="grid grid-cols-[120px_1fr] gap-y-2.5">
-            <span className="text-gray-500 font-medium">From</span>
-            <span className="font-semibold">53.400</span>
+            <span className="text-gray-500 font-medium">Track / Line</span>
+            <span className="font-semibold">{block.track}</span>
             
-            <span className="text-gray-500 font-medium">To</span>
-            <span className="font-semibold">53.300</span>
-          </div>
-        </section>
-
-        {/* Block Demanded */}
-        <section>
-          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Block Demanded</h3>
-          <div className="grid grid-cols-[120px_1fr] gap-y-2.5">
-            <span className="text-gray-500 font-medium">Type</span>
-            <span className="font-semibold">{(block as any).type || 'TRACMACHINE'}</span>
-            
-            <span className="text-gray-500 font-medium">Reason</span>
-            <span className="font-semibold">ENGG-TRACK MACHINE WORKING</span>
-            
-            <span className="text-gray-500 font-medium">Date</span>
-            <span className="font-semibold">{new Date(block.createdAt || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-
-            <span className="text-gray-500 font-medium">Start</span>
-            <span className="font-semibold">{block.startTime}</span>
-            
-            <span className="text-gray-500 font-medium">End</span>
-            <span className="font-semibold">{block.endTime}</span>
+            <span className="text-gray-500 font-medium">Proposed Window</span>
+            <span className="font-semibold">{block.startTime} — {block.endTime}</span>
             
             <span className="text-gray-500 font-medium">Duration</span>
-            <span className="font-semibold">{block.duration} hrs</span>
+            <span className="font-semibold">{block.duration} minutes</span>
+
+            <span className="text-gray-500 font-medium">Current Status</span>
+            <span className="font-semibold capitalize">{getStatusLabel(block.status).toLowerCase()}</span>
           </div>
         </section>
 
-        {/* Permitted / Imposed */}
+        {/* WHY THIS BLOCK? */}
         <section>
-          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Permitted / Imposed</h3>
+          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Why This Block?</h3>
+          <div className="bg-white p-3 rounded border border-gray-200 space-y-2 text-[12px]">
+            <p className="flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>Selected for the <strong>{block.startTime}–{block.endTime}</strong> window because the required maintenance duration is <strong>{block.duration} minutes</strong> and this represents an available feasible window.</span>
+            </p>
+            <p className="flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>Resolves <strong>{block.jobIds?.length || 1} pending maintenance requirement(s)</strong> {block.bundled ? 'grouped together on the same section to reduce repeated track possessions.' : 'on this track section.'}</span>
+            </p>
+            {(block.whyThisSlot || []).slice(0, 2).map((reason, i) => (
+              <p key={i} className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <span>{reason}</span>
+              </p>
+            ))}
+          </div>
+        </section>
+
+        {/* IMPACT / RESULT */}
+        <section>
+          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Impact / Result</h3>
           <div className="grid grid-cols-[120px_1fr] gap-y-2.5">
-            <span className="text-gray-500 font-medium">Actual Start</span>
-            <span className="font-semibold">—</span>
+            <span className="text-gray-500 font-medium">Trains Affected</span>
+            <span className="font-semibold flex items-center gap-1.5">
+              {block.expectedDelay > 0 ? (
+                <><AlertTriangle className="w-3.5 h-3.5 text-irctc-orange" /> {Math.ceil(block.expectedDelay / 15)} train(s)</>
+              ) : (
+                'None (Zero Impact)'
+              )}
+            </span>
             
-            <span className="text-gray-500 font-medium">Clear Time</span>
-            <span className="font-semibold">—</span>
+            <span className="text-gray-500 font-medium">Estimated Delay</span>
+            <span className="font-semibold text-irctc-orange">+{block.expectedDelay} min total</span>
             
-            <span className="text-gray-500 font-medium">Total Duration</span>
-            <span className="font-semibold">—</span>
-            
-            <span className="text-gray-500 font-medium">Organization</span>
-            <span className="font-semibold">Railway Board</span>
+            <span className="text-gray-500 font-medium">Section Impact</span>
+            <span className="font-semibold">{block.section} operation restricted</span>
+          </div>
+        </section>
+        
+        {/* DECISION / STATUS */}
+        <section>
+          <h3 className="text-[10px] font-bold text-irctc-muted uppercase tracking-wider mb-3 border-b border-gray-200 pb-1">Decision / Status</h3>
+          <div className="p-3 rounded bg-gray-50 border border-gray-200">
+            <p className="font-medium text-gray-800">
+              {block.status === 'APPROVED' ? '✓ Authorized by Section Controller. Rerouting active.' :
+               block.status === 'MODIFIED' ? '↻ Modified by Section Controller. Active.' :
+               block.status === 'COMPLETED' ? '✓ Maintenance completed and logged.' :
+               'Awaiting Section Controller review.'}
+            </p>
           </div>
         </section>
 
@@ -132,7 +138,7 @@ export default function TrackBlockDetails({ block, onApprove, onReject, onModify
       {(block.status === 'PROPOSED' || block.status === 'AI-OPTIMIZED') && (
         <div className="bg-white p-4 border-t border-gray-200 flex flex-col gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
           <button onClick={onApprove} className="irctc-btn irctc-btn-primary w-full justify-center py-2.5 text-[13px]">
-            Approve & Impose Block
+            Approve & Commit Block
           </button>
           <div className="flex gap-3">
             <button onClick={onModify} className="irctc-btn irctc-btn-outline flex-1 justify-center py-2 text-[12px]">

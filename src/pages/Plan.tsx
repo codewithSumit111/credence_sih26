@@ -19,6 +19,7 @@ import { mockDecisionHistory } from '../data/mockData';
 import RegionSelector from '../components/blocks/RegionSelector';
 import RailwayTrackView from '../components/blocks/RailwayTrackView';
 import TrackBlockDetails from '../components/blocks/TrackBlockDetails';
+import PlanReviewTabs from '../components/blocks/PlanReviewTabs';
 
 // ─── Block data ───────────────────────────────────────────────────────────────
 interface BlockItem {
@@ -41,7 +42,7 @@ interface BlockItem {
 // No hardcoded blocks — all data comes from /api/blocks
 
 const GANTT_HOURS = ['00', '02', '04', '06', '08', '10', '12', '14', '16', '18', '20', '22', '24'];
-const OPTIMIZER_STEPS = ['Computing Priority Scores...', 'Checking compatibility & bundling...', 'CP-SAT solver running...', 'Validating feasibility...'];
+const OPTIMIZER_STEPS = ['Computing Priority Scores...', 'Checking compatibility & bundling...', 'System solver running...', 'Validating feasibility...'];
 
 function timeToPct(t: string) {
   const [h, m] = t.split(':').map(Number);
@@ -234,7 +235,7 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
             <p className="text-[9px] font-bold text-blue-600 uppercase tracking-wider mb-1">Approval Status</p>
             <p className="text-[11px] text-gray-600"><strong>Status:</strong> {job.status}</p>
             <p className="text-[11px] text-gray-600">
-              {job.status === 'PENDING' || job.status === 'OVERDUE' ? 'Awaiting CP-SAT scheduling' : 'Scheduled / Approved in Plan'}
+              {job.status === 'PENDING' || job.status === 'OVERDUE' ? 'Awaiting System scheduling' : 'Scheduled / Approved in Plan'}
             </p>
           </div>
         </div>
@@ -293,7 +294,7 @@ function JobDetailContent({ job }: { job: MaintenanceJob }) {
             ))}
           </div>
           <p className="text-[9px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-            Compatibility is a candidate only. CP-SAT determines final scheduling.
+            Compatibility is a candidate only. System determines final scheduling.
           </p>
         </div>
       )}
@@ -379,7 +380,7 @@ export default function Plan() {
   const [selectedBlock, setSelectedBlock] = useState<BlockItem | null>(null);
   const [region, setRegion] = useState(() => localStorage.getItem('irctc_selected_region') || 'Central Railway');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [optimizing, setOptimizing] = useState(false);
   const [optimizerStep, setOptimizerStep] = useState(-1);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
@@ -403,7 +404,12 @@ export default function Plan() {
     if (statusFilter !== 'ALL' && b.status !== statusFilter) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      if (!(b.id.toLowerCase().includes(q) || b.track.toLowerCase().includes(q) || b.section.toLowerCase().includes(q))) {
+      const matchId = b.id.toLowerCase().includes(q);
+      const matchTrack = b.track.toLowerCase().includes(q);
+      const matchSection = b.section.toLowerCase().includes(q);
+      const matchJobs = b.rawBlock?.jobIds?.some(j => j.toLowerCase().includes(q));
+      
+      if (!(matchId || matchTrack || matchSection || matchJobs)) {
         return false;
       }
     }
@@ -423,7 +429,7 @@ export default function Plan() {
     }
     setOptimizing(false);
     setOptimizerStep(-1);
-    toast.success('CP-SAT Optimization Complete', { description: 'Generated 6 optimal possession blocks.' });
+    toast.success('System Optimization Complete', { description: 'Generated 6 optimal possession blocks.' });
   };
 
   const handleApproveBlock = async () => {
@@ -485,17 +491,17 @@ export default function Plan() {
         <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="irctc-page-title">Block Planning</h1>
-            <p className="text-[14px] text-irctc-muted mt-0.5">Maintenance scheduling · Block planning · CP-SAT optimization</p>
+            <p className="text-[14px] text-irctc-muted mt-0.5">Maintenance scheduling · Block planning · System optimization</p>
           </div>
           {/* Tab switcher — IRCTC style */}
           <div className="irctc-tabs gap-0">
-            {(['maintenance', 'blocks', 'requests'] as const).map(tab => (
+            {(['maintenance', 'blocks'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setTab(tab as 'maintenance' | 'blocks')}
                 className={clsx('irctc-tab capitalize', activeTab === tab && 'active')}
               >
-                {tab === 'maintenance' ? 'Maintenance' : tab === 'blocks' ? 'Blocks & Gantt' : 'Requests'}
+                {tab === 'maintenance' ? 'Maintenance' :  'Blocks & Gantt'}
               </button>
             ))}
           </div>
@@ -508,7 +514,7 @@ export default function Plan() {
                 className="irctc-btn irctc-btn-outline text-[13px]"
               >
                   {optimizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
-                  {optimizing ? 'Running CP-SAT...' : 'Run CP-SAT'}
+                  {optimizing ? 'Running System...' : 'Generate Plan'}
                 </button>
             )}
             <button
@@ -528,7 +534,7 @@ export default function Plan() {
           <div className="max-w-[1600px] mx-auto flex items-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-              <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wide">CP-SAT Solver Active</span>
+              <span className="text-[11px] font-bold text-blue-900 uppercase tracking-wide">System Solver Active</span>
             </div>
             {OPTIMIZER_STEPS.map((step, i) => (
               <div key={step} className={clsx(
@@ -590,67 +596,69 @@ export default function Plan() {
             </div>
 
             {/* Job list */}
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                 <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                  Priority Queue — Weighted Scoring Engine (MAUT)
+                  Requested Maintenance
                 </p>
               </div>
               {jobsLoading ? (
-                <div className="p-8 text-center text-gray-400 text-[12px]">Loading priority scores...</div>
+                <div className="p-8 text-center text-gray-400 text-[12px]">Loading maintenance requests...</div>
               ) : (
-                <div className="divide-y divide-gray-50">
-                  {filteredJobs.map(job => {
-                    const isSelected = selectedJob?.id === job.id;
-                    return (
-                      <div
-                        key={job.id}
-                        onClick={() => setSelectedJob(job)}
-                        className={clsx(
-                          'px-4 py-3 cursor-pointer flex items-center justify-between gap-4 transition-colors',
-                          isSelected ? 'bg-blue-50 border-l-2 border-blue-600' : 'hover:bg-gray-50 border-l-2 border-transparent'
-                        )}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="text-right flex-shrink-0 w-10">
-                            <span className="text-[10px] text-gray-400 block">Score</span>
-                            <span className="font-mono font-bold text-[14px] text-gray-900">{job.priorityScore}</span>
-                          </div>
-                          <div className="w-px h-8 bg-gray-200 flex-shrink-0" />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-mono font-bold text-[12px] text-gray-900">{job.id}</span>
-                              <span className="text-[11px] font-medium text-gray-700">{job.maintenanceType}</span>
-                              <span className="font-bold text-[11px] text-blue-800">· {job.track}</span>
-                              {job.overdueDays > 0 && (
-                                <span className="text-[9px] bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded border border-red-200">
-                                  {job.overdueDays}d OVERDUE
-                                </span>
-                              )}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50/50 border-b border-gray-100">
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Request ID</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Department</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Type & Location</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Duration</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Priority</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Planning Status</th>
+                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-500 uppercase">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredJobs.map(job => (
+                        <tr key={job.id} className={clsx('hover:bg-gray-50/80 transition-colors', selectedJob?.id === job.id && 'bg-blue-50/50')}>
+                          <td className="px-4 py-3 text-[12px] font-mono font-bold text-gray-900">{job.id}</td>
+                          <td className="px-4 py-3 text-[12px] text-gray-700">{job.department}</td>
+                          <td className="px-4 py-3">
+                            <div className="text-[12px] font-medium text-gray-900">{job.maintenanceType}</div>
+                            <div className="text-[11px] text-gray-500 mt-0.5">{job.section} · {job.track}</div>
+                          </td>
+                          <td className="px-4 py-3 text-[12px] text-gray-700">{job.estimatedDuration} min</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-1.5">
+                              <span className={clsx('w-2 h-2 rounded-full', job.priorityScore > 0.6 ? 'bg-red-500' : job.priorityScore > 0.4 ? 'bg-amber-500' : 'bg-blue-500')} />
+                              <span className="text-[11px] font-bold text-gray-700">{(job.priorityScore * 100).toFixed(0)}</span>
+                              {job.overdueDays > 0 && <span className="text-[9px] bg-red-50 text-red-700 font-bold px-1.5 py-0.5 rounded border border-red-100 uppercase">{job.overdueDays}d Overdue</span>}
                             </div>
-                            <p className="text-[10px] text-gray-500 mt-0.5">
-                              {job.department} · {job.asset} · {job.estimatedDuration} min
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <PriorityBadge priority={job.priority} />
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setSelectedJob(job); }}
-                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
-                          >
-                            Detail <ArrowRight className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {filteredJobs.length === 0 && (
-                    <div className="p-6 text-center text-gray-400 text-[12px]">No jobs found for selected department.</div>
-                  )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={clsx('text-[11px] font-bold px-2 py-0.5 rounded uppercase border', 
+                              job.status === 'SCHEDULED' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
+                              job.status === 'COMPLETED' ? 'bg-green-50 text-green-700 border-green-200' : 
+                              'bg-gray-100 text-gray-600 border-gray-200'
+                            )}>
+                              {job.status === 'SCHEDULED' ? 'Planned' : job.status === 'COMPLETED' ? 'Completed' : 'Pending Planning'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-[12px]">
+                            <button onClick={() => setSelectedJob(job)} className="text-blue-600 font-bold hover:text-blue-800">
+                              View Details
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
+            {filteredJobs.length === 0 && (
+                    <div className="p-6 text-center text-gray-400 text-[12px]">No jobs found for selected department.</div>
+                  )}
 
             {/* My Requests Table */}
             <div className="bg-white rounded-lg border border-gray-200 p-4 mt-6">
@@ -753,72 +761,12 @@ export default function Plan() {
               <span className="text-[11px] text-gray-400 ml-auto">{filteredBlocks.length} blocks</span>
             </div>
 
-            {/* Block list */}
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-[11px]">
-                <thead>
-                  <tr className="border-b border-gray-100 bg-gray-50 text-gray-400 text-left">
-                    <th className="py-2.5 px-4 font-semibold">BLOCK</th>
-                    <th className="py-2.5 px-4 font-semibold">SECTION</th>
-                    <th className="py-2.5 px-4 font-semibold">WINDOW</th>
-                    <th className="py-2.5 px-4 font-semibold">DEPARTMENT</th>
-                    <th className="py-2.5 px-4 font-semibold">STATUS</th>
-                    <th className="py-2.5 px-4 font-semibold">IMPACT</th>
-                    <th className="py-2.5 px-4 font-semibold text-right">ACTION</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {filteredBlocks.map(block => {
-                    const isSelected = selectedBlock?.id === block.id;
-                    return (
-                      <tr
-                        key={block.id}
-                        onClick={() => setSelectedBlock(block)}
-                        className={clsx(
-                          'cursor-pointer transition-colors',
-                          isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                        )}
-                      >
-                        <td className="py-3 px-4">
-                          <span className="font-mono font-bold text-gray-900">{block.id}</span>
-                          <span className="block text-[10px] text-gray-400">{block.jobs}</span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="font-mono font-semibold text-gray-700">{block.track}</span>
-                          <span className="block text-[10px] text-gray-400">{block.section}</span>
-                        </td>
-                        <td className="py-3 px-4 font-mono text-gray-700">{block.timeWindow}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex gap-1 flex-wrap">
-                            {block.departments.map(d => (
-                              <span key={d} className="text-[9px] font-bold bg-gray-100 text-gray-600 border border-gray-200 px-1.5 py-0.5 rounded">{d}</span>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <StatusBadge status={block.status} size="sm" />
-                        </td>
-                        <td className="py-3 px-4">
-                          {block.affectedTrains > 0 ? (
-                            <span className="text-amber-700 font-semibold">{block.affectedTrains} train{block.affectedTrains > 1 ? 's' : ''}</span>
-                          ) : (
-                            <span className="text-green-700">None</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setSelectedBlock(block); }}
-                            className="text-[11px] font-semibold text-blue-600 hover:text-blue-800"
-                          >
-                            Open →
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            {/* Plan Review Tabs */}
+            <PlanReviewTabs
+              blocks={filteredBlocks}
+              selectedBlockId={selectedBlock?.id || ''}
+              onSelectBlock={(id) => setSelectedBlock(blocks.find(b => b.id === id) || null)}
+            />
           </div>
         )}
       </div>

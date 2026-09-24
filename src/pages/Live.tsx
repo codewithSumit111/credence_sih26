@@ -1,169 +1,90 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
-import {
-  AlertOctagon, RefreshCw, CheckCircle2, Lock,
-  ChevronDown, ChevronUp, Check, AlertTriangle, Clock
-} from 'lucide-react';
+import { CheckCircle2, AlertOctagon } from 'lucide-react';
 import ConfirmationDialog from '../components/common/ConfirmationDialog';
-import StatusBadge from '../components/common/StatusBadge';
 import LoadingState from '../components/common/LoadingState';
-import { eventsApi, reoptimizationApi } from '../api';
+import { eventsApi, blocksApi, reoptimizationApi } from '../api';
 import type { LiveEvent, ReoptimizationPlan } from '../types';
 import DisruptionSimulator from '../components/live/DisruptionSimulator';
+import RailwayTrackView, { BlockItem } from '../components/blocks/RailwayTrackView';
+import { useAuth } from '../contexts/AuthContext';
 
-// ─── Recovery workflow step indicator ─────────────────────────────────────────
-const WORKFLOW_STEPS = ['EVENT', 'IMPACT', 'ALNS', 'A*', 'NEW PLAN', 'APPROVE'] as const;
-type WorkflowStep = typeof WORKFLOW_STEPS[number];
-
-function WorkflowIndicator({ currentStep }: { currentStep: number }) {
-  return (
-    <div className="flex items-center gap-0">
-      {WORKFLOW_STEPS.map((step, i) => (
-        <div key={step} className="flex items-center">
-          <div className={clsx(
-            'flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-bold transition-all',
-            i < currentStep ? 'bg-blue-100 text-blue-700 border border-blue-200'
-              : i === currentStep ? 'bg-blue-700 text-white shadow-sm'
-              : 'bg-gray-100 text-gray-400 border border-gray-200'
-          )}>
-            {i < currentStep ? (
-              <Check className="w-3 h-3" />
-            ) : (
-              <span>{i + 1}</span>
-            )}
-            {step}
-          </div>
-          {i < WORKFLOW_STEPS.length - 1 && (
-            <div className={clsx(
-              'w-5 h-px mx-0.5 transition-all',
-              i < currentStep ? 'bg-emerald-400' : 'bg-gray-200'
-            )} />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Event Card ───────────────────────────────────────────────────────────────
-function EventRow({ event, selected, onClick }: { event: LiveEvent; selected: boolean; onClick: () => void }) {
-  const severityColors = {
-    CRITICAL: 'border-red-200 bg-red-50',
-    HIGH: 'border-orange-200 bg-orange-50',
-    MEDIUM: 'border-amber-200 bg-amber-50',
-    LOW: 'border-gray-200 bg-gray-50',
-  };
-  const severityDot = {
-    CRITICAL: 'bg-red-600',
-    HIGH: 'bg-orange-500',
-    MEDIUM: 'bg-amber-500',
-    LOW: 'bg-gray-400',
-  };
-
-  return (
-    <div
-      onClick={onClick}
-      className={clsx(
-        'border rounded-lg p-3.5 cursor-pointer transition-all',
-        severityColors[event.severity],
-        selected && 'ring-2 ring-offset-1 ring-gray-700'
-      )}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className={clsx('w-2 h-2 rounded-full flex-shrink-0 animate-pulse', severityDot[event.severity])} />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className={clsx(
-                'text-[9px] font-bold px-1.5 py-0.5 rounded uppercase text-white',
-                event.severity === 'CRITICAL' ? 'bg-red-600' :
-                event.severity === 'HIGH' ? 'bg-orange-500' :
-                event.severity === 'MEDIUM' ? 'bg-amber-500' : 'bg-gray-400'
-              )}>{event.severity}</span>
-              <span className="text-[13px] font-bold text-gray-900">{event.title}</span>
-            </div>
-            <p className="text-[11px] text-gray-600 mt-0.5">{event.location} · {event.description}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 flex-shrink-0 ml-3">
-          <StatusBadge status={event.status} />
-          <span className="text-[10px] font-mono text-gray-400">
-            {new Date(event.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Live Page ────────────────────────────────────────────────────────────────
 export default function Live() {
+  const { user } = useAuth();
+  const isController = user?.role === 'SECTION_CONTROLLER';
+
   const [events, setEvents] = useState<LiveEvent[]>([]);
+  const [blocks, setBlocks] = useState<BlockItem[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<LiveEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [recovering, setRecovering] = useState(false);
-  const [recoveryStep, setRecoveryStep] = useState(0); // 0=event, 1=impact, 2=alns, 3=astar, 4=plan, 5=approve
   const [plan, setPlan] = useState<ReoptimizationPlan | null>(null);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [showOptDetails, setShowOptDetails] = useState(false);
 
   useEffect(() => {
-    eventsApi.getEvents().then(data => {
-      setEvents(data);
-      if (data.length > 0) {
-        setSelectedEvent(data[0]);
-      }
-      setLoading(false);
-    }).catch(() => {
-      toast.error('Failed to load events');
+    Promise.all([eventsApi.getEvents(), blocksApi.getBlocks()]).then(([eventsData, blocksData]) => {
+      setEvents(eventsData);
+      setBlocks(blocksData.map(b => ({
+        id: b.id,
+        track: b.track,
+        section: b.section,
+        timeWindow: `${b.startTime} - ${b.endTime}`,
+        startTime: b.startTime,
+        endTime: b.endTime,
+        duration: String(b.duration),
+        departments: b.departments,
+        jobs: b.jobIds.join(', '),
+        jobCount: b.jobIds.length,
+        priority: b.priority as 'HIGH' | 'MEDIUM' | 'LOW',
+        status: b.status,
+        affectedTrains: b.affectedTrains.length,
+        rawBlock: b
+      })));
       setLoading(false);
     });
   }, []);
 
-  const handleRunRecovery = async () => {
-    if (!selectedEvent) return;
-    setRecovering(true);
-    setRecoveryStep(1); // impact
-    await new Promise(r => setTimeout(r, 800));
-    setRecoveryStep(2); // alns
-    await new Promise(r => setTimeout(r, 1200));
-    setRecoveryStep(3); // a*
-    await new Promise(r => setTimeout(r, 900));
-    setRecoveryStep(4); // new plan
-
-    try {
-      const newPlan = await eventsApi.triggerReoptimize(selectedEvent.id);
-      setPlan(newPlan);
-      toast.success('Recovery Plan Generated', {
-        description: 'ALNS re-optimized remaining schedule. A* rerouted affected train. Awaiting approval.',
-      });
-    } catch {
-      toast.error('Recovery calculation failed');
-    }
-    setRecovering(false);
-  };
-
   const handleInjectEvent = (newEvent: LiveEvent) => {
     setEvents([newEvent, ...events]);
     setSelectedEvent(newEvent);
-    setRecoveryStep(0);
     setPlan(null);
     toast.warning('Disruption Injected', {
       description: `${newEvent.title} has been simulated on ${newEvent.location}.`
     });
   };
 
+  const handleRunRecovery = async () => {
+    if (!selectedEvent) return;
+    setRecovering(true);
+    // Simulate recovery calculation delay
+    setTimeout(async () => {
+      try {
+        const newPlan = await eventsApi.triggerReoptimize(selectedEvent.id);
+        setPlan(newPlan);
+        toast.success('Recovery Plan Generated', { description: 'Re-optimization engine generated a feasible recovery plan.' });
+      } catch {
+        toast.error('Recovery failed');
+      }
+      setRecovering(false);
+    }, 1500);
+  };
+
   const handleApprove = async () => {
-    if (!plan) return;
+    if (!plan || !selectedEvent) return;
     setActionLoading(true);
     try {
       await reoptimizationApi.approve(plan.id);
-      setPlan(prev => prev ? { ...prev, status: 'APPROVED' } : null);
-      setRecoveryStep(5);
+      
+      // Reflect the final state in the global backend/state
+      for (const blockId of selectedEvent.affectedBlocks) {
+        await blocksApi.updateStatus(blockId, 'MODIFIED' as any, { notes: 'Updated via Local Recovery' });
+      }
+      
+      setPlan({ ...plan, status: 'APPROVED' });
       toast.success('Recovery Plan Approved', {
-        description: 'New schedule committed. Train dispatch orders issued.',
+        description: 'New schedule committed. Reroute orders dispatched.',
       });
       setShowApproveDialog(false);
     } catch {
@@ -177,436 +98,220 @@ export default function Live() {
     if (!plan) return;
     await reoptimizationApi.reject(plan.id);
     setPlan(null);
-    setRecoveryStep(0);
     toast.info('Recovery plan rejected. Manual resolution required.');
   };
 
+  // Map blocks to their BEFORE visual state
+  const currentBlocksRender = useMemo(() => {
+    return blocks.map(b => ({
+      ...b,
+      // In CURRENT PLAN, completed/active are shown as PROTECTED
+      status: (b.status === 'COMPLETED' || b.status === 'ACTIVE' || b.status === 'IMPOSED') ? 'PROTECTED' : b.status
+    }));
+  }, [blocks]);
+
+  // Map blocks to their AFTER visual state
+  const recoveredBlocksRender = useMemo(() => {
+    if (!selectedEvent) return [];
+    return blocks.map(b => {
+      if (selectedEvent.affectedBlocks.includes(b.id)) {
+        return { ...b, status: 'UPDATED' }; // Modified downstream
+      }
+      return { ...b, status: 'UNCHANGED' }; // Protected or Unaffected downstream
+    });
+  }, [blocks, selectedEvent]);
+
   if (loading) return <LoadingState message="Connecting to live event stream..." />;
 
-  const currentWorkflowStep = plan?.status === 'APPROVED' ? 5 : recoveryStep;
-
   return (
-    <div className="irctc-page">
-      {/* ── Page Header (IRCTC style — matches 4.png layout) ── */}
+    <div className="irctc-page bg-gray-50 min-h-screen">
       <div className="bg-white border-b border-irctc-border px-7 py-5">
-        <div className="max-w-[1400px] mx-auto flex items-start justify-between flex-wrap gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="irctc-page-title">Alerts and Updates</h1>
-              <div className="flex items-center gap-1.5 text-[12px] font-semibold text-irctc-blue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-irctc-blue animate-pulse" />
-                Live Monitoring
-              </div>
+        <div className="max-w-[1600px] mx-auto">
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="irctc-page-title">Live Event Inject: Local Recovery</h1>
+            <div className="flex items-center gap-1.5 text-[12px] font-semibold text-red-600 bg-red-50 border border-red-200 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+              Actual Operations Disruption
             </div>
-            <p className="text-[14px] text-irctc-muted">Event detection → ALNS re-optimization → A* rerouting → human approval</p>
           </div>
-          <div className="overflow-x-auto">
-            <WorkflowIndicator currentStep={currentWorkflowStep} />
-          </div>
+          <p className="text-[14px] text-irctc-muted">Report live disruption → Assess frozen-state local recovery → Commit changes.</p>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-7 py-6 space-y-6">
-
-        {/* Event list — IRCTC Announcements style (4.png) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left: Announcements */}
-          <div className="irctc-card">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="irctc-section-title">Announcements</h2>
-              <div className="flex gap-1">
-                <button className="w-8 h-8 rounded-full border border-irctc-border text-irctc-muted flex items-center justify-center hover:bg-gray-50 text-[14px] font-bold">‹</button>
-                <button className="w-8 h-8 rounded-full border border-irctc-border text-irctc-muted flex items-center justify-center hover:bg-gray-50 text-[14px] font-bold">›</button>
-              </div>
-            </div>
-            {events.length === 0 && (
-              <div className="py-8 text-center">
-                <CheckCircle2 className="w-7 h-7 text-green-500 mx-auto mb-2" />
-                <p className="text-[14px] font-semibold text-irctc-text">No active disruptions</p>
-                <p className="text-[13px] text-irctc-muted">All corridor operations nominal</p>
-              </div>
-            )}
-            <div className="space-y-0">
-              {events.map(event => (
-                <div
-                  key={event.id}
-                  onClick={() => { setSelectedEvent(event); setRecoveryStep(0); setPlan(null); }}
-                  className={clsx(
-                    'flex items-start gap-3 py-4 border-b border-irctc-border-light last:border-0 cursor-pointer hover:bg-blue-50/40 transition-colors -mx-5 px-5',
-                    selectedEvent?.id === event.id && 'bg-blue-50'
-                  )}
-                >
-                  <span className={clsx(
-                    'w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5',
-                    event.severity === 'CRITICAL' ? 'bg-red-600' :
-                    event.severity === 'HIGH' ? 'bg-irctc-orange' :
-                    event.severity === 'MEDIUM' ? 'bg-amber-500' : 'bg-gray-400'
-                  )} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-semibold text-irctc-text leading-snug">{event.title}</p>
-                    <p className="text-[12px] text-irctc-muted mt-0.5">{event.location} · {event.description}</p>
-                    <p className="text-[11px] text-irctc-muted mt-0.5 font-mono">
-                      {new Date(event.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                  <StatusBadge status={event.status} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right: Operational Advisories & Simulator */}
-          <div className="space-y-6">
+      <div className="max-w-[1600px] mx-auto px-5 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          
+          {/* LEFT: TRIGGER DISRUPTION */}
+          <div className="xl:col-span-3 space-y-6">
             <DisruptionSimulator onInject={handleInjectEvent} />
             
-            <div className="irctc-card">
-              <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-irctc-blue flex items-center justify-center">
-                  <AlertOctagon className="w-5 h-5" />
+            {selectedEvent && (
+              <div className="irctc-card border-l-4 border-l-red-500 shadow-md">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertOctagon className="w-5 h-5 text-red-600" />
+                  <h3 className="font-bold text-red-900">IMPACT DETECTED</h3>
                 </div>
-                <h2 className="irctc-section-title">Operational Advisories</h2>
+                <div className="space-y-4 text-[12px]">
+                  <div>
+                    <p className="font-bold text-gray-700 uppercase tracking-wider">Affected</p>
+                    <ul className="list-disc pl-4 text-red-700 mt-1.5 space-y-1 font-medium">
+                      {selectedEvent.affectedBlocks.map(b => <li key={b}>Block {b}</li>)}
+                      {selectedEvent.affectedTrains.map(t => <li key={t}>Train {t}</li>)}
+                      <li>Downstream section {selectedEvent.location}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-700 uppercase tracking-wider">Protected</p>
+                    <ul className="list-disc pl-4 text-green-700 mt-1.5 space-y-1 font-medium">
+                      <li>Completed blocks</li>
+                      <li>Active operations</li>
+                      <li>Unaffected trains</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-              <button className="text-irctc-muted hover:text-irctc-text">
-                <ChevronUp className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-3 max-h-72 overflow-y-auto">
-              {[{
-                text: 'Review all active blocks before authorizing new maintenance windows on TR-02.',
-                level: 'note',
-              }, {
-                text: 'Train conflict detection active — 2 trains flagged for potential delay on NGP–AK section.',
-                level: 'warning',
-              }, {
-                text: 'Block overrun threshold exceeded on TR-04. Notify Engineering department.',
-                level: 'critical',
-              }].map((adv, i) => (
-                <div
-                  key={i}
-                  className={clsx(
-                    'p-4 rounded-xl border text-[13px] leading-relaxed',
-                    adv.level === 'critical' ? 'bg-red-50/60 border-red-100' :
-                    adv.level === 'warning' ? 'bg-amber-50/60 border-amber-100' :
-                    'bg-blue-50/40 border-blue-100'
-                  )}
-                >
-                  {adv.text}
+            )}
+          </div>
+
+          {isController ? (
+            <>
+              {/* CENTER: RAILWAY SCHEMATIC (BEFORE / AFTER) */}
+              <div className="xl:col-span-6 space-y-6">
+                
+                {/* Before View */}
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center justify-between">
+                    <span className="font-bold text-gray-700 text-[13px]">CURRENT PLAN</span>
+                  </div>
+                  <RailwayTrackView region="Central Railway" blocks={currentBlocksRender} selectedId="" onSelect={() => {}} />
+                  <div className="px-4 py-3 bg-gray-50 text-[11px] text-gray-700 border-t flex justify-between uppercase tracking-wider font-semibold">
+                    <span>Completed/Active: <span className="text-green-600 ml-1">PROTECTED</span></span>
+                    <span>Downstream: <span className="text-gray-500 ml-1">CURRENT</span></span>
+                  </div>
                 </div>
-              ))}
+
+                {/* After View */}
+                {plan && (
+                  <div className="bg-white border-2 border-blue-400 rounded-lg overflow-hidden shadow-md transition-all">
+                    <div className="bg-blue-50 px-4 py-2 border-b border-blue-200 flex items-center justify-between">
+                      <span className="font-bold text-blue-900 text-[13px]">RECOVERY PLAN</span>
+                      <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded font-bold">UPDATED</span>
+                    </div>
+                    <RailwayTrackView region="Central Railway" blocks={recoveredBlocksRender} selectedId="" onSelect={() => {}} />
+                    <div className="px-4 py-3 bg-blue-50 text-[11px] text-blue-900 border-t flex justify-between uppercase tracking-wider font-semibold">
+                      <span>Completed/Active: <span className="text-gray-500 ml-1">UNCHANGED</span></span>
+                      <span>Downstream Affected: <span className="text-blue-600 ml-1">UPDATED</span></span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT: RECOVERY SUMMARY */}
+              <div className="xl:col-span-3 space-y-6">
+                 {!plan && selectedEvent && (
+                   <button 
+                      onClick={handleRunRecovery} 
+                      disabled={recovering}
+                      className="w-full flex justify-center items-center gap-2 bg-blue-600 text-white font-bold py-3.5 rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-70 transition-colors"
+                   >
+                     {recovering ? 'Computing Recovery...' : 'Launch Local Recovery'}
+                   </button>
+                 )}
+                 
+                 {plan && (
+                   <>
+                     <div className="irctc-card border-blue-200 shadow-sm">
+                       <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-[14px]">
+                         <CheckCircle2 className="w-4 h-4" />
+                         RECOVERY SUMMARY
+                       </h3>
+                       <div className="grid grid-cols-2 gap-2 text-[12px] mb-5">
+                         <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                           <p className="text-gray-500 uppercase text-[9px] font-bold mb-0.5">Blocks Changed</p>
+                           <p className="font-bold text-[14px] text-gray-900">{plan.impact.blocksChanged}</p>
+                         </div>
+                         <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                           <p className="text-gray-500 uppercase text-[9px] font-bold mb-0.5">Trains Affected</p>
+                           <p className="font-bold text-[14px] text-gray-900">{plan.impact.trainsRerouted}</p>
+                         </div>
+                         <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                           <p className="text-gray-500 uppercase text-[9px] font-bold mb-0.5">Addl Delay</p>
+                           <p className="font-bold text-[14px] text-amber-700">+{plan.impact.additionalDelay} min</p>
+                         </div>
+                         <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                           <p className="text-gray-500 uppercase text-[9px] font-bold mb-0.5">Status</p>
+                           <p className="font-bold text-[14px] text-green-600">Feasible</p>
+                         </div>
+                       </div>
+                       
+                       <div className="space-y-4 pt-4 border-t border-gray-100">
+                         <div>
+                           <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">WHAT CHANGED?</h4>
+                           <ul className="text-[11px] space-y-1.5 mt-2 text-gray-700">
+                             {selectedEvent?.affectedBlocks.map(b => <li key={b} className="flex gap-2"><span className="text-blue-500">◆</span> Block {b} shifted</li>)}
+                             {selectedEvent?.affectedTrains.map(t => <li key={t} className="flex gap-2"><span className="text-blue-500">◆</span> Train {t} receives updated timing</li>)}
+                             <li className="flex gap-2"><span className="text-blue-500">◆</span> Downstream section adjusted</li>
+                           </ul>
+                         </div>
+                         <div>
+                           <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">WHAT DID NOT CHANGE?</h4>
+                           <ul className="text-[11px] space-y-1.5 mt-2 text-green-700">
+                             <li className="flex gap-2"><span>◆</span> Completed operations</li>
+                             <li className="flex gap-2"><span>◆</span> Active operations</li>
+                             <li className="flex gap-2"><span>◆</span> Unaffected blocks</li>
+                             <li className="flex gap-2"><span>◆</span> Unaffected trains</li>
+                           </ul>
+                         </div>
+                         <div className="bg-blue-50/50 p-3 rounded">
+                           <h4 className="text-[10px] font-bold text-blue-900 uppercase tracking-wider">WHY?</h4>
+                           <p className="text-[11px] text-blue-800 mt-1 leading-relaxed">
+                             The recovery modifies only the affected downstream portion while preserving protected operations.
+                           </p>
+                         </div>
+                       </div>
+                     </div>
+
+                     <div className="irctc-card shadow-sm">
+                       <h3 className="font-bold text-gray-900 mb-3 text-[13px] uppercase tracking-wider">Verification</h3>
+                       <div className="space-y-2.5 text-[11px] font-semibold text-green-700 bg-green-50/50 p-3 rounded border border-green-100">
+                         <div className="flex items-center gap-2.5"><CheckCircle2 className="w-3.5 h-3.5" /> Timing constraints</div>
+                         <div className="flex items-center gap-2.5"><CheckCircle2 className="w-3.5 h-3.5" /> Block conflicts</div>
+                         <div className="flex items-center gap-2.5"><CheckCircle2 className="w-3.5 h-3.5" /> Train conflicts</div>
+                         <div className="flex items-center gap-2.5"><CheckCircle2 className="w-3.5 h-3.5" /> Resource constraints</div>
+                         <div className="flex items-center gap-2.5"><CheckCircle2 className="w-3.5 h-3.5" /> Protected operations preserved</div>
+                       </div>
+                     </div>
+
+                     <div className="irctc-card bg-amber-50 border-amber-200 shadow-sm">
+                       <h3 className="font-bold text-amber-900 mb-4 text-center uppercase tracking-wider text-[13px]">RECOVERY PLAN READY</h3>
+                       <div className="flex gap-2">
+                         <button onClick={handleReject} className="flex-1 py-2.5 bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-bold rounded shadow-sm text-[11px] transition-colors">Reject Recovery</button>
+                         <button onClick={() => setShowApproveDialog(true)} className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded shadow-sm text-[11px] transition-colors">Approve & Commit</button>
+                       </div>
+                     </div>
+                   </>
+                 )}
+              </div>
+            </>
+          ) : (
+            <div className="xl:col-span-9 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl bg-white min-h-[400px]">
+              <AlertOctagon className="w-12 h-12 text-gray-300 mb-4" />
+              <h3 className="text-gray-600 font-bold text-[16px] mb-2">Live Event Reporter</h3>
+              <p className="text-[13px] text-gray-500 max-w-md mx-auto text-center leading-relaxed">
+                Use the left panel to report operational disruptions. The Section Controller will review the event and generate a local recovery plan for operations.
+              </p>
             </div>
-          </div>
-          </div>
+          )}
+
         </div>
-
-        {/* Selected event detail — full recovery workspace */}
-        {selectedEvent && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left: Impact + Recovery workflow */}
-            <div className="lg:col-span-7 space-y-5">
-              {/* Impact */}
-              <div className="irctc-card">
-                <h3 className="irctc-card-title mb-5">Impact Assessment</h3>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {[
-                    { label: 'Trains Affected', value: selectedEvent.systemImpact.trainsAffected, color: 'text-red-700', bg: 'bg-red-50 border-red-100' },
-                    { label: 'Block Overruns', value: selectedEvent.systemImpact.blocksOverrunning, color: 'text-amber-700', bg: 'bg-amber-50 border-amber-100' },
-                    { label: 'Route Recalcs', value: selectedEvent.systemImpact.routeRecalculations, color: 'text-blue-700', bg: 'bg-blue-50 border-blue-100' },
-                    { label: 'Safety Violations', value: selectedEvent.systemImpact.safetyViolations, color: 'text-green-700', bg: 'bg-green-50 border-green-100' },
-                  ].map(item => (
-                    <div key={item.label} className={clsx('border rounded-xl p-4 flex items-center justify-between', item.bg)}>
-                      <span className="text-[13px] font-semibold text-irctc-text">{item.label}</span>
-                      <span className={clsx('font-bold text-[20px]', item.color)}>{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Affected trains list */}
-                <h4 className="irctc-label mb-3 mt-4">Affected Trains</h4>
-                <div className="space-y-2">
-                  {selectedEvent.affectedTrains.map((tNum, idx) => {
-                    const isFirst = idx === 0;
-                    return (
-                      <div key={tNum} className="flex items-center justify-between p-3 bg-gray-50 border border-irctc-border rounded-lg">
-                        <span className="font-mono font-bold text-irctc-navy text-[14px]">{tNum}</span>
-                        <span className={clsx('text-[13px] font-medium', isFirst ? 'text-amber-700' : 'text-irctc-muted')}>
-                          {isFirst ? 'Reroute via alternate path recommended' : 'Wait strategy recommended'}
-                        </span>
-                        <StatusBadge status={isFirst ? 'DELAYED' : 'ON_TIME'} />
-                      </div>
-                    );
-                  })}
-                  {selectedEvent.affectedBlocks.length > 0 && (
-                    <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                      <span className="text-[13px] font-semibold text-amber-800">Affected Blocks</span>
-                      <span className="font-mono text-[13px] text-amber-700">{selectedEvent.affectedBlocks.join(', ')}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Recovery Engine */}
-              <div className="irctc-card">
-                <div className="flex items-center justify-between mb-5">
-                  <h3 className="irctc-card-title">Recovery Engine</h3>
-                  <span className="text-[12px] font-mono text-irctc-blue bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-full font-bold">
-                    ALNS + TD-A*
-                  </span>
-                </div>
-
-                {/* ALNS section */}
-                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 2 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200')}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {recoveryStep >= 3 ? (
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                    ) : recoveryStep === 2 ? (
-                      <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
-                    ) : (
-                      <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
-                    )}
-                    <span className="text-[12px] font-bold text-gray-800">ALNS Re-optimization</span>
-                  </div>
-                  <p className="text-[11px] text-gray-600 ml-6">
-                    Adaptive Large Neighborhood Search re-optimizes the <strong>remaining schedule</strong> from now onward.
-                    Past and active operations are <strong>frozen</strong> — only future possessions and train slots are adjusted.
-                  </p>
-                  {recoveryStep >= 3 && (
-                    <div className="ml-6 mt-2 space-y-1">
-                      {[
-                        'Completed operations frozen & protected',
-                        ...(plan?.changesMade || selectedEvent.affectedBlocks.map(b => `${b} shifted to accommodate disruption`)),
-                      ].slice(0, 3).map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-[10px] text-blue-700">
-                          <Check className="w-3 h-3" />{item}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* A* section */}
-                <div className={clsx('p-4 rounded-lg border mb-3 transition-all', recoveryStep >= 3 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200')}>
-                  <div className="flex items-center gap-2 mb-2">
-                    {recoveryStep >= 4 ? (
-                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                    ) : recoveryStep === 3 ? (
-                      <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
-                    ) : (
-                      <span className="w-4 h-4 rounded-full border-2 border-gray-300 inline-block" />
-                    )}
-                    <span className="text-[12px] font-bold text-gray-800">Time-Dependent A* Rerouting</span>
-                  </div>
-                  <p className="text-[11px] text-gray-600 ml-6">
-                    Computes feasible alternate routes for affected trains, considering blocked sections, current network state, and travel time costs.
-                  </p>
-                  {recoveryStep >= 4 && (
-                    <div className="ml-6 mt-2 space-y-1">
-                      {selectedEvent.affectedTrains.map((tNum, idx) => (
-                        <div key={tNum} className="flex items-center gap-2 text-[10px] text-blue-700">
-                          <Check className="w-3 h-3" />
-                          {idx === 0
-                            ? `Train ${tNum} → Reroute via alternate path (A* computed)`
-                            : `Train ${tNum} → Wait strategy at current signal`
-                          }
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Trigger button */}
-                {recoveryStep === 0 && !plan && (
-                  <button
-                    onClick={handleRunRecovery}
-                    disabled={recovering}
-                    className="irctc-btn irctc-btn-blue w-full justify-center py-3 text-[14px] font-bold"
-                  >
-                    {recovering ? <RefreshCw className="w-4 h-4 animate-spin" /> : <AlertOctagon className="w-4 h-4" />}
-                    Launch ALNS + A* Recovery Engine
-                  </button>
-                )}
-
-                {recovering && (
-                  <div className="text-center py-2">
-                    <p className="text-[11px] text-blue-700 font-semibold animate-pulse">
-                      {recoveryStep === 1 && 'Assessing impact area...'}
-                      {recoveryStep === 2 && 'ALNS re-optimizing remaining schedule...'}
-                      {recoveryStep === 3 && 'A* computing rerouting paths...'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right: Timeline + Recovery Plan */}
-            <div className="lg:col-span-5 space-y-5">
-              {/* Timeline */}
-              <div className="irctc-card">
-                <h3 className="irctc-card-title mb-5">
-                  Disruption Timeline
-                </h3>
-                <div className="relative space-y-3.5">
-                  {selectedEvent.timeline.map((entry, i) => (
-                    <div key={i} className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-gray-500 w-10 flex-shrink-0 text-right">{entry.time}</span>
-                      <div className="flex flex-col items-center flex-shrink-0">
-                        <div className={clsx(
-                          'w-2.5 h-2.5 rounded-full mt-0.5',
-                          entry.isAlert ? 'bg-red-600 ring-3 ring-red-100' : 'bg-blue-500'
-                        )} />
-                        {i < selectedEvent.timeline.length - 1 && (
-                          <div className="w-px h-4 bg-gray-200 mt-0.5" />
-                        )}
-                      </div>
-                      <span className={clsx(
-                        'pt-0.5 leading-relaxed flex-1',
-                        entry.isAlert ? 'text-red-800 font-semibold' : 'text-gray-700'
-                      )}>
-                        {entry.description}
-                      </span>
-                    </div>
-                  ))}
-
-                  {/* Add recovery steps to timeline */}
-                  {recoveryStep >= 2 && (
-                    <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="pt-0.5 text-blue-800 font-semibold">ALNS recovery started</span>
-                    </div>
-                  )}
-                  {recoveryStep >= 3 && (
-                    <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0" />
-                      <span className="pt-0.5 text-blue-800 font-semibold">A* rerouting computed</span>
-                    </div>
-                  )}
-                  {plan && (
-                    <div className="flex items-start gap-3 text-[11px]">
-                      <span className="font-mono font-bold text-blue-700 w-10 flex-shrink-0 text-right">Now</span>
-                      <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-0.5 flex-shrink-0 animate-pulse" />
-                      <span className="pt-0.5 text-blue-800 font-bold">New plan generated — awaiting approval</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Recovery Plan — appears after ALNS runs */}
-              {plan && (
-                <div className="irctc-card border-irctc-blue border-2">
-                  <div className="flex items-center justify-between mb-5">
-                    <div>
-                      <h3 className="irctc-card-title text-irctc-navy">New Operating Plan</h3>
-                      <p className="text-[12px] text-irctc-muted mt-0.5">Generated by ALNS + Time-Dependent A*</p>
-                    </div>
-                    <span className="irctc-badge bg-amber-50 text-amber-700 border-amber-200">
-                      Awaiting Approval
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 mb-4">
-                    {/* Frozen block */}
-                    <div className="p-3 bg-gray-100/70 border border-gray-300 rounded text-[11px] opacity-80">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-mono font-bold text-gray-700 flex items-center gap-1.5">
-                          <Lock className="w-3 h-3 text-gray-500" />BR-00231
-                        </span>
-                        <span className="font-mono text-gray-600">14:00–15:30</span>
-                      </div>
-                      <p className="text-gray-500 text-[10px]">FROZEN — completed possession preserved</p>
-                    </div>
-
-                    {/* Shifted block */}
-                    <div className="p-3 bg-amber-50 border border-amber-300 rounded text-[11px]">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-mono font-bold text-amber-900">BR-00232</span>
-                        <span className="font-mono font-bold text-amber-900">16:30–17:20 ↺ (+20m)</span>
-                      </div>
-                      <p className="text-amber-700 text-[10px]">Shifted downstream by 20 min</p>
-                    </div>
-
-                    {/* Rerouted train */}
-                    <div className="p-3 bg-blue-50 border border-emerald-300 rounded text-[11px]">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-mono font-bold text-blue-900">Train 12123</span>
-                        <span className="font-mono font-bold text-blue-900">Route A (+12 min)</span>
-                      </div>
-                      <p className="text-blue-700 text-[10px]">Rerouted via TR-04 — Time-Dependent A*</p>
-                    </div>
-                  </div>
-
-                  {/* Impact summary */}
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {[
-                      { label: 'Extra Delay', value: `+${plan.impact.additionalDelay} min` },
-                      { label: 'Blocks Changed', value: plan.impact.blocksChanged },
-                      { label: 'Trains Rerouted', value: plan.impact.trainsRerouted },
-                      { label: 'Safety Violations', value: '0 (Safe)' },
-                    ].map(item => (
-                      <div key={item.label} className="p-2 bg-gray-50 border border-gray-200 rounded text-center">
-                        <p className="text-[9px] text-gray-400 uppercase tracking-wide">{item.label}</p>
-                        <p className="font-bold text-gray-800 text-[13px]">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Opt details expandable */}
-                  <button
-                    onClick={() => setShowOptDetails(!showOptDetails)}
-                    className="w-full flex items-center justify-between text-[11px] text-gray-500 hover:text-gray-700 mb-3"
-                  >
-                    <span>View ALNS constraint summary</span>
-                    {showOptDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  </button>
-                  {showOptDetails && (
-                    <div className="p-3 bg-gray-50 border border-gray-200 rounded mb-3 space-y-1.5 text-[10px] text-gray-600">
-                      {['Past operations frozen and not modified', 'All safety buffers maintained', 'Resource availability verified', 'No constraint violations in recovered plan'].map((c, i) => (
-                        <div key={i} className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />{c}</div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* HITL Note */}
-                  <div className="p-2.5 bg-amber-50 border border-amber-200 rounded text-[10px] text-amber-800 font-medium mb-3">
-                    ⚠ Human approval required before this plan can be executed. Section Controller authorization mandatory.
-                  </div>
-
-                  {plan.status !== 'APPROVED' ? (
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleReject}
-                        className="irctc-btn irctc-btn-outline flex-1 justify-center py-2.5 text-red-700 border-red-200 hover:bg-red-50"
-                      >
-                        Reject
-                      </button>
-                      <button
-                        onClick={() => setShowApproveDialog(true)}
-                        className="irctc-btn irctc-btn-primary flex-1 justify-center py-2.5"
-                      >
-                        ✓ Approve Plan
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2 py-2.5 bg-green-50 border border-green-200 rounded-lg">
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                      <span className="text-[12px] font-bold text-green-800">Plan Approved — Executing</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Approval Dialog */}
       <ConfirmationDialog
         open={showApproveDialog}
         onClose={() => setShowApproveDialog(false)}
         onConfirm={handleApprove}
         title="Approve Recovery Plan?"
-        description="Approving this recovered plan will: commit shifted block BR-00232, authorize Train 12123 dispatch via Route A, assign Train 11008 a waiting strategy. All controllers will be notified immediately."
+        description={`Approving this recovered plan will commit changes to ${plan?.impact.blocksChanged} blocks and update schedules for ${plan?.impact.trainsRerouted} trains.`}
         confirmLabel="Approve & Commit Plan"
         loading={actionLoading}
       />

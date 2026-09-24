@@ -3,6 +3,7 @@ import { Bell, AlertTriangle, Shield, Layers, Info, LogOut } from 'lucide-react'
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
+import { blocksApi } from '../../api';
 
 const ALL_NAV_LINKS = [
   { path: '/command', label: 'HOME', roles: ['SECTION_CONTROLLER'] },
@@ -12,7 +13,7 @@ const ALL_NAV_LINKS = [
   { path: '/assets',  label: 'ASSETS', roles: ['SECTION_CONTROLLER'] },
   { path: '/analytics', label: 'ANALYTICS', roles: ['SECTION_CONTROLLER'] },
   { path: '/reports', label: 'REPORTS', roles: ['SECTION_CONTROLLER'] },
-  { path: '/requests', label: 'REQUESTS', roles: ['BDMS_INCHARGE'] },
+  { path: '/requests', label: 'REQUESTS', roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE'] },
   { path: '/field',   label: 'FIELD', roles: ['FIELD_MANAGER'] },
 ];
 
@@ -104,6 +105,7 @@ export default function TopBar() {
 
       {/* ── Right: Tools ── */}
       <div className="flex items-center gap-3 flex-shrink-0">
+        
         {/* Alerts Bell */}
         <div className="relative" ref={notifRef}>
           <button
