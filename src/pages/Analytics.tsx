@@ -17,8 +17,8 @@ import { Download, TrendingUp, Activity, CheckCircle, Clock, Play, AlertOctagon,
 // ─── What-If Panel ─────────────────────────────────────────────────────────────
 const SIM_STEPS = [
   { label: 'Loading scenario parameters...', delay: 300 },
-  { label: 'Running CP-SAT constraint solver...', delay: 900 },
-  { label: 'Time-Dependent A* routing...', delay: 700 },
+  { label: 'Running System constraint solver...', delay: 900 },
+  { label: 'Routing Engine routing...', delay: 700 },
   { label: 'Checking safety constraints...', delay: 500 },
   { label: 'Aggregating impact metrics...', delay: 400 },
 ] as const;
@@ -55,7 +55,7 @@ function WhatIfPanel({ onClose }: { onClose: () => void }) {
     setSimStep(-1);
     setHasRun(true);
     toast.success('Simulation Completed', {
-      description: `CP-SAT + A* solved in ${accumulated}ms — ${scenario.trains} train(s) evaluated.`,
+      description: `System + A* solved in ${accumulated}ms — ${scenario.trains} train(s) evaluated.`,
     });
   };
 
@@ -82,7 +82,7 @@ function WhatIfPanel({ onClose }: { onClose: () => void }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-mono text-amber-600">Solver: CP-SAT + TD-A*</span>
+          <span className="text-[10px] font-mono text-amber-600">Solver: System + TD-A*</span>
           <button onClick={onClose} className="p-1 rounded text-amber-600 hover:bg-amber-100 transition-colors">
             <X className="w-4 h-4" />
           </button>
@@ -318,7 +318,7 @@ export default function Analytics() {
             Algorithm Performance: Baseline vs Optimized
           </h3>
           <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-            CP-SAT Optimization
+            System Optimization
           </span>
         </div>
         <div className="overflow-x-auto">
@@ -430,7 +430,7 @@ export default function Analytics() {
       {/* Disruption Recovery Table */}
       <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
-          Disruption Recovery & ALNS Repair Performance
+          Disruption Recovery & Re-optimization Engine Repair Performance
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">

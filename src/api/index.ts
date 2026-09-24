@@ -168,7 +168,7 @@ export const eventsApi = {
     const delayedTrains = trains.filter(t => t.delay > 0);
     return {
       id: `RP-${Date.now().toString(36).toUpperCase()}`,
-      triggeredBy: 'ALNS+TDA*',
+      triggeredBy: 'System Optimized',
       eventId,
       disruptionDescription: 'Block possession causing train delays',
       disruptionLocation: 'Corridor',
@@ -188,7 +188,7 @@ export const eventsApi = {
         safetyViolations: 0,
         maintenanceDelayed: 0,
       },
-      algorithm: 'ALNS + Time-Dependent A*',
+      algorithm: 'Re-optimization Engine',
       createdAt: new Date().toISOString(),
     };
   },
@@ -360,7 +360,7 @@ function normalizeBlock(b: any): OptimizedBlock {
     expectedDelay: b.trainImpact || b.expectedDelay || 0,
     safetyBuffer: b.safetyBuffer || 10,
     resources: b.resources || { manpower: 0, machinery: [], available: true },
-    optimizationSource: (b.optimizationSource || 'CP-SAT') as 'CP-SAT' | 'MANUAL' | 'ALNS',
+    optimizationSource: (b.optimizationSource || 'SYSTEM') as any,
     bundled: b.bundled ?? (b.jobIds?.length > 1),
     bundledCount: b.bundledCount || b.jobIds?.length || 1,
     whyThisSlot: b.whyThisSlot || [],

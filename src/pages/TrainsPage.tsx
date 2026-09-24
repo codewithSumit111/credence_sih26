@@ -28,7 +28,7 @@ const routeOptions = [
     delay: 12,
     extraKm: 12,
     recommended: true,
-    description: 'Time-Dependent A* computed path. Lowest delay option.',
+    description: 'Routing Engine computed path. Lowest delay option.',
   },
 ];
 
@@ -107,7 +107,7 @@ function TrainImpactDrawer({
       {isAffected && (
         <div>
           <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Options — Time-Dependent A*
+            Options — Routing Engine
           </h4>
           <div className="space-y-2">
             {routeOptions.map(option => (
@@ -168,7 +168,7 @@ function TrainImpactDrawer({
           </div>
           <div className="flex items-center gap-1.5 mt-2">
             <span className="text-[10px] font-mono bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded">
-              Engine: Time-Dependent A*
+              Engine: Routing Engine
             </span>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function Trains() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-[12px] font-semibold text-irctc-blue bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-irctc-blue animate-pulse" />
-              Time-Dependent A* Active
+              Routing Engine Active
             </div>
           </div>
         </div>

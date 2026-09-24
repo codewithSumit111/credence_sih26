@@ -59,11 +59,11 @@ export default function App() {
           <Route path="command" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><Command /></RoleRoute>} />
           <Route path="plan" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER', 'BDMS_INCHARGE']}><Plan /></RoleRoute>} />
           <Route path="trains" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><TrainsPage /></RoleRoute>} />
-          <Route path="live" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><Live /></RoleRoute>} />
+          <Route path="live" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER', 'BDMS_INCHARGE', 'FIELD_MANAGER']}><Live /></RoleRoute>} />
           <Route path="assets" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><Assets /></RoleRoute>} />
           <Route path="analytics" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><Analytics /></RoleRoute>} />
           <Route path="reports" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER']}><ReportsPage /></RoleRoute>} />
-          <Route path="requests" element={<RoleRoute allowedRoles={['BDMS_INCHARGE']}><Requests /></RoleRoute>} />
+          <Route path="requests" element={<RoleRoute allowedRoles={['SECTION_CONTROLLER', 'BDMS_INCHARGE']}><Requests /></RoleRoute>} />
 
           {/* Field is rendered inside AppShell too */}
           <Route path="field" element={<RoleRoute allowedRoles={['FIELD_MANAGER']}><FieldExecution /></RoleRoute>} />

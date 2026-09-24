@@ -1,367 +1,387 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
-import { CheckCircle2, ClipboardList, ArrowLeft } from 'lucide-react';
-import PrimaryButton from '../components/buttons/PrimaryButton';
-import SecondaryButton from '../components/buttons/SecondaryButton';
+import { 
+  ClipboardList, Plus, Search, MapPin, X, Filter, Eye, CheckCircle2
+} from 'lucide-react';
 import { blocksApi } from '../api';
 import { useAuth } from '../contexts/AuthContext';
-
-type Department = 'Engineering' | 'S&T' | 'Traction';
-type Priority = 'Low' | 'Medium' | 'High' | 'Critical';
-
-interface FormData {
-  department: Department;
-  maintenanceType: string;
-  track: string;
-  asset: string;
-  preferredDate: string;
-  requestedDuration: number;
-  preferredWindowStart: string;
-  preferredWindowEnd: string;
-  requiredManpower: number;
-  machinery: string;
-  priority: Priority;
-  safetyBuffer: boolean;
-  dependsOnJob: boolean;
-  requiresIsolation: boolean;
-  notes: string;
-  submittedBy: string;
-}
-
-const initialForm: FormData = {
-  department: 'Engineering',
-  maintenanceType: '',
-  track: 'TR-02',
-  asset: '',
-  preferredDate: new Date().toISOString().split('T')[0],
-  requestedDuration: 60,
-  preferredWindowStart: '22:00',
-  preferredWindowEnd: '04:00',
-  requiredManpower: 6,
-  machinery: '',
-  priority: 'Medium',
-  safetyBuffer: true,
-  dependsOnJob: false,
-  requiresIsolation: false,
-  notes: '',
-  submittedBy: 'R. Sharma',
-};
+import type { BlockRequest, Department, Priority } from '../types';
+import StatusBadge from '../components/common/StatusBadge';
+import PriorityBadge from '../components/common/PriorityBadge';
+import PrimaryButton from '../components/buttons/PrimaryButton';
 
 export default function Requests() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [form, setForm] = useState<FormData>(initialForm);
+  
+  const [requests, setRequests] = useState<BlockRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [submittedId, setSubmittedId] = useState('');
+  const [formData, setFormData] = useState({
+    department: (user?.role === 'SECTION_CONTROLLER' ? 'ENG' : (user?.department_id === 2 ? 'S&T' : user?.department_id === 3 ? 'TRD' : 'ENG')) as Department,
+    maintenanceType: '',
+    track: 'TR-DR-TNA-UP',
+    preferredDate: '',
+    preferredWindowStart: '10:00',
+    preferredWindowEnd: '12:00',
+    requestedDuration: 120,
+    priority: 'MEDIUM' as Priority,
+    notes: '',
+  });
+  
+  const isController = user?.role === 'SECTION_CONTROLLER';
 
-  const handleChange = (field: keyof FormData, value: unknown) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+  const fetchRequests = async () => {
+    try {
+      const data = await blocksApi.getRequests();
+      setRequests(data);
+    } catch (e) {
+      toast.error('Failed to load maintenance requests');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const filteredRequests = requests.filter(req => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!(req.id.toLowerCase().includes(q) || req.track.toLowerCase().includes(q) || req.department.toLowerCase().includes(q))) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.maintenanceType || !form.asset) {
-      toast.error('Please fill in all required fields');
+    if (!formData.maintenanceType || !formData.preferredDate) {
+      toast.error('Please fill all required fields');
       return;
     }
     setSubmitting(true);
     try {
-      const result = await blocksApi.createRequest({
-        ...form,
-        requestedDuration: Number(form.requestedDuration),
-        requiredManpower: Number(form.requiredManpower),
-        actor_id: user?.user_id,
+      const newReq = await blocksApi.createRequest({
+        ...formData,
+        submittedBy: user?.user_id || 'Unknown',
       });
-      const reqId = result.id || `REQ-${Date.now().toString(36).toUpperCase()}`;
-      setSubmittedId(reqId);
-      setSubmitted(true);
-      toast.success('Block Request Submitted to DB', {
-        description: `${reqId} saved for CP-SAT scheduling. You will be notified when the optimization is ready.`,
-      });
-    } catch {
-      toast.error('Submission failed. Please try again.');
+      toast.success('Maintenance request submitted successfully');
+      setShowModal(false);
+      setRequests(prev => [newReq, ...prev]);
+    } catch (err) {
+      toast.error('Failed to submit request');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleNewRequest = () => {
-    setForm(initialForm);
-    setSubmitted(false);
-    setSubmittedId('');
+  const handleIncludeInPlanning = (id: string) => {
+    toast.success(`Request ${id} included in active planning queue.`, {
+      description: 'The optimization engine will consider this request in the next run.'
+    });
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: 'PROPOSED' as any } : r));
   };
 
-  if (submitted) {
-    return (
-      <div className="h-full flex items-center justify-center bg-[#F8FAFC]">
-        <div className="bg-white border border-gray-200 rounded-xl p-8 max-w-md w-full text-center shadow-sm">
-          <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h2 className="text-[18px] font-bold text-gray-900 mb-1">Request Submitted</h2>
-          <p className="text-[12px] text-gray-500 mb-3">Your block request has been received.</p>
-
-          <div className="p-3 bg-blue-50 border border-emerald-100 rounded-lg mb-4">
-            <p className="font-mono font-bold text-blue-900 text-[16px]">{submittedId}</p>
-            <p className="text-[11px] text-blue-700 mt-0.5">Pending CP-SAT scheduling</p>
-          </div>
-
-          <div className="text-left space-y-1.5 text-[11px] text-gray-600 mb-6">
-            {[
-              'Request logged and visible to Section Controller',
-              'CP-SAT optimizer will evaluate compatibility',
-              'Scheduling result will appear in Plan → Blocks',
-              'You will be notified when the block is ready',
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0" />
-                {item}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <SecondaryButton onClick={() => navigate('/plan?view=blocks')}>View in Plan</SecondaryButton>
-            <PrimaryButton onClick={handleNewRequest} variant="green">Submit Another</PrimaryButton>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full overflow-auto bg-[#F8FAFC]">
+    <div className="irctc-page relative">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-5 py-4">
-        <div className="max-w-[860px] mx-auto flex items-center justify-between">
+      <div className="bg-white border-b border-irctc-border px-7 py-5">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/plan?view=blocks')}
-              className="flex items-center gap-1 text-[12px] font-semibold text-gray-600 hover:text-blue-800 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-emerald-300 px-2.5 py-1.5 rounded-lg transition-colors mr-1"
-              title="Return to Plan"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Plan</span>
-            </button>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
-              <ClipboardList className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
+              <ClipboardList className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-[18px] font-bold text-gray-900 tracking-tight">New Block Request</h1>
-              <p className="text-[12px] text-gray-500 mt-0.5">
-                Submit a maintenance block request for CP-SAT scheduling optimization
+              <h1 className="irctc-page-title">Maintenance Requests</h1>
+              <p className="text-[14px] text-irctc-muted mt-0.5">
+                {isController ? 'Review incoming departmental block requests' : 'Manage your departmental block requests'}
               </p>
             </div>
           </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search requests..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 w-64"
+              />
+            </div>
+            <PrimaryButton onClick={() => setShowModal(true)} variant="blue">
+              <Plus className="w-4 h-4 mr-2" />
+              New Request
+            </PrimaryButton>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-[860px] mx-auto p-5">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Department + Maintenance Type */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">Work Details</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Department *</label>
-                <select
-                  value={form.department}
-                  onChange={e => handleChange('department', e.target.value as Department)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500 transition-colors"
-                >
-                  <option>Engineering</option>
-                  <option>S&T</option>
-                  <option>Traction</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Maintenance Type *</label>
-                <input
-                  type="text"
-                  value={form.maintenanceType}
-                  onChange={e => handleChange('maintenanceType', e.target.value)}
-                  placeholder="e.g., Rail Grinding, Signal Inspection..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-300"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Track Section *</label>
-                <select
-                  value={form.track}
-                  onChange={e => handleChange('track', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                >
-                  {['TR-01', 'TR-02', 'TR-03', 'TR-04', 'TR-05', 'TR-06', 'TR-07', 'TR-08'].map(t => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Asset ID *</label>
-                <input
-                  type="text"
-                  value={form.asset}
-                  onChange={e => handleChange('asset', e.target.value)}
-                  placeholder="e.g., A-TR02-144"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-300"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Priority Level</label>
-                <div className="flex gap-2">
-                  {(['Low', 'Medium', 'High', 'Critical'] as Priority[]).map(p => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => handleChange('priority', p)}
-                      className={clsx(
-                        'flex-1 py-2 rounded-lg border text-[11px] font-semibold transition-colors',
-                        form.priority === p
-                          ? p === 'Critical' ? 'bg-red-700 text-white border-red-700'
-                            : p === 'High' ? 'bg-orange-600 text-white border-orange-600'
-                            : p === 'Medium' ? 'bg-amber-500 text-white border-amber-500'
-                            : 'bg-gray-600 text-white border-gray-600'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-                      )}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+      {/* Main Content */}
+      <div className="max-w-[1600px] mx-auto px-7 py-6">
+        
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pending</p>
+            <p className="text-2xl font-bold text-gray-900">{requests.filter(r => r.status === 'DEMANDED').length}</p>
           </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">High Priority</p>
+            <p className="text-2xl font-bold text-red-600">{requests.filter(r => r.priority === 'High' || r.priority === 'Critical').length}</p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">In Planning</p>
+            <p className="text-2xl font-bold text-blue-600">{requests.filter(r => r.status === 'PROPOSED' || r.status === 'AI-OPTIMIZED').length}</p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Approved Blocks</p>
+            <p className="text-2xl font-bold text-green-600">{requests.filter(r => r.status === 'APPROVED').length}</p>
+          </div>
+        </div>
 
-          {/* Scheduling Preferences */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">Scheduling Preferences</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Preferred Date</label>
-                <input
-                  type="date"
-                  value={form.preferredDate}
-                  onChange={e => handleChange('preferredDate', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Window Start</label>
-                <input
-                  type="time"
-                  value={form.preferredWindowStart}
-                  onChange={e => handleChange('preferredWindowStart', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Window End</label>
-                <input
-                  type="time"
-                  value={form.preferredWindowEnd}
-                  onChange={e => handleChange('preferredWindowEnd', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Duration (minutes)</label>
-                <input
-                  type="number"
-                  min="15"
-                  max="480"
-                  step="15"
-                  value={form.requestedDuration}
-                  onChange={e => handleChange('requestedDuration', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Manpower Required</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={form.requiredManpower}
-                  onChange={e => handleChange('requiredManpower', e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-semibold text-gray-600 mb-1.5">Machinery/Equipment</label>
-                <input
-                  type="text"
-                  value={form.machinery}
-                  onChange={e => handleChange('machinery', e.target.value)}
-                  placeholder="e.g., Rail grinder, PLASSER"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-white text-gray-800 focus:outline-none focus:border-blue-500 placeholder-gray-300"
-                />
-              </div>
-            </div>
+        {/* Professional Operational Table */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <div className="px-5 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 className="text-[13px] font-bold text-gray-700">Incoming Requirements Queue</h3>
+            <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1">
+              <Filter className="w-3 h-3" /> Filtered: {filteredRequests.length}
+            </span>
           </div>
-
-          {/* Safety Requirements */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">Safety Requirements</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {[
-                { key: 'safetyBuffer', label: 'Safety Buffer Required', desc: 'Extra time margin around block' },
-                { key: 'dependsOnJob', label: 'Depends on Another Job', desc: 'Has prerequisite maintenance' },
-                { key: 'requiresIsolation', label: 'Requires Isolation', desc: 'Full electrical/traction isolation' },
-              ].map(item => (
-                <div
-                  key={item.key}
-                  onClick={() => handleChange(item.key as keyof FormData, !form[item.key as keyof FormData])}
-                  className={clsx(
-                    'border rounded-lg p-3 cursor-pointer transition-all',
-                    form[item.key as keyof FormData] ? 'border-emerald-300 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className={clsx(
-                      'w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-                      form[item.key as keyof FormData] ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-                    )}>
-                      {form[item.key as keyof FormData] && <CheckCircle2 className="w-2.5 h-2.5 text-white" />}
-                    </div>
-                    <span className="text-[11px] font-semibold text-gray-800">{item.label}</span>
-                  </div>
-                  <p className="text-[10px] text-gray-500 ml-6">{item.desc}</p>
-                </div>
-              ))}
-            </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[12px]">
+              <thead>
+                <tr className="bg-white border-b border-gray-200 text-gray-500 text-[11px] uppercase tracking-wider">
+                  <th className="px-5 py-3 font-semibold">Request ID</th>
+                  <th className="px-5 py-3 font-semibold">Department</th>
+                  <th className="px-5 py-3 font-semibold">Section/Asset</th>
+                  <th className="px-5 py-3 font-semibold">Priority</th>
+                  <th className="px-5 py-3 font-semibold">Requested Window</th>
+                  <th className="px-5 py-3 font-semibold">Planning Status</th>
+                  <th className="px-5 py-3 font-semibold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {loading ? (
+                  <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">Loading requests...</td></tr>
+                ) : filteredRequests.length === 0 ? (
+                  <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400 flex items-center justify-center gap-2"><CheckCircle2 className="w-5 h-5 text-green-500" /> No pending requests found.</td></tr>
+                ) : (
+                  filteredRequests.map(req => (
+                    <tr key={req.id} className="hover:bg-gray-50 transition-colors group">
+                      <td className="px-5 py-3">
+                        <span className="font-mono font-bold text-blue-900">{req.id}</span>
+                        <span className="block text-[10px] text-gray-400 mt-0.5 truncate max-w-[120px]">{req.maintenanceType}</span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className="font-semibold text-gray-700">{req.department}</span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className="font-mono font-semibold text-gray-800">{req.track}</span>
+                        <span className="block text-[10px] text-gray-500 mt-0.5">{req.asset}</span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <PriorityBadge priority={req.priority} />
+                      </td>
+                      <td className="px-5 py-3">
+                        <span className="text-gray-700 font-medium">{req.preferredDate}</span>
+                        <span className="block text-[10px] text-gray-500 font-mono mt-0.5">
+                          {req.preferredWindowStart} - {req.preferredWindowEnd} ({req.requestedDuration}m)
+                        </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <StatusBadge status={req.status as any} size="sm" />
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button 
+                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="View on Network"
+                            onClick={() => navigate(`/plan?view=blocks&search=${req.track}`)}
+                          >
+                            <MapPin className="w-4 h-4" />
+                          </button>
+                          {req.status === 'DEMANDED' && isController && (
+                            <button 
+                              onClick={() => handleIncludeInPlanning(req.id)}
+                              className="px-3 py-1.5 bg-blue-50 text-blue-700 text-[11px] font-bold rounded hover:bg-blue-100 transition-colors border border-blue-200"
+                            >
+                              Include in Planning
+                            </button>
+                          )}
+                          {req.status !== 'DEMANDED' && isController && (
+                            <button 
+                              onClick={() => navigate('/plan')}
+                              className="px-3 py-1.5 bg-white text-gray-600 text-[11px] font-bold rounded hover:bg-gray-50 transition-colors border border-gray-200"
+                            >
+                              Open Plan
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-
-          {/* Notes */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5">
-            <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-3">Additional Notes</h3>
-            <textarea
-              rows={3}
-              value={form.notes}
-              onChange={e => handleChange('notes', e.target.value)}
-              placeholder="Any additional requirements, site conditions, or constraints for the CP-SAT scheduler..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] bg-gray-50 text-gray-800 focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-300 resize-none"
-            />
-          </div>
-
-          {/* Note on CP-SAT */}
-          <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-lg text-[11px] text-blue-800">
-            <p className="font-semibold mb-1">How scheduling works</p>
-            <p>This request will be evaluated by the CP-SAT constraint solver. The optimizer will check for compatible jobs (bundling opportunity), train conflicts, resource availability, and safety constraints before proposing a block window. Section Controller approval is required before activation.</p>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <SecondaryButton onClick={() => navigate('/plan?view=blocks')}>
-              Cancel
-            </SecondaryButton>
-            <PrimaryButton type="submit" variant="green" loading={submitting}>
-              Submit Request for Scheduling
-            </PrimaryButton>
-          </div>
-        </form>
+        </div>
       </div>
+
+      {/* New Request Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h2 className="text-[16px] font-bold text-irctc-navy">Create Maintenance Request</h2>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitRequest} className="flex-1 overflow-y-auto p-6">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+                
+                {/* Department */}
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Department</label>
+                  <select 
+                    className="irctc-select"
+                    value={formData.department}
+                    onChange={e => setFormData({ ...formData, department: e.target.value as Department })}
+                    disabled={!isController}
+                  >
+                    <option value="ENG">Engineering</option>
+                    <option value="TRD">Traction (TRD)</option>
+                    <option value="S&T">Signaling (S&T)</option>
+                  </select>
+                </div>
+
+                {/* Maintenance Type */}
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Request Type / Reason *</label>
+                  <input 
+                    type="text" 
+                    className="irctc-input"
+                    value={formData.maintenanceType}
+                    onChange={e => setFormData({ ...formData, maintenanceType: e.target.value })}
+                    placeholder="e.g. TRACMACHINE, OHE MAINTENANCE"
+                    required
+                  />
+                </div>
+
+                {/* Section & Track */}
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Track / Line</label>
+                  <input 
+                    type="text" 
+                    className="irctc-input"
+                    value={formData.track}
+                    onChange={e => setFormData({ ...formData, track: e.target.value })}
+                    placeholder="e.g. TR-DR-TNA-UP"
+                    required
+                  />
+                </div>
+
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Requested Date *</label>
+                  <input 
+                    type="date" 
+                    className="irctc-input"
+                    value={formData.preferredDate}
+                    onChange={e => setFormData({ ...formData, preferredDate: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Requested Window Start</label>
+                  <input 
+                    type="time" 
+                    className="irctc-input"
+                    value={formData.preferredWindowStart}
+                    onChange={e => setFormData({ ...formData, preferredWindowStart: e.target.value })}
+                  />
+                </div>
+
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Requested Window End</label>
+                  <input 
+                    type="time" 
+                    className="irctc-input"
+                    value={formData.preferredWindowEnd}
+                    onChange={e => setFormData({ ...formData, preferredWindowEnd: e.target.value })}
+                  />
+                </div>
+
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Duration (Minutes)</label>
+                  <input 
+                    type="number" 
+                    className="irctc-input"
+                    value={formData.requestedDuration}
+                    onChange={e => setFormData({ ...formData, requestedDuration: Number(e.target.value) })}
+                    min={15}
+                    step={15}
+                    required
+                  />
+                </div>
+
+                <div className="irctc-form-group">
+                  <label className="irctc-input-label">Priority</label>
+                  <select 
+                    className="irctc-select"
+                    value={formData.priority}
+                    onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </div>
+                
+                <div className="irctc-form-group col-span-2">
+                  <label className="irctc-input-label">Notes</label>
+                  <textarea 
+                    className="irctc-input"
+                    rows={2}
+                    value={formData.notes}
+                    onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Additional context or dependencies..."
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-gray-100 flex items-center justify-end gap-3">
+                <button type="button" onClick={() => setShowModal(false)} className="px-5 py-2.5 text-[13px] font-bold text-gray-600 hover:bg-gray-50 rounded-lg">
+                  Cancel
+                </button>
+                <button type="submit" disabled={submitting} className="irctc-btn irctc-btn-primary px-6 py-2.5 text-[13px] justify-center min-w-[120px]">
+                  {submitting ? 'Submitting...' : 'Submit Request'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,12 +13,12 @@ const getPrimaryNav = (role: string) => {
   const allNav = [
     { path: '/command', label: 'Command', icon: LayoutDashboard, matchPaths: ['/command', '/dashboard', '/overview'], roles: ['SECTION_CONTROLLER'] },
     { path: '/plan', label: 'Plan', icon: CalendarClock, matchPaths: ['/plan', '/blocks', '/priority'], roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE'] },
-    { path: '/requests', label: 'Requests', icon: FileQuestion, matchPaths: ['/requests'], roles: ['BDMS_INCHARGE'] },
+    { path: '/requests', label: 'Requests', icon: FileQuestion, matchPaths: ['/requests'], roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE'] },
     { path: '/trains', label: 'Trains', icon: Train, matchPaths: ['/trains', '/rerouting'], roles: ['SECTION_CONTROLLER'] },
-    { path: '/live', label: 'Live', icon: AlertTriangle, matchPaths: ['/live', '/events', '/reoptimization'], badge: 1, roles: ['SECTION_CONTROLLER'] },
+    { path: '/live', label: 'Live Recovery', icon: AlertTriangle, matchPaths: ['/live', '/events', '/reoptimization'], badge: 1, roles: ['SECTION_CONTROLLER', 'BDMS_INCHARGE', 'FIELD_MANAGER'] },
     { path: '/analytics', label: 'Analytics', icon: BarChart3, matchPaths: ['/analytics', '/what-if'], roles: ['SECTION_CONTROLLER'] },
     { path: '/reports', label: 'Reports', icon: FileText, matchPaths: ['/reports'], roles: ['SECTION_CONTROLLER'] },
-    { path: '/field', label: 'Field', icon: Wrench, matchPaths: ['/field'], roles: ['FIELD_MANAGER'] },
+    { path: '/field', label: 'Field Execution', icon: Wrench, matchPaths: ['/field'], roles: ['FIELD_MANAGER'] },
   ];
   return allNav.filter(nav => nav.roles.includes(role));
 };
