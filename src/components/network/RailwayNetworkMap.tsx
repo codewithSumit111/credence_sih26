@@ -156,7 +156,7 @@ export default function RailwayNetworkMap({ blocks, onApproveBlock, className, i
         style={{ background: '#f8fafc' }}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
         />
         
