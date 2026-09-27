@@ -42,7 +42,7 @@ export default function Footer() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '0.875rem', color: '#101828' }}>KAVACH</div>
+                <div style={{ fontWeight: 800, fontSize: '0.875rem', color: '#101828' }}>VAJRA</div>
                 <div style={{ fontSize: '0.6rem', color: '#94A3B8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Central Railway</div>
               </div>
             </div>

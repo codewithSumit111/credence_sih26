@@ -994,7 +994,7 @@ export default function ReportsPage() {
                   <div className="text-[10px] text-gray-500">Sr. Divisional Operations Mgr</div>
                 </div>
                 <div>
-                  <div className="text-[11px] font-bold text-gray-900">Kavach-CR AI 2.0</div>
+                  <div className="text-[11px] font-bold text-gray-900">Vajra-CR AI 2.0</div>
                   <div className="text-[10px] text-blue-700 font-bold">CP-SAT Solver Verified</div>
                 </div>
               </div>

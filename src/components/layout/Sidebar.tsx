@@ -143,7 +143,7 @@ export default function Sidebar() {
             <Link to="/" className="min-w-0 overflow-hidden group/text no-underline" title="Go to Landing Page">
               <div className="flex items-center gap-1.5">
                 <span className="text-[13px] font-black tracking-wider text-white group-hover/text:text-emerald-300 uppercase leading-tight font-sans transition-colors">
-                  KAVACH
+                  VAJRA
                 </span>
                 <span className="text-[9px] font-extrabold text-emerald-400 bg-emerald-950/90 border border-blue-500/30 px-1.5 py-0.5 rounded leading-none">
                   CR

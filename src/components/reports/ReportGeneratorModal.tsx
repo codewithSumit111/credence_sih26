@@ -147,7 +147,7 @@ export default function ReportGeneratorModal() {
             <div className="flex flex-col items-center justify-center py-6 text-blue-700">
               <RefreshCw className="w-6 h-6 animate-spin mb-3" />
               <p className="text-[13px] font-bold">Compiling Report Data...</p>
-              <p className="text-[11px] text-blue-600 mt-1">Aggregating KAVACH simulations</p>
+              <p className="text-[11px] text-blue-600 mt-1">Aggregating VAJRA simulations</p>
             </div>
           )}
           
